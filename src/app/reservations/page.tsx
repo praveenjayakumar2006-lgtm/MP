@@ -1,14 +1,13 @@
 
-import { Header } from '@/components/layout/header';
 import { ReservationsTable } from '@/components/reservations/reservations-table';
 
-export default function ReservationsPage() {
+export default function ViewBookingsPage() {
   return (
-    <div className="flex flex-col gap-8">
-      <Header title="My Reservations" />
-      <main className="px-4 md:px-6">
+    <div className="mx-auto grid w-full max-w-6xl gap-2">
+       <h1 className="text-3xl font-semibold">My Bookings</h1>
+       <div className="mt-4">
         <ReservationsTable />
-      </main>
+      </div>
     </div>
   );
 }

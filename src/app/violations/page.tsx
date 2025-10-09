@@ -1,14 +1,14 @@
 
-import { Header } from '@/components/layout/header';
 import { ViolationChecker } from '@/components/violations/violation-checker';
 
 export default function ViolationsPage() {
   return (
-    <div className="flex flex-col gap-8">
-      <Header title="Violation Detector" />
-      <main className="px-4 md:px-6">
+    <div className="mx-auto grid w-full max-w-6xl gap-2">
+       <h1 className="text-3xl font-semibold">AI Violation Detector</h1>
+       <p className="text-muted-foreground">Submit potential parking violations for AI analysis.</p>
+       <div className="mt-4">
         <ViolationChecker />
-      </main>
+      </div>
     </div>
   );
 }

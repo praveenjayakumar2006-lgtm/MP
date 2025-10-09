@@ -1,18 +1,15 @@
 
-import { Header } from '@/components/layout/header';
-import { StatsCards } from '@/components/dashboard/stats-cards';
 import { ParkingMap } from '@/components/dashboard/parking-map';
 
-export default function DashboardPage() {
+export default function ViewParkingPage() {
   return (
     <div className="flex flex-col gap-8">
-      <Header title="Dashboard" />
-      <main className="px-4 md:px-6">
-        <StatsCards />
-        <div className="mt-8">
-          <ParkingMap />
-        </div>
-      </main>
+      <div className="mx-auto grid w-full max-w-6xl gap-2">
+        <h1 className="text-3xl font-semibold">Parking Availability</h1>
+      </div>
+      <div className="mx-auto w-full max-w-6xl">
+        <ParkingMap />
+      </div>
     </div>
   );
 }

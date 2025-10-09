@@ -24,6 +24,8 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { parkingSlots as initialSlots } from '@/lib/data';
 import type { ParkingSlot } from '@/lib/types';
+import Link from 'next/link';
+import { Button } from '../ui/button';
 
 export function ParkingMap() {
   const [slots, setSlots] = useState<ParkingSlot[]>(initialSlots);
@@ -48,7 +50,6 @@ export function ParkingMap() {
     toast({
       title: 'Reservation Successful!',
       description: `You have successfully reserved parking slot ${selectedSlot.id}.`,
-      variant: 'default',
     });
 
     setSelectedSlot(null);
@@ -58,11 +59,11 @@ export function ParkingMap() {
     return cn(
       'relative flex flex-col items-center justify-center aspect-square rounded-md border-2 transition-all duration-300 transform hover:scale-105',
       {
-        'bg-accent/20 border-accent text-accent-foreground cursor-pointer hover:bg-accent/40':
+        'bg-green-100 border-green-400 text-green-800 cursor-pointer hover:bg-green-200':
           status === 'available',
-        'bg-destructive/20 border-destructive text-destructive-foreground opacity-70':
+        'bg-red-100 border-red-400 text-red-800 opacity-70':
           status === 'occupied',
-        'bg-primary/20 border-primary text-primary-foreground opacity-90':
+        'bg-blue-100 border-blue-400 text-blue-800 opacity-90':
           status === 'reserved',
       }
     );
@@ -72,13 +73,21 @@ export function ParkingMap() {
     <>
       <Card>
         <CardHeader>
-          <CardTitle>Parking Lot A</CardTitle>
-          <CardDescription>
-            Click on an available slot to reserve it.
-          </CardDescription>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>Parking Lot A</CardTitle>
+              <CardDescription>
+                Click an available slot to reserve, or book a slot for a future
+                time.
+              </CardDescription>
+            </div>
+            <Link href="/book-parking" passHref>
+              <Button>Book a Slot</Button>
+            </Link>
+          </div>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-4 gap-4 md:grid-cols-6 lg:grid-cols-8">
+          <div className="grid grid-cols-4 gap-4 md:grid-cols-6 lg:grid-cols-10">
             {slots.map((slot) => (
               <div
                 key={slot.id}
@@ -100,42 +109,39 @@ export function ParkingMap() {
 
           <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-2">
             <div className="flex items-center gap-2">
-              <div className="h-4 w-4 rounded-sm border-2 border-accent bg-accent/20" />
+              <div className="h-4 w-4 rounded-sm border-2 border-green-400 bg-green-100" />
               <span className="text-sm text-muted-foreground">Available</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="h-4 w-4 rounded-sm border-2 border-primary bg-primary/20" />
+              <div className="h-4 w-4 rounded-sm border-2 border-blue-400 bg-blue-100" />
               <span className="text-sm text-muted-foreground">Reserved</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="h-4 w-4 rounded-sm border-2 border-destructive bg-destructive/20" />
+              <div className="h-4 w-4 rounded-sm border-2 border-red-400 bg-red-100" />
               <span className="text-sm text-muted-foreground">Occupied</span>
             </div>
           </div>
         </CardContent>
       </Card>
-      
+
       <AlertDialog
         open={!!selectedSlot}
         onOpenChange={(open) => !open && setSelectedSlot(null)}
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Confirm Reservation</AlertDialogTitle>
+            <AlertDialogTitle>Confirm Instant Reservation</AlertDialogTitle>
             <AlertDialogDescription>
               Are you sure you want to reserve parking slot{' '}
               <span className="font-bold text-foreground">
                 {selectedSlot?.id}
-              </span>
-              ?
+              </span>{' '}
+              for right now?
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              className="bg-accent hover:bg-accent/90 text-accent-foreground"
-              onClick={handleConfirmReservation}
-            >
+            <AlertDialogAction onClick={handleConfirmReservation}>
               Confirm
             </AlertDialogAction>
           </AlertDialogFooter>

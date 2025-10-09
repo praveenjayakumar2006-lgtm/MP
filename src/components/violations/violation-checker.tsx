@@ -81,15 +81,15 @@ export function ViolationChecker() {
   return (
     <div className="grid gap-8 md:grid-cols-2">
       <Card>
-        <CardHeader>
-          <CardTitle>Report a Violation</CardTitle>
-          <CardDescription>
-            Fill in the details to check for a parking violation using our AI
-            tool.
-          </CardDescription>
-        </CardHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
+            <CardHeader>
+                <CardTitle>Report a Violation</CardTitle>
+                <CardDescription>
+                    Fill in the details to check for a parking violation using our AI
+                    tool.
+                </CardDescription>
+            </CardHeader>
             <CardContent className="space-y-4">
               <FormField
                 control={form.control}
@@ -165,7 +165,7 @@ export function ViolationChecker() {
             The AI-powered analysis will be displayed here.
           </CardDescription>
         </CardHeader>
-        <CardContent className="flex min-h-[300px] items-center justify-center">
+        <CardContent className="flex min-h-[300px] items-center justify-center rounded-lg border-dashed border-2">
           {isLoading && <Loader2 className="h-8 w-8 animate-spin text-primary" />}
           {!isLoading && !result && (
             <p className="text-muted-foreground">
@@ -177,7 +177,7 @@ export function ViolationChecker() {
               {result.isViolationDetected ? (
                 <ShieldCheck className="h-16 w-16 text-destructive" />
               ) : (
-                <ShieldX className="h-16 w-16 text-accent" />
+                <ShieldX className="h-16 w-16 text-green-600" />
               )}
               <h3 className="text-xl font-semibold">
                 {result.isViolationDetected
