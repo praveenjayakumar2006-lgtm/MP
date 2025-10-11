@@ -7,9 +7,6 @@ import { cn } from '@/lib/utils';
 import {
   Card,
   CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
 } from '@/components/ui/card';
 import {
   AlertDialog,
@@ -24,8 +21,6 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { parkingSlots as initialSlots } from '@/lib/data';
 import type { ParkingSlot } from '@/lib/types';
-import Link from 'next/link';
-import { Button } from '../ui/button';
 
 export function ParkingMap() {
   const [slots, setSlots] = useState<ParkingSlot[]>(initialSlots);
@@ -61,9 +56,9 @@ export function ParkingMap() {
       {
         'bg-green-100 border-green-400 text-green-800 cursor-pointer hover:bg-green-200':
           status === 'available',
-        'bg-red-100 border-red-400 text-red-800 opacity-70':
+        'bg-red-100 border-red-400 text-red-800 opacity-70 cursor-not-allowed':
           status === 'occupied',
-        'bg-blue-100 border-blue-400 text-blue-800 opacity-90':
+        'bg-blue-100 border-blue-400 text-blue-800 opacity-90 cursor-not-allowed':
           status === 'reserved',
       }
     );
@@ -72,22 +67,8 @@ export function ParkingMap() {
   return (
     <>
       <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle>Parking Lot A</CardTitle>
-              <CardDescription>
-                Click an available slot to reserve, or book a slot for a future
-                time.
-              </CardDescription>
-            </div>
-            <Link href="/book-parking" passHref>
-              <Button>Book a Slot</Button>
-            </Link>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-4 gap-4 md:grid-cols-6 lg:grid-cols-10">
+        <CardContent className="pt-6">
+          <div className="grid grid-cols-5 gap-2 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-12 xl:grid-cols-15">
             {slots.map((slot) => (
               <div
                 key={slot.id}
@@ -98,7 +79,7 @@ export function ParkingMap() {
                 aria-label={`Parking slot ${slot.id}, status: ${slot.status}`}
               >
                 {slot.status !== 'available' && (
-                  <Car className="h-1/3 w-1/3" />
+                  <Car className="h-1/2 w-1/2" />
                 )}
                 <span className="absolute bottom-1 right-2 text-sm font-bold">
                   {slot.id}
@@ -107,7 +88,7 @@ export function ParkingMap() {
             ))}
           </div>
 
-          <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-2">
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
             <div className="flex items-center gap-2">
               <div className="h-4 w-4 rounded-sm border-2 border-green-400 bg-green-100" />
               <span className="text-sm text-muted-foreground">Available</span>

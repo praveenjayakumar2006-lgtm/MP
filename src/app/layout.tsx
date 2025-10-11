@@ -8,8 +8,8 @@ import { AppHeader } from '@/components/layout/app-header';
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
 export const metadata: Metadata = {
-  title: 'ParkSmart Reserve',
-  description: 'Online Parking Reservation System',
+  title: 'ParkEasy',
+  description: 'Your one-stop solution for hassle-free parking.',
 };
 
 export default function RootLayout({
@@ -19,10 +19,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.variable} font-body antialiased`}>
+      <body className={`${inter.variable} font-sans antialiased`}>
         <div className="flex min-h-screen w-full flex-col">
           <AppHeader />
-          <main className="flex min-h-[calc(100vh_-_theme(spacing.16))] flex-1 flex-col gap-4 bg-muted/40 p-4 md:gap-8 md:p-10">
+          <main className="flex-1">
             {children}
           </main>
         </div>
