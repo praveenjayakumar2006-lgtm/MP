@@ -1,4 +1,5 @@
 
+
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import {
@@ -13,7 +14,7 @@ import { Label } from '@/components/ui/label';
 
 export default function LoginPage() {
   return (
-    <div className="flex min-h-screen w-full items-center justify-center bg-background">
+    <div className="flex w-full items-center justify-center bg-background py-12">
       <Card className="mx-auto max-w-sm">
         <CardHeader>
           <CardTitle className="text-2xl">Login</CardTitle>
@@ -36,7 +37,7 @@ export default function LoginPage() {
                 <Label htmlFor="password">Password</Label>
               <Input id="password" type="password" required />
             </div>
-            <Link href="/" className="w-full">
+            <Link href="/home" className="w-full">
               <Button className="w-full">Login</Button>
             </Link>
           </div>
