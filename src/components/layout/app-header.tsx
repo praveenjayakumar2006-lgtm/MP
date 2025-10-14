@@ -60,14 +60,14 @@ export function AppHeader() {
             <NavLink
               key={item.href}
               href={item.href}
-              className="font-medium transform hover:scale-105 transition-transform duration-200"
+              className="font-medium"
             >
               {item.label}
             </NavLink>
           ))}
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="flex items-center gap-1 text-lg font-medium text-muted-foreground transition-colors hover:text-foreground hover:bg-transparent p-0 transform hover:scale-105 transition-transform duration-200">
+                <Button variant="ghost" className="flex items-center gap-1 text-lg font-medium text-muted-foreground transition-colors hover:text-foreground hover:bg-transparent p-0">
                     Others <ChevronDown className="h-4 w-4" />
                 </Button>
                 </DropdownMenuTrigger>
