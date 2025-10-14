@@ -91,7 +91,7 @@ export function ParkingMap() {
             </div>
 
             {/* Top Row - Car Slots */}
-            <div className="grid grid-cols-3 gap-4 mb-4 border-b-4 border-gray-700 pb-4">
+            <div className="grid grid-cols-[repeat(3,minmax(0,100px))] gap-2 mb-4 border-b-4 border-gray-700 pb-4 justify-center">
               {carSlots.map((slot) => (
                 <div
                   key={slot.id}
