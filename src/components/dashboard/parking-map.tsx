@@ -2,7 +2,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Car, ArrowUp, ArrowDown } from 'lucide-react';
+import { Car } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
   Card,
@@ -85,73 +85,69 @@ export function ParkingMap() {
     <>
       <Card>
         <CardContent className="p-4">
-          <div className="relative flex flex-col items-center border-2 border-gray-400 bg-gray-200 p-2 rounded-lg">
+          <div className="relative flex flex-col items-center border-2 border-gray-400 bg-gray-200 p-2 rounded-lg gap-2">
             
-            <div className="flex flex-row items-start gap-4">
-              {/* Car Slots */}
-              <div className="flex flex-col gap-2">
-                <div className="flex flex-row gap-2">
-                  {carSlots.map((slot) => (
-                    <div
-                      key={slot.id}
-                      className={getSlotClasses(slot)}
-                      onClick={() => handleSlotClick(slot)}
-                      role="button"
-                      tabIndex={slot.status === 'available' ? 0 : -1}
-                      aria-label={`Parking slot ${slot.id}, status: ${slot.status}`}
-                    >
-                      {slot.status !== 'available' && (
-                        <VehicleIcon type={slot.type} />
-                      )}
-                      <span className="absolute bottom-1 right-2 text-xs font-bold">
-                        {slot.id}
-                      </span>
-                    </div>
-                  ))}
+            <div className="flex flex-row gap-2">
+                {carSlots.map((slot) => (
+                <div
+                    key={slot.id}
+                    className={getSlotClasses(slot)}
+                    onClick={() => handleSlotClick(slot)}
+                    role="button"
+                    tabIndex={slot.status === 'available' ? 0 : -1}
+                    aria-label={`Parking slot ${slot.id}, status: ${slot.status}`}
+                >
+                    {slot.status !== 'available' && (
+                    <VehicleIcon type={slot.type} />
+                    )}
+                    <span className="absolute bottom-1 right-2 text-xs font-bold">
+                    {slot.id}
+                    </span>
                 </div>
-              </div>
+                ))}
+            </div>
 
-              {/* Bike Slots */}
-              <div className="flex flex-col gap-2">
-                 <div className="flex flex-row gap-2">
-                    {bikeSlots.slice(0, 4).map((slot) => (
+            <Separator className="my-2 bg-gray-400 h-1 w-full" />
+            
+            <div className="flex flex-col gap-2">
+                <div className="flex flex-row gap-2">
+                {bikeSlots.slice(0, 4).map((slot) => (
                     <div
-                        key={slot.id}
-                        className={getSlotClasses(slot)}
-                        onClick={() => handleSlotClick(slot)}
-                        role="button"
-                        tabIndex={slot.status === 'available' ? 0 : -1}
-                        aria-label={`Parking slot ${slot.id}, status: ${slot.status}`}
+                    key={slot.id}
+                    className={getSlotClasses(slot)}
+                    onClick={() => handleSlotClick(slot)}
+                    role="button"
+                    tabIndex={slot.status === 'available' ? 0 : -1}
+                    aria-label={`Parking slot ${slot.id}, status: ${slot.status}`}
                     >
-                        {slot.status !== 'available' && (
+                    {slot.status !== 'available' && (
                         <VehicleIcon type={slot.type} />
-                        )}
-                        <span className="absolute bottom-1 right-1 text-xs font-bold">
+                    )}
+                    <span className="absolute bottom-1 right-1 text-xs font-bold">
                         {slot.id}
-                        </span>
+                    </span>
                     </div>
-                    ))}
+                ))}
                 </div>
                 <div className="flex flex-row gap-2">
-                    {bikeSlots.slice(4, 8).map((slot) => (
+                {bikeSlots.slice(4, 8).map((slot) => (
                     <div
-                        key={slot.id}
-                        className={getSlotClasses(slot)}
-                        onClick={() => handleSlotClick(slot)}
-                        role="button"
-                        tabIndex={slot.status === 'available' ? 0 : -1}
-                        aria-label={`Parking slot ${slot.id}, status: ${slot.status}`}
+                    key={slot.id}
+                    className={getSlotClasses(slot)}
+                    onClick={() => handleSlotClick(slot)}
+                    role="button"
+                    tabIndex={slot.status === 'available' ? 0 : -1}
+                    aria-label={`Parking slot ${slot.id}, status: ${slot.status}`}
                     >
-                        {slot.status !== 'available' && (
+                    {slot.status !== 'available' && (
                         <VehicleIcon type={slot.type} />
-                        )}
-                        <span className="absolute bottom-1 right-1 text-xs font-bold">
+                    )}
+                    <span className="absolute bottom-1 right-1 text-xs font-bold">
                         {slot.id}
-                        </span>
+                    </span>
                     </div>
-                    ))}
+                ))}
                 </div>
-              </div>
             </div>
           </div>
 
