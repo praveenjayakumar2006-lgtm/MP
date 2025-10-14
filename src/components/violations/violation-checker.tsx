@@ -90,12 +90,12 @@ export function ViolationChecker() {
                     tool.
                 </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-2 p-4">
+            <CardContent className="p-4">
               <FormField
                 control={form.control}
                 name="slotNumber"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="mb-2">
                     <FormLabel>Slot Number</FormLabel>
                     <FormControl>
                       <Input placeholder="e.g., A14" {...field} />
@@ -108,7 +108,7 @@ export function ViolationChecker() {
                 control={form.control}
                 name="violationType"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="mb-2">
                     <FormLabel>Violation Type</FormLabel>
                     <Select
                       onValueChange={field.onChange}
@@ -168,7 +168,7 @@ export function ViolationChecker() {
         <CardContent className="flex flex-1 items-center justify-center rounded-lg border-dashed border-2 m-4 mt-0 p-4">
           {isLoading && <Loader2 className="h-8 w-8 animate-spin text-primary" />}
           {!isLoading && !result && (
-            <p className="text-muted-foreground text-sm">
+            <p className="text-muted-foreground text-xs">
               Submit a report to see the analysis.
             </p>
           )}
