@@ -1,8 +1,8 @@
 
 'use client';
 
-import { useState } from 'react';
-import { Car } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Car, Bike, CheckCircle2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
   Card,
@@ -21,12 +21,14 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { parkingSlots as initialSlots } from '@/lib/data';
 import type { ParkingSlot } from '@/lib/types';
-import { Bike } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
+import { motion } from 'framer-motion';
+
 
 export function ParkingMap() {
   const [slots, setSlots] = useState<ParkingSlot[]>(initialSlots);
   const [selectedSlot, setSelectedSlot] = useState<ParkingSlot | null>(null);
+  const [showSuccess, setShowSuccess] = useState(false);
   const { toast } = useToast();
 
   const carSlots = slots.filter((slot) => slot.type === 'car');
@@ -41,18 +43,18 @@ export function ParkingMap() {
   const handleConfirmReservation = () => {
     if (!selectedSlot) return;
 
+    setShowSuccess(true);
+
     setSlots((prevSlots) =>
       prevSlots.map((s) =>
         s.id === selectedSlot.id ? { ...s, status: 'reserved' } : s
       )
     );
 
-    toast({
-      title: 'Reservation Successful!',
-      description: `You have successfully reserved parking slot ${selectedSlot.id}.`,
-    });
-
-    setSelectedSlot(null);
+    setTimeout(() => {
+        setSelectedSlot(null);
+        setShowSuccess(false);
+    }, 1500)
   };
 
   const getSlotClasses = (slot: ParkingSlot) => {
@@ -65,8 +67,8 @@ export function ParkingMap() {
           slot.status === 'occupied',
         'bg-blue-100 border-blue-400 text-blue-800 opacity-90 cursor-not-allowed':
           slot.status === 'reserved',
-        'h-24 w-14': slot.type === 'car',
-        'h-20 w-14': slot.type === 'bike',
+        'h-24 w-16': slot.type === 'car',
+        'h-20 w-16': slot.type === 'bike',
       }
     );
   };
@@ -85,9 +87,9 @@ export function ParkingMap() {
     <>
       <Card>
         <CardContent className="p-4">
-          <div className="relative flex flex-col items-center border-2 border-gray-400 bg-gray-200 p-2 rounded-lg gap-2">
+          <div className="relative flex flex-col items-center border-2 border-gray-400 bg-gray-200 p-2 rounded-lg gap-4">
             
-            <div className="flex flex-row gap-2">
+            <div className="flex flex-row gap-4">
                 {carSlots.map((slot) => (
                 <div
                     key={slot.id}
@@ -110,7 +112,7 @@ export function ParkingMap() {
             <Separator className="my-2 bg-gray-400 h-1 w-full" />
             
             <div className="flex flex-col gap-2">
-                <div className="flex flex-row gap-2">
+                <div className="flex flex-row gap-4">
                 {bikeSlots.slice(0, 5).map((slot) => (
                     <div
                     key={slot.id}
@@ -129,7 +131,7 @@ export function ParkingMap() {
                     </div>
                 ))}
                 </div>
-                <div className="flex flex-row gap-2">
+                <div className="flex flex-row gap-4">
                 {bikeSlots.slice(5, 10).map((slot) => (
                     <div
                     key={slot.id}
@@ -170,25 +172,44 @@ export function ParkingMap() {
 
       <AlertDialog
         open={!!selectedSlot}
-        onOpenChange={(open) => !open && setSelectedSlot(null)}
+        onOpenChange={(open) => {
+            if (!open) {
+                setSelectedSlot(null);
+                setShowSuccess(false);
+            }
+        }}
       >
         <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Confirm Instant Reservation</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to reserve parking slot{' '}
-              <span className="font-bold text-foreground">
-                {selectedSlot?.id}
-              </span>{' '}
-              for right now?
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleConfirmReservation}>
-              Confirm
-            </AlertDialogAction>
-          </AlertDialogFooter>
+            {showSuccess ? (
+                <div className="flex flex-col items-center justify-center p-8 gap-4">
+                    <motion.div initial={{ scale: 0 }} animate={{ scale: 1, rotate: 360 }} transition={{ duration: 0.5, type: 'spring' }}>
+                        <CheckCircle2 className="h-24 w-24 text-green-500" />
+                    </motion.div>
+                    <AlertDialogTitle>Reservation Successful!</AlertDialogTitle>
+                    <AlertDialogDescription>
+                        Parking slot <span className="font-bold text-foreground">{selectedSlot?.id}</span> is now yours.
+                    </AlertDialogDescription>
+                </div>
+            ) : (
+            <>
+                <AlertDialogHeader>
+                    <AlertDialogTitle>Confirm Instant Reservation</AlertDialogTitle>
+                    <AlertDialogDescription>
+                    Are you sure you want to reserve parking slot{' '}
+                    <span className="font-bold text-foreground">
+                        {selectedSlot?.id}
+                    </span>{' '}
+                    for right now?
+                    </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleConfirmReservation}>
+                    Confirm
+                    </AlertDialogAction>
+                </AlertDialogFooter>
+            </>
+            )}
         </AlertDialogContent>
       </AlertDialog>
     </>
