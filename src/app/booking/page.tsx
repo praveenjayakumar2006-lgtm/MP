@@ -2,7 +2,6 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
 import {
   Card,
   CardContent,
@@ -36,7 +35,6 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
-import { motion } from 'framer-motion';
 
 const bookingSchema = z.object({
   date: z.date({
@@ -65,10 +63,7 @@ const timeSlots = Array.from({ length: 24 * 2 }, (_, i) => {
 
 export default function BookingPage() {
   const router = useRouter();
-  const [isDateOpen, setIsDateOpen] = useState(false);
-  const [isTimeOpen, setIsTimeOpen] = useState(false);
-  const [isDurationOpen, setIsDurationOpen] = useState(false);
-
+  
   const form = useForm<BookingFormValues>({
     resolver: zodResolver(bookingSchema),
   });
@@ -78,12 +73,8 @@ export default function BookingPage() {
     router.push('/select-spot');
   }
 
-  const animationProps = {
-    transition: { type: 'spring', stiffness: 400, damping: 25 },
-  };
-
   return (
-    <section id="booking" className="py-12 md:py-24 lg:py-32 flex flex-col items-center justify-center flex-1 bg-muted">
+    <section id="booking" className="py-12 md:py-24 lg:py-32 flex flex-col items-center justify-center flex-1 bg-background">
         <div className="container px-4 md:px-6">
            <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
             <div className="space-y-2">
@@ -99,105 +90,96 @@ export default function BookingPage() {
                 <form onSubmit={form.handleSubmit(onSubmit)}>
                     <CardContent className="pt-6 space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <motion.div animate={{ scale: isDateOpen ? 1.05 : 1 }} {...animationProps}>
-                          <FormField
-                              control={form.control}
-                              name="date"
-                              render={({ field }) => (
-                              <FormItem>
-                                  <FormLabel>Date</FormLabel>
-                                  <Popover open={isDateOpen} onOpenChange={setIsDateOpen}>
-                                  <PopoverTrigger asChild>
-                                      <FormControl>
-                                      <Button
-                                          variant={'outline'}
-                                          className={cn(
-                                          'w-full pl-3 text-left font-normal',
-                                          !field.value && 'text-muted-foreground'
-                                          )}
-                                      >
-                                          {field.value ? (
-                                          format(field.value, 'PPP')
-                                          ) : (
-                                          <span>Pick a date</span>
-                                          )}
-                                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                      </Button>
-                                      </FormControl>
-                                  </PopoverTrigger>
-                                  <PopoverContent className="w-auto p-0" align="start">
-                                      <Calendar
-                                      mode="single"
-                                      selected={field.value}
-                                      onSelect={(date) => {
-                                        field.onChange(date);
-                                        setIsDateOpen(false);
-                                      }}
-                                      disabled={(date) =>
-                                          date < new Date(new Date().setHours(0, 0, 0, 0))
-                                      }
-                                      initialFocus
-                                      />
-                                  </PopoverContent>
-                                  </Popover>
-                                  <FormMessage />
-                              </FormItem>
-                              )}
-                          />
-                        </motion.div>
-                        <motion.div animate={{ scale: isTimeOpen ? 1.05 : 1 }} {...animationProps}>
-                          <FormField
-                          control={form.control}
-                          name="startTime"
-                          render={({ field }) => (
-                              <FormItem>
-                              <FormLabel>Start Time</FormLabel>
-                              <Select onValueChange={field.onChange} defaultValue={field.value} onOpenChange={setIsTimeOpen}>
-                                  <FormControl>
-                                  <SelectTrigger>
-                                      <Clock className="mr-2 h-4 w-4" />
-                                      <SelectValue placeholder="Select a time" />
-                                  </SelectTrigger>
-                                  </FormControl>
-                                  <SelectContent>
-                                  {timeSlots.map((time) => (
-                                      <SelectItem key={time.value} value={time.value}>
-                                      {time.label}
-                                      </SelectItem>
-                                  ))}
-                                  </SelectContent>
-                              </Select>
-                              <FormMessage />
-                              </FormItem>
-                          )}
-                          />
-                        </motion.div>
-                        <motion.div animate={{ scale: isDurationOpen ? 1.05 : 1 }} {...animationProps}>
-                          <FormField
-                          control={form.control}
-                          name="duration"
-                          render={({ field }) => (
-                              <FormItem>
-                              <FormLabel>Duration (Hours)</FormLabel>
-                              <Select onValueChange={field.onChange} defaultValue={field.value} onOpenChange={setIsDurationOpen}>
-                                  <FormControl>
-                                  <SelectTrigger>
-                                      <SelectValue placeholder="Select hours" />
-                                  </SelectTrigger>
-                                  </FormControl>
-                                  <SelectContent>
-                                      {Array.from({ length: 12 }, (_, i) => i + 1).map(hour => (
-                                          <SelectItem key={hour} value={String(hour)}>
-                                              {hour} hour{hour > 1 ? 's' : ''}
-                                          </SelectItem>
-                                      ))}
-                                  </SelectContent>
-                              </Select>
-                              <FormMessage />
-                              </FormItem>
-                          )}
-                          />
-                        </motion.div>
+                        <FormField
+                            control={form.control}
+                            name="date"
+                            render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Date</FormLabel>
+                                <Popover>
+                                <PopoverTrigger asChild>
+                                    <FormControl>
+                                    <Button
+                                        variant={'outline'}
+                                        className={cn(
+                                        'w-full pl-3 text-left font-normal',
+                                        !field.value && 'text-muted-foreground'
+                                        )}
+                                    >
+                                        {field.value ? (
+                                        format(field.value, 'PPP')
+                                        ) : (
+                                        <span>Pick a date</span>
+                                        )}
+                                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                    </Button>
+                                    </FormControl>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-auto p-0" align="start">
+                                    <Calendar
+                                    mode="single"
+                                    selected={field.value}
+                                    onSelect={field.onChange}
+                                    disabled={(date) =>
+                                        date < new Date(new Date().setHours(0, 0, 0, 0))
+                                    }
+                                    initialFocus
+                                    />
+                                </PopoverContent>
+                                </Popover>
+                                <FormMessage />
+                            </FormItem>
+                            )}
+                        />
+                        <FormField
+                        control={form.control}
+                        name="startTime"
+                        render={({ field }) => (
+                            <FormItem>
+                            <FormLabel>Start Time</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <FormControl>
+                                <SelectTrigger>
+                                    <Clock className="mr-2 h-4 w-4" />
+                                    <SelectValue placeholder="Select a time" />
+                                </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                {timeSlots.map((time) => (
+                                    <SelectItem key={time.value} value={time.value}>
+                                    {time.label}
+                                    </SelectItem>
+                                ))}
+                                </SelectContent>
+                            </Select>
+                            <FormMessage />
+                            </FormItem>
+                        )}
+                        />
+                        <FormField
+                        control={form.control}
+                        name="duration"
+                        render={({ field }) => (
+                            <FormItem>
+                            <FormLabel>Duration (Hours)</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <FormControl>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select hours" />
+                                </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                    {Array.from({ length: 12 }, (_, i) => i + 1).map(hour => (
+                                        <SelectItem key={hour} value={String(hour)}>
+                                            {hour} hour{hour > 1 ? 's' : ''}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                            <FormMessage />
+                            </FormItem>
+                        )}
+                        />
                     </div>
                     </CardContent>
                     <CardFooter className='flex justify-center'>

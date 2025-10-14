@@ -9,7 +9,7 @@ export default function HomePage() {
 
   return (
     <div className="flex flex-col flex-1">
-      <section id="home" className="flex flex-col items-center justify-center text-center bg-muted flex-1">
+      <section id="home" className="flex flex-col items-center justify-center text-center bg-background flex-1">
         <div className="container px-4 md:px-6">
           <div className="flex flex-col justify-center space-y-4">
             <div className="space-y-2">

@@ -23,7 +23,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} font-sans antialiased`}>
        <Providers>
-          <div className="flex min-h-screen w-full flex-col">
+          <div className="flex min-h-screen w-full flex-col bg-muted">
             <AppHeader />
             <main className="flex flex-1 flex-col">
               <PageTransition>{children}</PageTransition>
