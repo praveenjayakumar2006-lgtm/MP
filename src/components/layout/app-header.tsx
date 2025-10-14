@@ -50,7 +50,7 @@ export function AppHeader() {
     <header className="sticky top-0 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6 z-50">
         <Link
           href="/home"
-          className="flex items-center gap-2 text-xl font-semibold"
+          className="flex items-center gap-2 text-lg font-semibold"
         >
           <Car className="h-8 w-8 text-primary" />
           <span className="font-bold text-xl">ParkEasy</span>
@@ -67,7 +67,7 @@ export function AppHeader() {
           ))}
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="flex items-center gap-1 text-lg font-medium text-muted-foreground transition-colors hover:text-foreground">
+                <Button variant="ghost" className="flex items-center gap-1 text-lg font-medium text-muted-foreground transition-colors hover:text-foreground hover:bg-transparent px-0">
                     Others <ChevronDown className="h-4 w-4" />
                 </Button>
                 </DropdownMenuTrigger>
@@ -82,7 +82,7 @@ export function AppHeader() {
         </nav>
         <div className="flex items-center gap-4">
             <Link href="/login" className="hidden md:block">
-                <Image src="https://picsum.photos/seed/usericon/40/40" alt="Sign In" width={40} height={40} className="rounded-full" data-ai-hint="user icon" />
+                <Image src="https://picsum.photos/seed/usericon/40/40" alt="Sign In" width={40} height={40} data-ai-hint="user icon" />
             </Link>
             <Sheet>
             <SheetTrigger asChild>
