@@ -37,6 +37,7 @@ export function ParkingMap() {
   const handleSlotClick = (slot: ParkingSlot) => {
     if (slot.status === 'available') {
       setSelectedSlot(slot);
+      setShowSuccess(false);
     }
   };
 
@@ -67,7 +68,7 @@ export function ParkingMap() {
           slot.status === 'occupied',
         'bg-blue-100 border-blue-400 text-blue-800 opacity-90 cursor-not-allowed':
           slot.status === 'reserved' && slot.reservedBy !== 'user',
-         'bg-yellow-100 border-yellow-400 text-yellow-800 opacity-90 cursor-not-allowed':
+         'bg-yellow-100 border-yellow-400 text-yellow-800':
           slot.status === 'reserved' && slot.reservedBy === 'user',
         'h-24 w-16': slot.type === 'car',
         'h-20 w-16': slot.type === 'bike',
@@ -102,9 +103,12 @@ export function ParkingMap() {
                     aria-label={`Parking slot ${slot.id}, status: ${slot.status}`}
                 >
                     {slot.status === 'reserved' && slot.reservedBy === 'user' && (
-                       <span className="absolute top-1 left-2 text-xs font-bold">You</span>
+                       <>
+                        <span className="absolute top-1 left-2 text-xs font-bold">You</span>
+                        <VehicleIcon type={slot.type} />
+                       </>
                     )}
-                    {slot.status !== 'available' && (
+                    {slot.status !== 'available' && slot.reservedBy !== 'user' && (
                        <VehicleIcon type={slot.type} />
                     )}
                     <span className="absolute bottom-1 right-2 text-xs font-bold">
@@ -128,9 +132,12 @@ export function ParkingMap() {
                     aria-label={`Parking slot ${slot.id}, status: ${slot.status}`}
                     >
                     {slot.status === 'reserved' && slot.reservedBy === 'user' && (
-                       <span className="absolute top-1 left-2 text-xs font-bold">You</span>
+                       <>
+                        <span className="absolute top-1 left-2 text-xs font-bold">You</span>
+                        <VehicleIcon type={slot.type} />
+                       </>
                     )}
-                    {slot.status !== 'available' && (
+                    {slot.status !== 'available' && slot.reservedBy !== 'user' && (
                        <VehicleIcon type={slot.type} />
                     )}
                     <span className="absolute bottom-1 right-1 text-xs font-bold">
@@ -149,10 +156,13 @@ export function ParkingMap() {
                     tabIndex={slot.status === 'available' ? 0 : -1}
                     aria-label={`Parking slot ${slot.id}, status: ${slot.status}`}
                     >
-                     {slot.status === 'reserved' && slot.reservedBy === 'user' && (
-                       <span className="absolute top-1 left-2 text-xs font-bold">You</span>
+                    {slot.status === 'reserved' && slot.reservedBy === 'user' && (
+                       <>
+                        <span className="absolute top-1 left-2 text-xs font-bold">You</span>
+                        <VehicleIcon type={slot.type} />
+                       </>
                     )}
-                    {slot.status !== 'available' && (
+                    {slot.status !== 'available' && slot.reservedBy !== 'user' && (
                        <VehicleIcon type={slot.type} />
                     )}
                     <span className="absolute bottom-1 right-1 text-xs font-bold">
