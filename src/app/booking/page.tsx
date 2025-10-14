@@ -31,7 +31,6 @@ import {
 import { format } from 'date-fns';
 import { Calendar as CalendarIcon, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useToast } from '@/hooks/use-toast';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -63,7 +62,6 @@ const timeSlots = Array.from({ length: 24 * 2 }, (_, i) => {
 });
 
 export default function BookingPage() {
-  const { toast } = useToast();
   const router = useRouter();
   const form = useForm<BookingFormValues>({
     resolver: zodResolver(bookingSchema),
@@ -71,10 +69,6 @@ export default function BookingPage() {
 
   function onSubmit(values: BookingFormValues) {
     console.log(values);
-    toast({
-      title: 'Booking Details Submitted',
-      description: 'Please select a parking slot to complete your reservation.',
-    });
     router.push('/select-spot');
   }
 
