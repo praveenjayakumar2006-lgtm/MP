@@ -35,7 +35,7 @@ export function AppHeader() {
   const pathname = usePathname();
 
   const NavLink = ({ href, children, className }: { href: string, children: React.ReactNode, className?: string }) => {
-    const isActive = pathname === href;
+    const isActive = href === '/booking' ? pathname.startsWith('/booking') || pathname.startsWith('/select-spot') : pathname === href;
     return (
       <Link
         href={href}
