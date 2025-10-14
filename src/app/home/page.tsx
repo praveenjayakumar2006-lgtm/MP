@@ -194,7 +194,7 @@ export default function HomePage() {
                         render={({ field }) => (
                             <FormItem>
                             <FormLabel>Duration (Hours)</FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <Select onValuechange={field.onChange} defaultValue={field.value}>
                                 <FormControl>
                                 <SelectTrigger>
                                     <SelectValue placeholder="Select hours" />
