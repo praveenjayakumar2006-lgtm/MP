@@ -49,12 +49,12 @@ export function AppHeader() {
     <header className="sticky top-0 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6 z-50">
         <Link
           href="/home"
-          className="flex items-center gap-2 text-lg font-semibold"
+          className="flex items-center gap-2 text-xl font-semibold"
         >
-          <Car className="h-6 w-6 text-primary" />
+          <Car className="h-7 w-7 text-primary" />
           <span className="font-bold">ParkEasy</span>
         </Link>
-        <nav className="hidden md:flex flex-1 items-center justify-center gap-5 text-sm lg:gap-6">
+        <nav className="hidden md:flex flex-1 items-center justify-center gap-5 text-base lg:gap-6">
           {navItems.map(item => (
             <NavLink
               key={item.href}
@@ -91,7 +91,7 @@ export function AppHeader() {
                 </Button>
             </SheetTrigger>
             <SheetContent side="left">
-                <nav className="grid gap-6 text-lg font-medium">
+                <nav className="grid gap-6 text-xl font-medium">
                 <Link
                     href="/home"
                     className="flex items-center gap-2 text-lg font-semibold"
