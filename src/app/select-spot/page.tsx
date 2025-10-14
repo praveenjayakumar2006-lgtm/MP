@@ -5,7 +5,7 @@ import { ParkingMap } from '@/components/dashboard/parking-map';
 
 export default function SelectSpotPage() {
     return (
-        <section className="py-12 md:py-24 lg:py-32 flex flex-col items-center justify-center min-h-[calc(100vh-4rem)] bg-muted">
+        <section className="flex flex-col items-center justify-center min-h-[calc(100vh-4rem)] bg-muted">
             <div className="container px-4 md:px-6">
                 <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
                     <div className="space-y-2">
