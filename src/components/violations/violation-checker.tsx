@@ -2,16 +2,16 @@
 'use client';
 
 import { useState } from 'react';
-import { useForm, useForm as useFormRHF } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
+  CardFooter
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
@@ -129,7 +129,7 @@ export function ViolationChecker() {
 
   const renderResult = () => {
     if (!analysisResult) {
-        return <p className="text-xs text-muted-foreground">Submit a report to see the analysis.</p>;
+        return <p className="text-sm text-muted-foreground">Submit a report to see the analysis.</p>;
     }
     
     // Type guard for DetectParkingViolationOutput
@@ -137,12 +137,12 @@ export function ViolationChecker() {
         return (
             <div className="flex flex-col items-center gap-4 text-center">
                 {analysisResult.isViolationDetected ? (
-                    <ShieldCheck className="h-12 w-12 text-green-500" />
+                    <ShieldCheck className="h-16 w-16 text-green-500" />
                 ) : (
-                    <ShieldX className="h-12 w-12 text-red-500" />
+                    <ShieldX className="h-16 w-16 text-red-500" />
                 )}
                 <div className='space-y-1'>
-                    <h3 className="text-lg font-semibold">
+                    <h3 className="text-xl font-semibold">
                         {analysisResult.isViolationDetected ? 'Violation Detected' : 'No Violation Detected'}
                     </h3>
                     <p className="text-sm text-muted-foreground">{analysisResult.violationDetails}</p>
@@ -155,7 +155,7 @@ export function ViolationChecker() {
     if ('licensePlate' in analysisResult) {
         const result = analysisResult; // for type safety
         return (
-             <div className="w-full space-y-4">
+             <div className="w-full space-y-6">
               <div>
                 <h3 className="font-semibold text-lg">Vehicle Details</h3>
                 <div className="mt-2 space-y-2 text-sm text-muted-foreground">
@@ -194,26 +194,27 @@ export function ViolationChecker() {
           );
     }
     
-    return <p className="text-xs text-muted-foreground">Analysis result is in an unknown format.</p>;
+    return <p className="text-sm text-muted-foreground">Analysis result is in an unknown format.</p>;
   }
 
   return (
-    <div className="w-full max-w-4xl mx-auto">
+    <div className="w-full grid md:grid-cols-2 gap-8 items-start">
+      <div>
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="report">Report Violation</TabsTrigger>
                 <TabsTrigger value="image">Analyze Vehicle Image</TabsTrigger>
             </TabsList>
             <TabsContent value="report">
-                <Card>
+                <Card className="flex flex-col h-full">
                     <Form {...violationForm}>
-                        <form onSubmit={violationForm.handleSubmit(onViolationSubmit)}>
-                            <CardContent className="p-4 space-y-2">
+                        <form onSubmit={violationForm.handleSubmit(onViolationSubmit)} className="flex flex-col flex-1">
+                            <CardContent className="p-6 space-y-4 flex-1">
                                 <FormField
                                     control={violationForm.control}
                                     name="slotNumber"
                                     render={({ field }) => (
-                                    <FormItem className="mb-2">
+                                    <FormItem>
                                         <FormLabel>Slot Number</FormLabel>
                                         <FormControl>
                                         <Input placeholder="e.g., C5" {...field} />
@@ -226,7 +227,7 @@ export function ViolationChecker() {
                                     control={violationForm.control}
                                     name="violationType"
                                     render={({ field }) => (
-                                    <FormItem className="mb-2">
+                                    <FormItem>
                                         <FormLabel>Violation Type</FormLabel>
                                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                                         <FormControl>
@@ -253,6 +254,7 @@ export function ViolationChecker() {
                                         <Textarea
                                             placeholder="Provide more details about the violation..."
                                             {...field}
+                                            rows={4}
                                         />
                                         </FormControl>
                                         <FormMessage />
@@ -260,7 +262,7 @@ export function ViolationChecker() {
                                     )}
                                 />
                             </CardContent>
-                             <CardFooter className="p-4 pt-0">
+                             <CardFooter>
                                 <Button type="submit" disabled={isLoading}>
                                     {isLoading && activeTab === 'report' && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                                     Analyze Violation
@@ -271,10 +273,10 @@ export function ViolationChecker() {
                 </Card>
             </TabsContent>
             <TabsContent value="image">
-                <Card>
+                <Card className="flex flex-col h-full">
                     <Form {...imageForm}>
-                        <form onSubmit={imageForm.handleSubmit(onImageSubmit)}>
-                            <CardContent className="p-4 space-y-2">
+                        <form onSubmit={imageForm.handleSubmit(onImageSubmit)} className="flex flex-col flex-1">
+                            <CardContent className="p-6 space-y-4 flex-1">
                                <FormField
                                 control={imageForm.control}
                                 name="image"
@@ -303,7 +305,7 @@ export function ViolationChecker() {
                                 </div>
                               )}
                             </CardContent>
-                            <CardFooter className="p-4 pt-0">
+                            <CardFooter>
                                 <Button type="submit" disabled={isLoading || !imageForm.formState.isValid}>
                                     {isLoading && activeTab === 'image' && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                                     Analyze Image
@@ -314,21 +316,20 @@ export function ViolationChecker() {
                 </Card>
             </TabsContent>
         </Tabs>
-        
-        <div className="mt-8">
-            <Card>
-                <CardHeader className="p-4">
-                    <CardTitle>Analysis Result</CardTitle>
-                    <CardDescription>
-                        The AI-powered analysis will be displayed here.
-                    </CardDescription>
-                </CardHeader>
-                <CardContent className="flex items-center justify-center rounded-lg border-dashed border-2 m-4 mt-0 p-4 min-h-[200px]">
-                    {isLoading ? <Loader2 className="h-8 w-8 animate-spin text-primary" /> : renderResult()}
-                </CardContent>
-            </Card>
-        </div>
+      </div>
+      <div className="flex flex-col">
+          <Card className="flex-1 flex flex-col">
+              <CardHeader>
+                  <CardTitle>Analysis Result</CardTitle>
+                  <CardDescription>
+                      The AI-powered analysis will be displayed here.
+                  </CardDescription>
+              </CardHeader>
+              <CardContent className="flex-1 flex items-center justify-center rounded-lg border-dashed border-2 m-6 mt-0 p-6">
+                  {isLoading ? <Loader2 className="h-8 w-8 animate-spin text-primary" /> : renderResult()}
+              </CardContent>
+          </Card>
+      </div>
     </div>
   );
 }
-
