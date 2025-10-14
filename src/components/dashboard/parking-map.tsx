@@ -59,14 +59,16 @@ export function ParkingMap() {
 
   const getSlotClasses = (slot: ParkingSlot) => {
     return cn(
-      'relative flex flex-col items-center justify-center rounded-md border-2 transition-all duration-300 transform hover:scale-105',
+      'relative flex flex-col items-center justify-center rounded-md border-2 transition-all duration-300',
       {
         'bg-green-100 border-green-400 text-green-800 cursor-pointer hover:bg-green-200':
           slot.status === 'available',
         'bg-red-100 border-red-400 text-red-800 opacity-70 cursor-not-allowed':
           slot.status === 'occupied',
         'bg-blue-100 border-blue-400 text-blue-800 opacity-90 cursor-not-allowed':
-          slot.status === 'reserved',
+          slot.status === 'reserved' && slot.reservedBy !== 'user',
+         'bg-yellow-100 border-yellow-400 text-yellow-800 opacity-90 cursor-not-allowed':
+          slot.status === 'reserved' && slot.reservedBy === 'user',
         'h-24 w-16': slot.type === 'car',
         'h-20 w-16': slot.type === 'bike',
       }
@@ -99,9 +101,10 @@ export function ParkingMap() {
                     tabIndex={slot.status === 'available' ? 0 : -1}
                     aria-label={`Parking slot ${slot.id}, status: ${slot.status}`}
                 >
-                    {slot.status === 'reserved' && slot.reservedBy === 'user' ? (
+                    {slot.status === 'reserved' && slot.reservedBy === 'user' && (
                        <span className="absolute top-1 left-2 text-xs font-bold">You</span>
-                    ) : slot.status !== 'available' && (
+                    )}
+                    {slot.status !== 'available' && (
                        <VehicleIcon type={slot.type} />
                     )}
                     <span className="absolute bottom-1 right-2 text-xs font-bold">
@@ -124,9 +127,10 @@ export function ParkingMap() {
                     tabIndex={slot.status === 'available' ? 0 : -1}
                     aria-label={`Parking slot ${slot.id}, status: ${slot.status}`}
                     >
-                    {slot.status === 'reserved' && slot.reservedBy === 'user' ? (
+                    {slot.status === 'reserved' && slot.reservedBy === 'user' && (
                        <span className="absolute top-1 left-2 text-xs font-bold">You</span>
-                    ) : slot.status !== 'available' && (
+                    )}
+                    {slot.status !== 'available' && (
                        <VehicleIcon type={slot.type} />
                     )}
                     <span className="absolute bottom-1 right-1 text-xs font-bold">
@@ -145,9 +149,10 @@ export function ParkingMap() {
                     tabIndex={slot.status === 'available' ? 0 : -1}
                     aria-label={`Parking slot ${slot.id}, status: ${slot.status}`}
                     >
-                    {slot.status === 'reserved' && slot.reservedBy === 'user' ? (
+                     {slot.status === 'reserved' && slot.reservedBy === 'user' && (
                        <span className="absolute top-1 left-2 text-xs font-bold">You</span>
-                    ) : slot.status !== 'available' && (
+                    )}
+                    {slot.status !== 'available' && (
                        <VehicleIcon type={slot.type} />
                     )}
                     <span className="absolute bottom-1 right-1 text-xs font-bold">
@@ -163,6 +168,10 @@ export function ParkingMap() {
             <div className="flex items-center gap-2">
               <div className="h-4 w-4 rounded-sm border-2 border-green-400 bg-green-100" />
               <span className="text-sm text-muted-foreground">Available</span>
+            </div>
+             <div className="flex items-center gap-2">
+              <div className="h-4 w-4 rounded-sm border-2 border-yellow-400 bg-yellow-100" />
+              <span className="text-sm text-muted-foreground">Your Reservation</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="h-4 w-4 rounded-sm border-2 border-blue-400 bg-blue-100" />
