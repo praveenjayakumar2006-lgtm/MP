@@ -39,7 +39,7 @@ export function AppHeader() {
     return (
       <Link
         href={href}
-        className={cn(className, isActive ? "text-foreground" : "text-muted-foreground", "transition-colors hover:text-foreground")}
+        className={cn(className, isActive ? "text-primary-foreground font-semibold" : "text-primary-foreground/80", "transition-colors hover:text-primary-foreground")}
       >
         {children}
       </Link>
@@ -47,12 +47,12 @@ export function AppHeader() {
   };
 
   return (
-    <header className="sticky top-0 flex h-20 items-center gap-4 border-b bg-background px-8 md:px-12 z-50">
+    <header className="sticky top-0 flex h-20 items-center gap-4 border-b bg-primary text-primary-foreground px-8 md:px-12 z-50">
         <Link
           href="/home"
           className="flex items-center gap-2 text-lg font-semibold"
         >
-          <Car className="h-8 w-8 text-primary" />
+          <Car className="h-8 w-8" />
           <span className="font-bold text-xl">ParkEasy</span>
         </Link>
         <nav className="hidden md:flex flex-1 items-center justify-center gap-8 text-lg lg:gap-10">
@@ -67,7 +67,7 @@ export function AppHeader() {
           ))}
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="flex items-center gap-1 text-lg font-medium text-muted-foreground transition-colors hover:text-foreground hover:bg-transparent p-0">
+                <Button variant="ghost" className="flex items-center gap-1 text-lg font-medium text-primary-foreground/80 transition-colors hover:text-primary-foreground hover:bg-white/10 p-2 rounded-md">
                     Others <ChevronDown className="h-4 w-4" />
                 </Button>
                 </DropdownMenuTrigger>
@@ -82,11 +82,11 @@ export function AppHeader() {
         </nav>
         <div className="flex items-center gap-4">
             <Link href="/login" className="hidden md:block">
-                <Image src="https://picsum.photos/seed/usericon/40/40" alt="Sign In" width={40} height={40} className="rounded-full" data-ai-hint="user icon" />
+                <Image src="https://picsum.photos/seed/usericon/40/40" alt="Sign In" width={40} height={40} className="rounded-full border-2 border-primary-foreground/50" data-ai-hint="user icon" />
             </Link>
             <Sheet>
             <SheetTrigger asChild>
-                <Button variant="outline" size="icon" className="shrink-0 md:hidden">
+                <Button variant="outline" size="icon" className="shrink-0 md:hidden bg-transparent border-primary-foreground/80 text-primary-foreground hover:bg-white/10 hover:text-primary-foreground">
                 <Menu className="h-5 w-5" />
                 <span className="sr-only">Toggle navigation menu</span>
                 </Button>
@@ -104,7 +104,7 @@ export function AppHeader() {
                     <NavLink
                     key={item.href}
                     href={item.href}
-                    className="transition-colors hover:text-foreground"
+                    className="transition-colors hover:text-foreground text-foreground"
                     >
                     {item.label}
                     </NavLink>
@@ -114,7 +114,7 @@ export function AppHeader() {
                     <NavLink
                     key={item.href}
                     href={item.href}
-                    className="block py-2 transition-colors hover:text-foreground"
+                    className="block py-2 transition-colors hover:text-foreground text-muted-foreground"
                     >
                     {item.label}
                     </NavLink>
