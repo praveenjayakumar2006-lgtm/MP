@@ -84,7 +84,7 @@ export default function HomePage() {
   }
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col bg-muted">
       <section id="home" className="flex flex-col items-center justify-center text-center bg-muted min-h-[calc(100vh-4rem)]">
         <div className="container px-4 md:px-6">
           <div className="flex flex-col justify-center space-y-4">
