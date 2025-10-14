@@ -83,14 +83,14 @@ export function ViolationChecker() {
       <Card>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
-            <CardHeader>
+            <CardHeader className="p-4">
                 <CardTitle>Report a Violation</CardTitle>
                 <CardDescription>
                     Fill in the details to check for a parking violation using our AI
                     tool.
                 </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4 p-4">
+            <CardContent className="space-y-2 p-4">
               <FormField
                 control={form.control}
                 name="slotNumber"
@@ -159,16 +159,16 @@ export function ViolationChecker() {
         </Form>
       </Card>
       <Card className="flex flex-col">
-        <CardHeader>
+        <CardHeader className="p-4">
           <CardTitle>Analysis Result</CardTitle>
           <CardDescription>
             The AI-powered analysis will be displayed here.
           </CardDescription>
         </CardHeader>
-        <CardContent className="flex flex-1 items-center justify-center rounded-lg border-dashed border-2 m-4 mt-0">
+        <CardContent className="flex flex-1 items-center justify-center rounded-lg border-dashed border-2 m-4 mt-0 p-4">
           {isLoading && <Loader2 className="h-8 w-8 animate-spin text-primary" />}
           {!isLoading && !result && (
-            <p className="text-muted-foreground">
+            <p className="text-muted-foreground text-sm">
               Submit a report to see the analysis.
             </p>
           )}
