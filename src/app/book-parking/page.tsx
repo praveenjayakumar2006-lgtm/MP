@@ -9,7 +9,7 @@ export default function BookParkingPage() {
   const router = useRouter();
   
   useEffect(() => {
-    router.replace('/home#booking');
+    router.replace('/booking');
   }, [router]);
 
   return null;
