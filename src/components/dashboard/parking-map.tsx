@@ -47,7 +47,7 @@ export function ParkingMap() {
 
     setSlots((prevSlots) =>
       prevSlots.map((s) =>
-        s.id === selectedSlot.id ? { ...s, status: 'reserved' } : s
+        s.id === selectedSlot.id ? { ...s, status: 'reserved', reservedBy: 'user' } : s
       )
     );
 
@@ -99,8 +99,10 @@ export function ParkingMap() {
                     tabIndex={slot.status === 'available' ? 0 : -1}
                     aria-label={`Parking slot ${slot.id}, status: ${slot.status}`}
                 >
-                    {slot.status !== 'available' && (
-                    <VehicleIcon type={slot.type} />
+                    {slot.status === 'reserved' && slot.reservedBy === 'user' ? (
+                       <span className="absolute top-1 left-2 text-xs font-bold">You</span>
+                    ) : slot.status !== 'available' && (
+                       <VehicleIcon type={slot.type} />
                     )}
                     <span className="absolute bottom-1 right-2 text-xs font-bold">
                     {slot.id}
@@ -122,8 +124,10 @@ export function ParkingMap() {
                     tabIndex={slot.status === 'available' ? 0 : -1}
                     aria-label={`Parking slot ${slot.id}, status: ${slot.status}`}
                     >
-                    {slot.status !== 'available' && (
-                        <VehicleIcon type={slot.type} />
+                    {slot.status === 'reserved' && slot.reservedBy === 'user' ? (
+                       <span className="absolute top-1 left-2 text-xs font-bold">You</span>
+                    ) : slot.status !== 'available' && (
+                       <VehicleIcon type={slot.type} />
                     )}
                     <span className="absolute bottom-1 right-1 text-xs font-bold">
                         {slot.id}
@@ -141,8 +145,10 @@ export function ParkingMap() {
                     tabIndex={slot.status === 'available' ? 0 : -1}
                     aria-label={`Parking slot ${slot.id}, status: ${slot.status}`}
                     >
-                    {slot.status !== 'available' && (
-                        <VehicleIcon type={slot.type} />
+                    {slot.status === 'reserved' && slot.reservedBy === 'user' ? (
+                       <span className="absolute top-1 left-2 text-xs font-bold">You</span>
+                    ) : slot.status !== 'available' && (
+                       <VehicleIcon type={slot.type} />
                     )}
                     <span className="absolute bottom-1 right-1 text-xs font-bold">
                         {slot.id}

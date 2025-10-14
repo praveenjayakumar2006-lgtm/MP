@@ -6,6 +6,7 @@ export type ParkingSlot = {
   id: string;
   status: ParkingSlotStatus;
   type: VehicleType;
+  reservedBy?: 'user' | 'other';
 };
 
 export type Reservation = {
