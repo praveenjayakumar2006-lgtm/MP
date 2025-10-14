@@ -158,14 +158,14 @@ export function ViolationChecker() {
           </form>
         </Form>
       </Card>
-      <Card>
+      <Card className="flex flex-col">
         <CardHeader>
           <CardTitle>Analysis Result</CardTitle>
           <CardDescription>
             The AI-powered analysis will be displayed here.
           </CardDescription>
         </CardHeader>
-        <CardContent className="flex min-h-[300px] items-center justify-center rounded-lg border-dashed border-2">
+        <CardContent className="flex flex-1 items-center justify-center rounded-lg border-dashed border-2">
           {isLoading && <Loader2 className="h-8 w-8 animate-spin text-primary" />}
           {!isLoading && !result && (
             <p className="text-muted-foreground">
