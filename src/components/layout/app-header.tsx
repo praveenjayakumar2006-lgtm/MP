@@ -55,7 +55,7 @@ export function AppHeader() {
           <Car className="h-8 w-8 text-primary" />
           <span className="font-bold text-xl">ParkEasy</span>
         </Link>
-        <nav className="hidden md:flex flex-1 items-center justify-center gap-5 text-lg lg:gap-6">
+        <nav className="hidden md:flex flex-1 items-center justify-center gap-8 text-lg lg:gap-10">
           {navItems.map(item => (
             <NavLink
               key={item.href}
