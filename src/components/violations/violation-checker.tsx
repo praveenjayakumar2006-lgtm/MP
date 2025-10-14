@@ -198,14 +198,14 @@ export function ViolationChecker() {
   }
 
   return (
-    <div className="w-full grid md:grid-cols-2 gap-8 items-start">
-      <div>
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+    <div className="w-full grid md:grid-cols-2 gap-8 items-stretch">
+      <div className="flex flex-col">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full flex flex-col flex-1">
             <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="report">Report Violation</TabsTrigger>
                 <TabsTrigger value="image">Analyze Vehicle Image</TabsTrigger>
             </TabsList>
-            <TabsContent value="report">
+            <TabsContent value="report" className="flex-1">
                 <Card className="flex flex-col h-full">
                     <Form {...violationForm}>
                         <form onSubmit={violationForm.handleSubmit(onViolationSubmit)} className="flex flex-col flex-1">
@@ -272,7 +272,7 @@ export function ViolationChecker() {
                     </Form>
                 </Card>
             </TabsContent>
-            <TabsContent value="image">
+            <TabsContent value="image" className="flex-1">
                 <Card className="flex flex-col h-full">
                     <Form {...imageForm}>
                         <form onSubmit={imageForm.handleSubmit(onImageSubmit)} className="flex flex-col flex-1">
