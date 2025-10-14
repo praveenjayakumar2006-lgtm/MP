@@ -22,6 +22,7 @@ import { useToast } from '@/hooks/use-toast';
 import { parkingSlots as initialSlots } from '@/lib/data';
 import type { ParkingSlot } from '@/lib/types';
 import { Bike } from 'lucide-react';
+import { Separator } from '@/components/ui/separator';
 
 export function ParkingMap() {
   const [slots, setSlots] = useState<ParkingSlot[]>(initialSlots);
@@ -64,8 +65,8 @@ export function ParkingMap() {
           slot.status === 'occupied',
         'bg-blue-100 border-blue-400 text-blue-800 opacity-90 cursor-not-allowed':
           slot.status === 'reserved',
-        'h-28 w-20': slot.type === 'car',
-        'h-24 w-16': slot.type === 'bike',
+        'h-24 w-16': slot.type === 'car',
+        'h-20 w-14': slot.type === 'bike',
       }
     );
   };
@@ -83,10 +84,10 @@ export function ParkingMap() {
   return (
     <>
       <Card>
-        <CardContent className="pt-6">
-          <div className="relative flex border-4 border-gray-700 bg-gray-200 p-4 rounded-lg">
-            {/* Left Side - Car Slots */}
-            <div className="grid grid-cols-1 gap-4">
+        <CardContent className="p-4">
+          <div className="relative flex flex-col items-center border-4 border-gray-700 bg-gray-200 p-4 rounded-lg">
+            {/* Top Side - Car Slots */}
+            <div className="flex flex-row gap-3">
               {carSlots.map((slot) => (
                 <div
                   key={slot.id}
@@ -99,7 +100,7 @@ export function ParkingMap() {
                   {slot.status !== 'available' && (
                     <VehicleIcon type={slot.type} />
                   )}
-                  <span className="absolute bottom-1 right-2 text-sm font-bold">
+                  <span className="absolute bottom-1 right-2 text-xs font-bold">
                     {slot.id}
                   </span>
                 </div>
@@ -107,13 +108,12 @@ export function ParkingMap() {
             </div>
 
             {/* Roadway */}
-            <div className="w-24 flex flex-col items-center justify-around mx-4">
-               <ArrowUp className="h-10 w-10 text-gray-600" />
-               <ArrowDown className="h-10 w-10 text-gray-600" />
+             <div className="flex items-center justify-center w-full my-3">
+              <Separator className="h-1 bg-gray-400 w-full" />
             </div>
 
-            {/* Right Side - Bike Slots */}
-            <div className="grid grid-cols-2 gap-2">
+            {/* Bottom Side - Bike Slots */}
+            <div className="grid grid-cols-3 gap-2">
               {bikeSlots.map((slot) => (
                  <div
                   key={slot.id}
@@ -177,3 +177,4 @@ export function ParkingMap() {
     </>
   );
 }
+
