@@ -65,8 +65,8 @@ export function ParkingMap() {
           slot.status === 'occupied',
         'bg-blue-100 border-blue-400 text-blue-800 opacity-90 cursor-not-allowed':
           slot.status === 'reserved',
-        'h-20 w-12': slot.type === 'car',
-        'h-16 w-12': slot.type === 'bike',
+        'h-24 w-14': slot.type === 'car',
+        'h-20 w-14': slot.type === 'bike',
       }
     );
   };
