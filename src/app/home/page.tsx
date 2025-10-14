@@ -4,18 +4,12 @@
 import { Button } from '@/components/ui/button';
 import { Car } from 'lucide-react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
 
 export default function HomePage() {
 
   return (
-     <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-      >
-    <div className="flex flex-col">
-      <section id="home" className="flex flex-col items-center justify-center text-center bg-muted min-h-[calc(100vh-4rem)]">
+    <div className="flex flex-col flex-1">
+      <section id="home" className="flex flex-col items-center justify-center text-center bg-muted flex-1">
         <div className="container px-4 md:px-6">
           <div className="flex flex-col justify-center space-y-4">
             <div className="space-y-2">
@@ -36,6 +30,5 @@ export default function HomePage() {
         </div>
       </section>
     </div>
-    </motion.div>
   );
 }

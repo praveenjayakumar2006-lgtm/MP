@@ -5,6 +5,7 @@ import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { AppHeader } from '@/components/layout/app-header';
 import { Providers } from '@/components/layout/providers';
+import { PageTransition } from '@/components/layout/page-transition';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
@@ -24,8 +25,8 @@ export default function RootLayout({
        <Providers>
           <div className="flex min-h-screen w-full flex-col">
             <AppHeader />
-            <main className="flex-1">
-              {children}
+            <main className="flex flex-1 flex-col">
+              <PageTransition>{children}</PageTransition>
             </main>
           </div>
           <Toaster />

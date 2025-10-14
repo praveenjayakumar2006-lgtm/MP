@@ -2,15 +2,11 @@
 'use client';
 
 import { ParkingMap } from '@/components/dashboard/parking-map';
-import { motion } from 'framer-motion';
 
 export default function SelectSpotPage() {
     return (
-        <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="flex flex-col items-center justify-center min-h-[calc(100vh-4rem)] bg-muted p-4"
+        <div
+            className="flex flex-col items-center justify-center flex-1 bg-muted p-4"
         >
             <div className="w-full max-w-4xl flex flex-col items-center">
                 <div className="text-center mb-8">
@@ -23,6 +19,6 @@ export default function SelectSpotPage() {
                     <ParkingMap />
                 </div>
             </div>
-        </motion.div>
+        </div>
     )
 }
