@@ -34,6 +34,8 @@ const otherItems = [
 export function AppHeader() {
   const pathname = usePathname();
 
+  const isOtherItemActive = otherItems.some(item => pathname.startsWith(item.href));
+
   const NavLink = ({ href, children, className }: { href: string, children: React.ReactNode, className?: string }) => {
     const isActive = href === '/booking' ? pathname.startsWith('/booking') || pathname.startsWith('/select-spot') : pathname === href;
     return (
@@ -67,7 +69,10 @@ export function AppHeader() {
           ))}
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="flex items-center gap-1 text-lg font-medium text-primary-foreground/80 transition-colors hover:text-primary-foreground hover:bg-white/10 p-2 rounded-md">
+                <Button variant="ghost" className={cn(
+                    "flex items-center gap-1 text-lg font-medium transition-colors hover:text-primary-foreground hover:bg-white/10 p-2 rounded-md",
+                    isOtherItemActive ? "text-primary-foreground font-semibold" : "text-primary-foreground/80"
+                )}>
                     Others <ChevronDown className="h-4 w-4" />
                 </Button>
                 </DropdownMenuTrigger>
