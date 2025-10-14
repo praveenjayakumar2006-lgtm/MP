@@ -239,7 +239,9 @@ export default function HomePage() {
                     </p>
                   </div>
                 </div>
-                <ParkingMap />
+                <div className="flex justify-center w-full">
+                    <ParkingMap />
+                </div>
               </motion.div>
             )}
           </AnimatePresence>
