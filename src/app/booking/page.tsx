@@ -36,6 +36,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
+import { motion } from 'framer-motion';
 
 const bookingSchema = z.object({
   date: z.date({
@@ -79,6 +80,11 @@ export default function BookingPage() {
   }
 
   return (
+    <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+      >
     <section id="booking" className="py-12 md:py-24 lg:py-32 flex flex-col items-center justify-center min-h-[calc(100vh-4rem)] bg-muted">
         <div className="container px-4 md:px-6">
            <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
@@ -196,5 +202,6 @@ export default function BookingPage() {
           </div>
         </div>
       </section>
+      </motion.div>
   )
 }
