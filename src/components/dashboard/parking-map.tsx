@@ -111,7 +111,7 @@ export function ParkingMap() {
             
             <div className="flex flex-col gap-2">
                 <div className="flex flex-row gap-2">
-                {bikeSlots.slice(0, 4).map((slot) => (
+                {bikeSlots.slice(0, 5).map((slot) => (
                     <div
                     key={slot.id}
                     className={getSlotClasses(slot)}
@@ -130,7 +130,7 @@ export function ParkingMap() {
                 ))}
                 </div>
                 <div className="flex flex-row gap-2">
-                {bikeSlots.slice(4, 8).map((slot) => (
+                {bikeSlots.slice(5, 10).map((slot) => (
                     <div
                     key={slot.id}
                     className={getSlotClasses(slot)}
