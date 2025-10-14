@@ -17,6 +17,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
+import Image from 'next/image';
 
 
 const navItems = [
@@ -51,10 +52,10 @@ export function AppHeader() {
           href="/home"
           className="flex items-center gap-2 text-xl font-semibold"
         >
-          <Car className="h-7 w-7 text-primary" />
-          <span className="font-bold">ParkEasy</span>
+          <Car className="h-8 w-8 text-primary" />
+          <span className="font-bold text-xl">ParkEasy</span>
         </Link>
-        <nav className="hidden md:flex flex-1 items-center justify-center gap-5 text-base lg:gap-6">
+        <nav className="hidden md:flex flex-1 items-center justify-center gap-5 text-lg lg:gap-6">
           {navItems.map(item => (
             <NavLink
               key={item.href}
@@ -66,7 +67,7 @@ export function AppHeader() {
           ))}
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="flex items-center gap-1 font-medium text-muted-foreground transition-colors hover:text-foreground">
+                <Button variant="ghost" className="flex items-center gap-1 text-lg font-medium text-muted-foreground transition-colors hover:text-foreground">
                     Others <ChevronDown className="h-4 w-4" />
                 </Button>
                 </DropdownMenuTrigger>
@@ -80,8 +81,8 @@ export function AppHeader() {
             </DropdownMenu>
         </nav>
         <div className="flex items-center gap-4">
-            <Link href="/login">
-                <Button variant="outline" className="hidden md:flex">Sign In</Button>
+            <Link href="/login" className="hidden md:block">
+                <Image src="https://picsum.photos/seed/usericon/40/40" alt="Sign In" width={40} height={40} className="rounded-full" data-ai-hint="user icon" />
             </Link>
             <Sheet>
             <SheetTrigger asChild>
