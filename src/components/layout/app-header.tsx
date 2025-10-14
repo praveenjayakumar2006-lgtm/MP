@@ -18,6 +18,8 @@ import {
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { useEffect, useState } from 'react';
 
 
 const navItems = [
@@ -33,6 +35,12 @@ const otherItems = [
 
 export function AppHeader() {
   const pathname = usePathname();
+  const isMobile = useIsMobile();
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const isOtherItemActive = otherItems.some(item => pathname.startsWith(item.href));
 
@@ -86,51 +94,55 @@ export function AppHeader() {
             </DropdownMenu>
         </nav>
         <div className="flex items-center gap-4">
-            <Link href="/login" className="hidden md:block">
-                <Image src="https://picsum.photos/seed/usericon/40/40" alt="Sign In" width={40} height={40} className="rounded-full border-2 border-primary-foreground/50" data-ai-hint="user icon" />
-            </Link>
+            {!isMobile && isClient && (
+              <Link href="/login">
+                  <Image src="https://picsum.photos/seed/usericon/40/40" alt="Sign In" width={40} height={40} className="rounded-full border-2 border-primary-foreground/50" data-ai-hint="user icon" />
+              </Link>
+            )}
+            {isMobile && isClient && (
             <Sheet>
-            <SheetTrigger asChild>
-                <Button variant="outline" size="icon" className="shrink-0 md:hidden bg-transparent border-primary-foreground/80 text-primary-foreground hover:bg-white/10 hover:text-primary-foreground">
-                <Menu className="h-5 w-5" />
-                <span className="sr-only">Toggle navigation menu</span>
-                </Button>
-            </SheetTrigger>
-            <SheetContent side="left">
-                <nav className="grid gap-6 text-xl font-medium">
-                <Link
-                    href="/home"
-                    className="flex items-center gap-2 text-lg font-semibold"
-                >
-                    <Car className="h-6 w-6 text-primary" />
-                    <span className="sr-only">ParkEasy</span>
-                </Link>
-                {navItems.map(item => (
-                    <NavLink
-                    key={item.href}
-                    href={item.href}
-                    className="transition-colors hover:text-foreground text-foreground"
-                    >
-                    {item.label}
-                    </NavLink>
-                ))}
-                <div className="border-t pt-4">
-                 {otherItems.map(item => (
-                    <NavLink
-                    key={item.href}
-                    href={item.href}
-                    className="block py-2 transition-colors hover:text-foreground text-muted-foreground"
-                    >
-                    {item.label}
-                    </NavLink>
-                ))}
-                </div>
-                 <Link href="/login">
-                    <Button variant="outline" className="w-full mt-4">Sign In</Button>
-                </Link>
-                </nav>
-            </SheetContent>
+              <SheetTrigger asChild>
+                  <Button variant="outline" size="icon" className="shrink-0 md:hidden bg-transparent border-primary-foreground/80 text-primary-foreground hover:bg-white/10 hover:text-primary-foreground">
+                  <Menu className="h-5 w-5" />
+                  <span className="sr-only">Toggle navigation menu</span>
+                  </Button>
+              </SheetTrigger>
+              <SheetContent side="left">
+                  <nav className="grid gap-6 text-xl font-medium">
+                  <Link
+                      href="/home"
+                      className="flex items-center gap-2 text-lg font-semibold"
+                  >
+                      <Car className="h-6 w-6 text-primary" />
+                      <span className="sr-only">ParkEasy</span>
+                  </Link>
+                  {navItems.map(item => (
+                      <NavLink
+                      key={item.href}
+                      href={item.href}
+                      className="transition-colors hover:text-foreground text-foreground"
+                      >
+                      {item.label}
+                      </NavLink>
+                  ))}
+                  <div className="border-t pt-4">
+                  {otherItems.map(item => (
+                      <NavLink
+                      key={item.href}
+                      href={item.href}
+                      className="block py-2 transition-colors hover:text-foreground text-muted-foreground"
+                      >
+                      {item.label}
+                      </NavLink>
+                  ))}
+                  </div>
+                  <Link href="/login">
+                      <Button variant="outline" className="w-full mt-4">Sign In</Button>
+                  </Link>
+                  </nav>
+              </SheetContent>
             </Sheet>
+             )}
         </div>
     </header>
   );
