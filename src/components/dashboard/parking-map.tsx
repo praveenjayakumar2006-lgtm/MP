@@ -86,12 +86,6 @@ export function ParkingMap() {
       <Card>
         <CardContent className="pt-6">
           <div className="relative border-4 border-gray-700 bg-gray-200 p-4 rounded-lg">
-            {/* Entry Point */}
-            <div className="absolute top-4 right-4 flex items-center gap-2">
-              <Badge variant="destructive" className="text-lg">ENTRY</Badge>
-              <ArrowLeft className="h-8 w-8 text-gray-800 animate-pulse" />
-            </div>
-
             {/* Top Row - Car Slots */}
             <div className="grid grid-cols-[repeat(3,minmax(0,140px))] gap-4 mb-4 border-b-4 border-gray-700 pb-4 justify-center">
               {carSlots.map((slot) => (
