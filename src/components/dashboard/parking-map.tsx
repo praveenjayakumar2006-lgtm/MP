@@ -65,8 +65,8 @@ export function ParkingMap() {
           slot.status === 'occupied',
         'bg-blue-100 border-blue-400 text-blue-800 opacity-90 cursor-not-allowed':
           slot.status === 'reserved',
-        'h-24 w-16': slot.type === 'car',
-        'h-20 w-14': slot.type === 'bike',
+        'h-20 w-12': slot.type === 'car',
+        'h-16 w-12': slot.type === 'bike',
       }
     );
   };
@@ -85,52 +85,73 @@ export function ParkingMap() {
     <>
       <Card>
         <CardContent className="p-4">
-          <div className="relative flex flex-col items-center border-4 border-gray-700 bg-gray-200 p-4 rounded-lg">
-            {/* Top Side - Car Slots */}
-            <div className="flex flex-row gap-3">
-              {carSlots.map((slot) => (
-                <div
-                  key={slot.id}
-                  className={getSlotClasses(slot)}
-                  onClick={() => handleSlotClick(slot)}
-                  role="button"
-                  tabIndex={slot.status === 'available' ? 0 : -1}
-                  aria-label={`Parking slot ${slot.id}, status: ${slot.status}`}
-                >
-                  {slot.status !== 'available' && (
-                    <VehicleIcon type={slot.type} />
-                  )}
-                  <span className="absolute bottom-1 right-2 text-xs font-bold">
-                    {slot.id}
-                  </span>
+          <div className="relative flex flex-col items-center border-2 border-gray-400 bg-gray-200 p-2 rounded-lg">
+            
+            <div className="flex flex-row items-start gap-4">
+              {/* Car Slots */}
+              <div className="flex flex-col gap-2">
+                <div className="flex flex-row gap-2">
+                  {carSlots.map((slot) => (
+                    <div
+                      key={slot.id}
+                      className={getSlotClasses(slot)}
+                      onClick={() => handleSlotClick(slot)}
+                      role="button"
+                      tabIndex={slot.status === 'available' ? 0 : -1}
+                      aria-label={`Parking slot ${slot.id}, status: ${slot.status}`}
+                    >
+                      {slot.status !== 'available' && (
+                        <VehicleIcon type={slot.type} />
+                      )}
+                      <span className="absolute bottom-1 right-2 text-xs font-bold">
+                        {slot.id}
+                      </span>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
+              </div>
 
-            {/* Roadway */}
-             <div className="flex items-center justify-center w-full my-3">
-              <Separator className="h-1 bg-gray-400 w-full" />
-            </div>
-
-            {/* Bottom Side - Bike Slots */}
-            <div className="grid grid-cols-3 gap-2">
-              {bikeSlots.map((slot) => (
-                 <div
-                  key={slot.id}
-                  className={getSlotClasses(slot)}
-                  onClick={() => handleSlotClick(slot)}
-                  role="button"
-                  tabIndex={slot.status === 'available' ? 0 : -1}
-                  aria-label={`Parking slot ${slot.id}, status: ${slot.status}`}
-                >
-                  {slot.status !== 'available' && (
-                     <VehicleIcon type={slot.type} />
-                  )}
-                  <span className="absolute bottom-1 right-1 text-xs font-bold">
-                    {slot.id}
-                  </span>
+              {/* Bike Slots */}
+              <div className="flex flex-col gap-2">
+                 <div className="flex flex-row gap-2">
+                    {bikeSlots.slice(0, 4).map((slot) => (
+                    <div
+                        key={slot.id}
+                        className={getSlotClasses(slot)}
+                        onClick={() => handleSlotClick(slot)}
+                        role="button"
+                        tabIndex={slot.status === 'available' ? 0 : -1}
+                        aria-label={`Parking slot ${slot.id}, status: ${slot.status}`}
+                    >
+                        {slot.status !== 'available' && (
+                        <VehicleIcon type={slot.type} />
+                        )}
+                        <span className="absolute bottom-1 right-1 text-xs font-bold">
+                        {slot.id}
+                        </span>
+                    </div>
+                    ))}
                 </div>
-              ))}
+                <div className="flex flex-row gap-2">
+                    {bikeSlots.slice(4, 8).map((slot) => (
+                    <div
+                        key={slot.id}
+                        className={getSlotClasses(slot)}
+                        onClick={() => handleSlotClick(slot)}
+                        role="button"
+                        tabIndex={slot.status === 'available' ? 0 : -1}
+                        aria-label={`Parking slot ${slot.id}, status: ${slot.status}`}
+                    >
+                        {slot.status !== 'available' && (
+                        <VehicleIcon type={slot.type} />
+                        )}
+                        <span className="absolute bottom-1 right-1 text-xs font-bold">
+                        {slot.id}
+                        </span>
+                    </div>
+                    ))}
+                </div>
+              </div>
             </div>
           </div>
 
@@ -177,4 +198,3 @@ export function ParkingMap() {
     </>
   );
 }
-
