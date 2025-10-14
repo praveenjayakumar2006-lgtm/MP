@@ -1,9 +1,11 @@
 
 export type ParkingSlotStatus = 'available' | 'occupied' | 'reserved';
+export type VehicleType = 'car' | 'bike';
 
 export type ParkingSlot = {
   id: string;
   status: ParkingSlotStatus;
+  type: VehicleType;
 };
 
 export type Reservation = {

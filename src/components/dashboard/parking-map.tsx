@@ -2,7 +2,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Car } from 'lucide-react';
+import { Car, ArrowRight, ArrowLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
   Card,
@@ -21,11 +21,16 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { parkingSlots as initialSlots } from '@/lib/data';
 import type { ParkingSlot } from '@/lib/types';
+import { Badge } from '../ui/badge';
+import { Bike } from 'lucide-react';
 
 export function ParkingMap() {
   const [slots, setSlots] = useState<ParkingSlot[]>(initialSlots);
   const [selectedSlot, setSelectedSlot] = useState<ParkingSlot | null>(null);
   const { toast } = useToast();
+
+  const carSlots = slots.filter((slot) => slot.type === 'car');
+  const bikeSlots = slots.filter((slot) => slot.type === 'bike');
 
   const handleSlotClick = (slot: ParkingSlot) => {
     if (slot.status === 'available') {
@@ -50,42 +55,88 @@ export function ParkingMap() {
     setSelectedSlot(null);
   };
 
-  const getSlotClasses = (status: ParkingSlot['status']) => {
+  const getSlotClasses = (slot: ParkingSlot) => {
     return cn(
-      'relative flex flex-col items-center justify-center aspect-square rounded-md border-2 transition-all duration-300 transform hover:scale-105',
+      'relative flex flex-col items-center justify-center rounded-md border-2 transition-all duration-300 transform hover:scale-105',
       {
         'bg-green-100 border-green-400 text-green-800 cursor-pointer hover:bg-green-200':
-          status === 'available',
+          slot.status === 'available',
         'bg-red-100 border-red-400 text-red-800 opacity-70 cursor-not-allowed':
-          status === 'occupied',
+          slot.status === 'occupied',
         'bg-blue-100 border-blue-400 text-blue-800 opacity-90 cursor-not-allowed':
-          status === 'reserved',
+          slot.status === 'reserved',
+        'aspect-[3/4]': slot.type === 'car',
+        'aspect-[2/3]': slot.type === 'bike',
       }
     );
+  };
+
+  const VehicleIcon = ({ type, className }: { type: 'car' | 'bike', className?: string }) => {
+    const iconClass = cn('h-1/2 w-1/2', className);
+    if (type === 'car') {
+      return <Car className={iconClass} />;
+    }
+    return <Bike className={iconClass} />;
   };
 
   return (
     <>
       <Card>
         <CardContent className="pt-6">
-          <div className="grid grid-cols-5 gap-2 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-12 xl:grid-cols-15">
-            {slots.map((slot) => (
-              <div
-                key={slot.id}
-                className={getSlotClasses(slot.status)}
-                onClick={() => handleSlotClick(slot)}
-                role="button"
-                tabIndex={slot.status === 'available' ? 0 : -1}
-                aria-label={`Parking slot ${slot.id}, status: ${slot.status}`}
-              >
-                {slot.status !== 'available' && (
-                  <Car className="h-1/2 w-1/2" />
-                )}
-                <span className="absolute bottom-1 right-2 text-sm font-bold">
-                  {slot.id}
-                </span>
-              </div>
-            ))}
+          <div className="relative border-4 border-gray-700 bg-gray-200 p-4 rounded-lg">
+            {/* Entry Point */}
+            <div className="absolute top-4 right-4 flex items-center gap-2">
+              <Badge variant="destructive" className="text-lg">ENTRY</Badge>
+              <ArrowLeft className="h-8 w-8 text-gray-800 animate-pulse" />
+            </div>
+
+            {/* Top Row - Car Slots */}
+            <div className="grid grid-cols-3 gap-4 mb-4 border-b-4 border-gray-700 pb-4">
+              {carSlots.map((slot) => (
+                <div
+                  key={slot.id}
+                  className={getSlotClasses(slot)}
+                  onClick={() => handleSlotClick(slot)}
+                  role="button"
+                  tabIndex={slot.status === 'available' ? 0 : -1}
+                  aria-label={`Parking slot ${slot.id}, status: ${slot.status}`}
+                >
+                  {slot.status !== 'available' && (
+                    <VehicleIcon type={slot.type} />
+                  )}
+                  <span className="absolute bottom-1 right-2 text-sm font-bold">
+                    {slot.id}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            {/* Roadway */}
+            <div className="h-24 flex items-center justify-around my-4">
+               <ArrowRight className="h-10 w-10 text-gray-600" />
+               <ArrowRight className="h-10 w-10 text-gray-600" />
+            </div>
+
+            {/* Bottom Row - Bike Slots */}
+            <div className="grid grid-cols-6 gap-2 border-t-4 border-gray-700 pt-4">
+              {bikeSlots.map((slot) => (
+                 <div
+                  key={slot.id}
+                  className={getSlotClasses(slot)}
+                  onClick={() => handleSlotClick(slot)}
+                  role="button"
+                  tabIndex={slot.status === 'available' ? 0 : -1}
+                  aria-label={`Parking slot ${slot.id}, status: ${slot.status}`}
+                >
+                  {slot.status !== 'available' && (
+                     <VehicleIcon type={slot.type} />
+                  )}
+                  <span className="absolute bottom-1 right-1 text-xs font-bold">
+                    {slot.id}
+                  </span>
+                </div>
+              ))}
+            </div>
           </div>
 
           <div className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
