@@ -21,7 +21,7 @@ import Image from 'next/image';
 
 
 const navItems = [
-  { href: '/home#home', label: 'Home' },
+  { href: '/home', label: 'Home' },
   { href: '/home#booking', label: 'Booking' },
 ];
 
@@ -35,7 +35,7 @@ export function AppHeader() {
   const pathname = usePathname();
 
   const NavLink = ({ href, children, className }: { href: string, children: React.ReactNode, className?: string }) => {
-    const isActive = pathname === href || (href.includes('#') && pathname === href.split('#')[0]);
+    const isActive = pathname === href || (href.includes('#') && pathname === href.split('#')[0] && window.location.hash === href.split('#')[1]);
     return (
       <Link
         href={href}
