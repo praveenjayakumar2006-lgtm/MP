@@ -82,7 +82,7 @@ export function AppHeader() {
         </nav>
         <div className="flex items-center gap-4">
             <Link href="/login" className="hidden md:block">
-                <Image src="https://picsum.photos/seed/usericon/40/40" alt="Sign In" width={40} height={40} data-ai-hint="user icon" />
+                <Image src="https://picsum.photos/seed/usericon/40/40" alt="Sign In" width={40} height={40} className="rounded-full" data-ai-hint="user icon" />
             </Link>
             <Sheet>
             <SheetTrigger asChild>
