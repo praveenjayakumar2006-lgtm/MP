@@ -90,7 +90,7 @@ export function ViolationChecker() {
                     tool.
                 </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-4 p-4">
               <FormField
                 control={form.control}
                 name="slotNumber"
@@ -147,7 +147,7 @@ export function ViolationChecker() {
                 )}
               />
             </CardContent>
-            <CardFooter>
+            <CardFooter className="p-4 pt-0">
               <Button type="submit" disabled={isLoading}>
                 {isLoading && (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -165,7 +165,7 @@ export function ViolationChecker() {
             The AI-powered analysis will be displayed here.
           </CardDescription>
         </CardHeader>
-        <CardContent className="flex flex-1 items-center justify-center rounded-lg border-dashed border-2">
+        <CardContent className="flex flex-1 items-center justify-center rounded-lg border-dashed border-2 m-4 mt-0">
           {isLoading && <Loader2 className="h-8 w-8 animate-spin text-primary" />}
           {!isLoading && !result && (
             <p className="text-muted-foreground">
@@ -175,9 +175,9 @@ export function ViolationChecker() {
           {result && (
             <div className="flex flex-col items-center gap-4 text-center">
               {result.isViolationDetected ? (
-                <ShieldCheck className="h-16 w-16 text-destructive" />
+                <ShieldCheck className="h-12 w-12 text-destructive" />
               ) : (
-                <ShieldX className="h-16 w-16 text-green-600" />
+                <ShieldX className="h-12 w-12 text-green-600" />
               )}
               <h3 className="text-xl font-semibold">
                 {result.isViolationDetected
