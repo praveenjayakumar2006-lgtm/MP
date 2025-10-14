@@ -39,7 +39,7 @@ export function AppHeader() {
     return (
       <Link
         href={href}
-        className={cn(className, isActive ? "text-foreground" : "text-muted-foreground")}
+        className={cn(className, isActive ? "text-foreground" : "text-muted-foreground", "transform hover:scale-105 transition-transform duration-200")}
       >
         {children}
       </Link>
@@ -55,19 +55,19 @@ export function AppHeader() {
           <Car className="h-8 w-8 text-primary" />
           <span className="font-bold text-xl">ParkEasy</span>
         </Link>
-        <nav className="hidden md:flex flex-1 items-center justify-center gap-5 text-lg lg:gap-6">
+        <nav className="hidden md:flex flex-1 items-center justify-center gap-8 text-lg lg:gap-10">
           {navItems.map(item => (
             <NavLink
               key={item.href}
               href={item.href}
-              className="font-medium transition-colors hover:text-foreground"
+              className="font-medium"
             >
               {item.label}
             </NavLink>
           ))}
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="flex items-center gap-1 text-lg font-medium text-muted-foreground transition-colors hover:text-foreground hover:bg-transparent px-0">
+                <Button variant="ghost" className="flex items-center gap-1 text-lg font-medium text-muted-foreground transition-colors hover:text-foreground hover:bg-transparent p-0 transform hover:scale-105 transition-transform duration-200">
                     Others <ChevronDown className="h-4 w-4" />
                 </Button>
                 </DropdownMenuTrigger>
