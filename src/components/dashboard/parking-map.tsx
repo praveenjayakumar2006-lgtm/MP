@@ -2,7 +2,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Car, ArrowRight, ArrowLeft } from 'lucide-react';
+import { Car, ArrowUp, ArrowDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
   Card,
@@ -21,7 +21,6 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { parkingSlots as initialSlots } from '@/lib/data';
 import type { ParkingSlot } from '@/lib/types';
-import { Badge } from '../ui/badge';
 import { Bike } from 'lucide-react';
 
 export function ParkingMap() {
@@ -65,8 +64,8 @@ export function ParkingMap() {
           slot.status === 'occupied',
         'bg-blue-100 border-blue-400 text-blue-800 opacity-90 cursor-not-allowed':
           slot.status === 'reserved',
-        'aspect-[2/3]': slot.type === 'car',
-        'aspect-[3/4]': slot.type === 'bike',
+        'h-28 w-20': slot.type === 'car',
+        'h-24 w-16': slot.type === 'bike',
       }
     );
   };
@@ -85,9 +84,9 @@ export function ParkingMap() {
     <>
       <Card>
         <CardContent className="pt-6">
-          <div className="relative border-4 border-gray-700 bg-gray-200 p-4 rounded-lg">
-            {/* Top Row - Car Slots */}
-            <div className="grid grid-cols-[repeat(3,minmax(0,140px))] gap-4 mb-4 border-b-4 border-gray-700 pb-4 justify-center">
+          <div className="relative flex border-4 border-gray-700 bg-gray-200 p-4 rounded-lg">
+            {/* Left Side - Car Slots */}
+            <div className="grid grid-cols-1 gap-4">
               {carSlots.map((slot) => (
                 <div
                   key={slot.id}
@@ -108,13 +107,13 @@ export function ParkingMap() {
             </div>
 
             {/* Roadway */}
-            <div className="h-24 flex items-center justify-around my-4">
-               <ArrowRight className="h-10 w-10 text-gray-600" />
-               <ArrowRight className="h-10 w-10 text-gray-600" />
+            <div className="w-24 flex flex-col items-center justify-around mx-4">
+               <ArrowUp className="h-10 w-10 text-gray-600" />
+               <ArrowDown className="h-10 w-10 text-gray-600" />
             </div>
 
-            {/* Bottom Row - Bike Slots */}
-            <div className="grid grid-cols-6 gap-2 border-t-4 border-gray-700 pt-4">
+            {/* Right Side - Bike Slots */}
+            <div className="grid grid-cols-2 gap-2">
               {bikeSlots.map((slot) => (
                  <div
                   key={slot.id}
@@ -135,7 +134,7 @@ export function ParkingMap() {
             </div>
           </div>
 
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
+          <div className="mt-4 flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
             <div className="flex items-center gap-2">
               <div className="h-4 w-4 rounded-sm border-2 border-green-400 bg-green-100" />
               <span className="text-sm text-muted-foreground">Available</span>
