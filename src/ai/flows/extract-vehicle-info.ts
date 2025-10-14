@@ -10,7 +10,7 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
-export const ExtractVehicleInfoInputSchema = z.object({
+const ExtractVehicleInfoInputSchema = z.object({
   imageDataUri: z
     .string()
     .describe(
@@ -19,7 +19,7 @@ export const ExtractVehicleInfoInputSchema = z.object({
 });
 export type ExtractVehicleInfoInput = z.infer<typeof ExtractVehicleInfoInputSchema>;
 
-export const ExtractVehicleInfoOutputSchema = z.object({
+const ExtractVehicleInfoOutputSchema = z.object({
   licensePlate: z.string().describe('The license plate number of the vehicle.'),
   make: z.string().describe('The make of the vehicle (e.g., Toyota, Ford).'),
   model: z.string().describe('The model of the vehicle (e.g., Camry, F-150).'),

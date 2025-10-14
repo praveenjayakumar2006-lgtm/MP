@@ -30,7 +30,7 @@ import Image from 'next/image';
 
 const formSchema = z.object({
   image: z.any().refine(
-    (file) => file instanceof FileList && file.length > 0,
+    (files) => files instanceof FileList && files.length > 0,
     'An image is required.'
   ),
 });
@@ -57,16 +57,16 @@ export function ViolationChecker() {
 
   const { register, handleSubmit, formState, watch } = form;
 
-  const imageFile = watch('image');
+  const imageFiles = watch('image');
   
   useState(() => {
-    if (imageFile && imageFile[0]) {
-      const url = URL.createObjectURL(imageFile[0]);
+    if (imageFiles && imageFiles[0]) {
+      const url = URL.createObjectURL(imageFiles[0]);
       setPreview(url);
       return () => URL.revokeObjectURL(url);
     }
     setPreview(null);
-  }, [imageFile]);
+  }, [imageFiles]);
 
 
   async function onSubmit(values: ViolationFormValues) {
