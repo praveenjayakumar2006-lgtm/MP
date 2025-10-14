@@ -65,17 +65,19 @@ export function ParkingMap() {
           slot.status === 'occupied',
         'bg-blue-100 border-blue-400 text-blue-800 opacity-90 cursor-not-allowed':
           slot.status === 'reserved',
-        'aspect-[3/4]': slot.type === 'car',
-        'aspect-[2/3]': slot.type === 'bike',
+        'aspect-[2/3]': slot.type === 'car',
+        'aspect-[3/4]': slot.type === 'bike',
       }
     );
   };
 
   const VehicleIcon = ({ type, className }: { type: 'car' | 'bike', className?: string }) => {
-    const iconClass = cn('h-1/2 w-1/2', className);
+    let iconClass = cn(className);
     if (type === 'car') {
+      iconClass = cn('h-1/2 w-1/2', className);
       return <Car className={iconClass} />;
     }
+    iconClass = cn('h-2/3 w-2/3', className);
     return <Bike className={iconClass} />;
   };
 
@@ -91,7 +93,7 @@ export function ParkingMap() {
             </div>
 
             {/* Top Row - Car Slots */}
-            <div className="grid grid-cols-[repeat(3,minmax(0,100px))] gap-2 mb-4 border-b-4 border-gray-700 pb-4 justify-center">
+            <div className="grid grid-cols-[repeat(3,minmax(0,140px))] gap-4 mb-4 border-b-4 border-gray-700 pb-4 justify-center">
               {carSlots.map((slot) => (
                 <div
                   key={slot.id}
