@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Car, Bike, CheckCircle2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
@@ -26,12 +26,23 @@ import { motion } from 'framer-motion';
 import { useReservations } from '@/context/reservations-context';
 
 export function ParkingMap() {
-  const [slots, setSlots] = useState<ParkingSlot[]>(initialSlots);
+  const { reservations, addReservation, removeReservation } = useReservations();
+  const [slots, setSlots] = useState<ParkingSlot[]>([]);
   const [selectedSlot, setSelectedSlot] = useState<ParkingSlot | null>(null);
   const [slotToCancel, setSlotToCancel] = useState<ParkingSlot | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
   const { toast } = useToast();
-  const { addReservation, removeReservation } = useReservations();
+
+  useEffect(() => {
+    // Initialize slots based on context reservations
+    const userReservedSlotIds = new Set(reservations.map(r => r.slotId));
+    const updatedSlots = initialSlots.map(slot => 
+      userReservedSlotIds.has(slot.id)
+        ? { ...slot, status: 'reserved' as const, reservedBy: 'user' as const }
+        : slot
+    );
+    setSlots(updatedSlots);
+  }, [reservations]);
 
 
   const carSlots = slots.filter((slot) => slot.type === 'car');
