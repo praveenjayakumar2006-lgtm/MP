@@ -11,38 +11,44 @@ import {
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import type { Reservation } from '@/lib/types';
-import { useCollection } from '@/firebase/firestore/use-collection';
-import { collection, query, where, Timestamp as FirestoreTimestamp } from 'firebase/firestore';
-import { useFirestore } from '@/firebase';
 import { Skeleton } from '../ui/skeleton';
 
 type Status = 'Active' | 'Completed' | 'Upcoming';
 
-// A placeholder user ID. In a real app, this would come from an auth system.
-const USER_ID = 'user-123';
+const mockReservations: Reservation[] = [
+    {
+        id: '1',
+        slotId: 'C2',
+        userId: 'user-123',
+        vehiclePlate: 'USER-195',
+        startTime: new Date('2025-10-17T21:00:00'),
+        endTime: new Date('2025-10-17T22:00:00'),
+        status: 'Upcoming',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+    },
+    {
+        id: '2',
+        slotId: 'B3',
+        userId: 'user-123',
+        vehiclePlate: 'USER-163',
+        startTime: new Date('2025-10-17T21:00:00'),
+        endTime: new Date('2025-10-17T22:00:00'),
+        status: 'Upcoming',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+    }
+];
+
 
 export function ReservationsTable() {
   const [filter, setFilter] = useState<Status | 'all'>('all');
-  const firestore = useFirestore();
+  const [loading, setLoading] = useState(false);
+  const [reservations, setReservations] = useState(mockReservations);
 
-  const reservationsQuery = useMemo(() => {
-    if (!firestore) return null;
-    return query(
-        collection(firestore, 'reservations'), 
-        where('userId', '==', USER_ID)
-    );
-  }, [firestore]);
-
-  const { data: reservations, loading } = useCollection<Reservation>(reservationsQuery, {
-      map: (r) => ({
-          ...r,
-          startTime: (r.startTime as unknown as FirestoreTimestamp).toDate(),
-          endTime: (r.endTime as unknown as FirestoreTimestamp).toDate(),
-      })
-  });
 
   const getStatusVariant = (status: Status) => {
     switch (status) {

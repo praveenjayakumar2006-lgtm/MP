@@ -6,8 +6,6 @@ import { Toaster } from '@/components/ui/toaster';
 import { AppHeader } from '@/components/layout/app-header';
 import { Providers } from '@/components/layout/providers';
 import { PageTransition } from '@/components/layout/page-transition';
-import { FirebaseClientProvider } from '@/firebase/client-provider';
-import FirebaseErrorListener from '@/components/FirebaseErrorListener';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
@@ -24,10 +22,8 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} font-sans antialiased`}>
-       <FirebaseClientProvider>
         <Providers>
             <div className="flex min-h-screen w-full flex-col bg-muted">
-              <FirebaseErrorListener />
               <AppHeader />
               <main className="flex flex-1 flex-col">
                 <PageTransition>{children}</PageTransition>
@@ -35,7 +31,6 @@ export default function RootLayout({
             </div>
             <Toaster />
           </Providers>
-        </FirebaseClientProvider>
       </body>
     </html>
   );

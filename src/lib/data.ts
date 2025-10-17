@@ -2,22 +2,20 @@ import type { ParkingSlot } from './types';
 
 export const parkingSlots: ParkingSlot[] = [
   // Car slots
-  { id: 'C1', type: 'car' },
-  { id: 'C2', type: 'car' },
-  { id: 'C3', type: 'car' },
-  { id: 'C4', type: 'car' },
-  { id: 'C5', type: 'car' },
+  { id: 'C1', type: 'car', status: 'available' },
+  { id: 'C2', type: 'car', status: 'available' },
+  { id: 'C3', type: 'car', status: 'available' },
+  { id: 'C4', type: 'car', status: 'occupied' },
+  { id: 'C5', type: 'car', status: 'available' },
   // Bike slots
-  { id: 'B1', type: 'bike' },
-  { id: 'B2', type: 'bike' },
-  { id: 'B3', type: 'bike' },
-  { id: 'B4', type: 'bike' },
-  { id: 'B5', type: 'bike' },
-  { id: 'B6', type: 'bike' },
-  { id: 'B7', type: 'bike' },
-  { id: 'B8', type: 'bike' },
-  { id: 'B9', type: 'bike' },
-  { id: 'B10', type: 'bike' },
+  { id: 'B1', type: 'bike', status: 'available' },
+  { id: 'B2', type: 'bike', status: 'reserved' },
+  { id: 'B3', type: 'bike', status: 'available' },
+  { id: 'B4', type: 'bike', status: 'available' },
+  { id: 'B5', type: 'bike', status: 'occupied' },
+  { id: 'B6', type: 'bike', status: 'available' },
+  { id: 'B7', type: 'bike', status: 'available' },
+  { id: 'B8', type: 'bike', status: 'available' },
+  { id: 'B9', type: 'bike', status: 'reserved' },
+  { id: 'B10', type: 'bike', status: 'available' },
 ];
-
-    

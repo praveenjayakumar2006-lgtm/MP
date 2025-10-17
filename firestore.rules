@@ -1,9 +1,51 @@
+/**
+ * @fileoverview Firestore Security Rules for the Parking Reservation app.
+ *
+ * Core Philosophy:
+ * This ruleset enforces a user-ownership model for reservations. Each reservation
+ * is associated with a specific user, and only that user can modify or delete
+ * their reservations. Reservations are publicly readable.
+ *
+ * Data Structure:
+ * Reservations are stored in the top-level `/reservations` collection. Each
+ * document contains a `userId` field indicating the owner.
+ *
+ * Key Security Decisions:
+ * - Users can only create, update, and delete their own reservations.
+ * - Listing reservations is allowed for all users.
+ * - The schema of the reservations are flexible on data shapes to allow for rapid iteration.
+ */
 rules_version = '2';
-
 service cloud.firestore {
   match /databases/{database}/documents {
+
+    /**
+     * @description Secures the /reservations collection, enforcing user ownership for writes.
+     * @path /reservations/{reservationId}
+     * @allow (get, list): Anyone can read all reservations.
+     * @allow (create): User with auth `uid: "user_abc"` can create a reservation where `userId: "user_abc"`.
+     * @deny (create): User with auth `uid: "user_def"` cannot create a reservation where `userId: "user_abc"`.
+     * @allow (update, delete): User with auth `uid: "user_abc"` can update/delete a reservation where `userId: "user_abc"`.
+     * @deny (update, delete): User with auth `uid: "user_def"` cannot update/delete a reservation where `userId: "user_abc"`.
+     * @principle Enforces document ownership for writes and public read access.
+     */
     match /reservations/{reservationId} {
-      allow read, write: if true;
+      allow get, list: if true;
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if isSignedIn() && isExistingOwner(resource.data.userId);
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+
+    function isExistingOwner(userId) {
+        return isOwner(userId) && resource != null;
     }
   }
 }
