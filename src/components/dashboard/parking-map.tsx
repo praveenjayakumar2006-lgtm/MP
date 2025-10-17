@@ -107,10 +107,6 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
       addReservation(newReservation);
       setSelectedSlot(null);
       setShowSuccess(false);
-      toast({
-        title: 'Reservation Successful!',
-        description: `Slot ${selectedSlot.id} is now yours.`,
-      });
     }, 1500);
   };
   
