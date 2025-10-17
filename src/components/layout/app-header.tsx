@@ -62,7 +62,7 @@ export function AppHeader() {
           href="/home"
           className="flex items-center gap-2 text-lg font-semibold"
         >
-          <Car className="h-8 w-8" />
+          <Car className="h-10 w-10" />
           <span className="font-bold text-xl">ParkEasy</span>
         </Link>
         <nav className="hidden md:flex flex-1 items-center justify-center gap-8 text-lg lg:gap-10">
