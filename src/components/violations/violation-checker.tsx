@@ -98,7 +98,7 @@ export function ViolationChecker() {
 
       // Run both analyses in parallel
       const imageDataUri = await fileToDataUrl(file);
-      await Promise.all([
+      const [violationResult, vehicleResult] = await Promise.all([
         analyzeViolationText({
             slotNumber: values.slotNumber,
             violationType: values.violationType,
@@ -108,7 +108,11 @@ export function ViolationChecker() {
         analyzeVehicleImage({ imageDataUri })
       ]);
       
-      router.push(`/violations/result`);
+      const queryParams = new URLSearchParams({
+        licensePlate: vehicleResult.licensePlate,
+      });
+
+      router.push(`/violations/result?${queryParams.toString()}`);
 
     } catch (error) {
       console.error('Error analyzing violation:', error);
