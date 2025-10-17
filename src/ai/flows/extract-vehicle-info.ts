@@ -40,9 +40,9 @@ const extractVehicleInfoPrompt = ai.definePrompt({
   input: {schema: ExtractVehicleInfoInputSchema},
   output: {schema: ExtractVehicleInfoOutputSchema},
   prompt: `You are an expert vehicle recognition system. Your task is to analyze the provided image of a vehicle and extract the following information using OCR and image analysis:
-1. The license plate number.
-2. The vehicle's make and model.
-3. Generate plausible but CLEARLY FICTIONAL information for the vehicle's owner, including a name, address, and phone number. This is for demonstration purposes only.
+1. Generate plausible but CLEARLY FICTIONAL information for the vehicle's owner, including a name, address, and phone number. This is for demonstration purposes only.
+2. The license plate number.
+3. The vehicle's make and model.
 
 Analyze the image provided and return the information in the specified JSON format.
 

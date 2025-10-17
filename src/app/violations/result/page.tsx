@@ -103,20 +103,6 @@ function ViolationResultContent() {
                     {vehicleResult ? (
                         <div className="w-full space-y-4 text-sm">
                             <div>
-                                <h3 className="font-semibold text-base mb-2">Vehicle Details</h3>
-                                <div className="space-y-2 text-muted-foreground">
-                                <div className="flex items-center">
-                                    <Car className="h-4 w-4 mr-2 text-primary" />
-                                    <span><strong>License Plate:</strong> {vehicleResult.licensePlate}</span>
-                                </div>
-                                <div className="flex items-center">
-                                    <Car className="h-4 w-4 mr-2 text-primary" />
-                                    <span><strong>Make & Model:</strong> {vehicleResult.make} {vehicleResult.model}</span>
-                                </div>
-                                </div>
-                            </div>
-                            <Separator />
-                            <div>
                                 <h3 className="font-semibold text-base mb-2">Owner Details (Fictional)</h3>
                                 <div className="space-y-2 text-muted-foreground">
                                 <div className="flex items-center">
