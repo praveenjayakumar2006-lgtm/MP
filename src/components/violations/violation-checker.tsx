@@ -31,21 +31,25 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { Loader2, Car, User, Phone, Home, ShieldCheck, ShieldX } from 'lucide-react';
-import type { CombinedAnalysisResult } from '@/app/violations/actions';
-import { analyzeCombinedViolation } from '@/app/violations/actions';
+import { Loader2, Car, User, Phone, Home, ShieldCheck, ShieldX, Upload } from 'lucide-react';
+import { analyzeVehicleImage, analyzeViolationText } from '@/app/violations/actions';
+import type { DetectParkingViolationOutput, ExtractVehicleInfoOutput } from '@/ai/flows/detect-parking-violations';
 import Image from 'next/image';
 
 const violationSchema = z.object({
   slotNumber: z.string().min(1, 'Slot number is required.'),
   violationType: z.enum(['overstaying', 'unauthorized_parking']),
   details: z.string().min(10, 'Details must be at least 10 characters.'),
-  image: z.any().refine(
-    (files) => files instanceof FileList && files.length > 0,
-    'An image is required.'
-  ),
 });
 type ViolationFormValues = z.infer<typeof violationSchema>;
+
+const imageSchema = z.object({
+    image: z.any().refine(
+        (files) => files instanceof FileList && files.length > 0,
+        'An image is required.'
+    ),
+});
+type ImageFormValues = z.infer<typeof imageSchema>;
 
 
 function fileToDataUrl(file: File): Promise<string> {
@@ -58,11 +62,12 @@ function fileToDataUrl(file: File): Promise<string> {
 }
 
 export function ViolationChecker() {
-  const [analysisResult, setAnalysisResult] = useState<CombinedAnalysisResult | null>(null);
+  const [violationResult, setViolationResult] = useState<DetectParkingViolationOutput | null>(null);
+  const [vehicleResult, setVehicleResult] = useState<ExtractVehicleInfoOutput | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
 
-  const form = useForm<ViolationFormValues>({
+  const violationForm = useForm<ViolationFormValues>({
     resolver: zodResolver(violationSchema),
     defaultValues: {
       slotNumber: '',
@@ -71,8 +76,9 @@ export function ViolationChecker() {
     },
   });
 
-  const { register, watch } = form;
-  
+  const imageForm = useForm<ImageFormValues>();
+  const { register, watch } = imageForm;
+
   const imageFiles = watch('image');
   
   useState(() => {
@@ -86,25 +92,21 @@ export function ViolationChecker() {
   }, [imageFiles]);
 
 
-  async function onSubmit(values: ViolationFormValues) {
+  async function onViolationSubmit(values: ViolationFormValues) {
     setIsLoading(true);
-    setAnalysisResult(null);
-
-    const file = values.image[0];
-    if (!file) return;
+    setViolationResult(null);
+    setVehicleResult(null);
+    setPreview(null);
+    imageForm.reset();
 
     try {
-      const imageDataUri = await fileToDataUrl(file);
-      const result = await analyzeCombinedViolation(
-        {
-          slotNumber: values.slotNumber,
-          violationType: values.violationType,
-          details: values.details,
-          timestamp: new Date().toISOString(),
-        },
-        { imageDataUri }
-      );
-      setAnalysisResult(result);
+      const result = await analyzeViolationText({
+        slotNumber: values.slotNumber,
+        violationType: values.violationType,
+        details: values.details,
+        timestamp: new Date().toISOString(),
+      });
+      setViolationResult(result);
     } catch (error) {
       console.error('Error analyzing violation:', error);
     } finally {
@@ -112,15 +114,34 @@ export function ViolationChecker() {
     }
   }
 
+  async function onImageSubmit(values: ImageFormValues) {
+      setIsLoading(true);
+      setVehicleResult(null);
+      const file = values.image[0];
+      if (!file) return;
+
+      try {
+        const imageDataUri = await fileToDataUrl(file);
+        const result = await analyzeVehicleImage({ imageDataUri });
+        setVehicleResult(result);
+      } catch (error) {
+        console.error('Error analyzing vehicle:', error);
+      } finally {
+        setIsLoading(false);
+      }
+  }
+
   const renderResult = () => {
-    if (!analysisResult) {
-        return null;
+    if (!violationResult) {
+        return (
+            <div className='text-center text-muted-foreground'>
+                <p>The AI-powered analysis will be displayed here.</p>
+            </div>
+        )
     }
-    
-    const {violationResult, vehicleResult} = analysisResult;
 
     return (
-        <div className="w-full space-y-6 text-sm">
+        <div className="w-full space-y-4 text-sm">
             <div className="flex flex-col items-center gap-2 text-center border-b pb-4">
                 {violationResult.isViolationDetected ? (
                     <ShieldCheck className="h-10 w-10 text-green-500" />
@@ -134,42 +155,83 @@ export function ViolationChecker() {
                     <p className="text-xs text-muted-foreground">{violationResult.violationDetails}</p>
                 </div>
             </div>
-             <div className="w-full space-y-4">
-              <div>
-                <h3 className="font-semibold text-base">Vehicle Details</h3>
-                <div className="mt-2 space-y-1 text-muted-foreground">
-                  <div className="flex items-center">
-                    <Car className="h-4 w-4 mr-2" />
-                    <span><strong>License Plate:</strong> {vehicleResult.licensePlate}</span>
-                  </div>
-                  <div className="flex items-center">
-                    <Car className="h-4 w-4 mr-2" />
-                    <span><strong>Make & Model:</strong> {vehicleResult.make} {vehicleResult.model}</span>
-                  </div>
-                   <div className="flex items-center">
-                    <Car className="h-4 w-4 mr-2" />
-                    <span><strong>Color:</strong> {vehicleResult.color}</span>
-                  </div>
+
+            {vehicleResult ? (
+                 <div className="w-full space-y-4">
+                    <div>
+                        <h3 className="font-semibold text-base">Vehicle Details</h3>
+                        <div className="mt-2 space-y-1 text-muted-foreground">
+                        <div className="flex items-center">
+                            <Car className="h-4 w-4 mr-2" />
+                            <span><strong>License Plate:</strong> {vehicleResult.licensePlate}</span>
+                        </div>
+                        <div className="flex items-center">
+                            <Car className="h-4 w-4 mr-2" />
+                            <span><strong>Make & Model:</strong> {vehicleResult.make} {vehicleResult.model}</span>
+                        </div>
+                        <div className="flex items-center">
+                            <Car className="h-4 w-4 mr-2" />
+                            <span><strong>Color:</strong> {vehicleResult.color}</span>
+                        </div>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 className="font-semibold text-base">Owner Details (Fictional)</h3>
+                        <div className="mt-2 space-y-1 text-muted-foreground">
+                        <div className="flex items-center">
+                            <User className="h-4 w-4 mr-2" />
+                            <span>{vehicleResult.owner.name}</span>
+                        </div>
+                        <div className="flex items-center">
+                            <Home className="h-4 w-4 mr-2" />
+                            <span>{vehicleResult.owner.address}</span>
+                        </div>
+                        <div className="flex items-center">
+                            <Phone className="h-4 w-4 mr-2" />
+                            <span>{vehicleResult.owner.phone}</span>
+                        </div>
+                        </div>
+                    </div>
+                 </div>
+            ) : (
+                <div className='space-y-4'>
+                    <Form {...imageForm}>
+                        <form onSubmit={imageForm.handleSubmit(onImageSubmit)} className="space-y-4">
+                             <FormField
+                                control={imageForm.control}
+                                name="image"
+                                render={({ field }) => (
+                                    <FormItem>
+                                    <FormLabel>Upload Vehicle Image</FormLabel>
+                                    <FormControl>
+                                        <Input
+                                        type="file"
+                                        accept="image/*"
+                                        {...register('image')}
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            {preview && (
+                            <div className="mt-4 relative aspect-video w-full">
+                                <Image
+                                src={preview}
+                                alt="Image preview"
+                                fill
+                                className="rounded-md object-cover"
+                                />
+                            </div>
+                            )}
+                            <Button type="submit" disabled={isLoading}>
+                                {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
+                                Analyze Vehicle
+                            </Button>
+                        </form>
+                    </Form>
                 </div>
-              </div>
-              <div>
-                <h3 className="font-semibold text-base">Owner Details (Fictional)</h3>
-                 <div className="mt-2 space-y-1 text-muted-foreground">
-                  <div className="flex items-center">
-                    <User className="h-4 w-4 mr-2" />
-                    <span>{vehicleResult.owner.name}</span>
-                  </div>
-                  <div className="flex items-center">
-                    <Home className="h-4 w-4 mr-2" />
-                    <span>{vehicleResult.owner.address}</span>
-                  </div>
-                   <div className="flex items-center">
-                    <Phone className="h-4 w-4 mr-2" />
-                    <span>{vehicleResult.owner.phone}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+            )}
         </div>
     );
   }
@@ -177,15 +239,15 @@ export function ViolationChecker() {
   return (
     <div className="w-full grid md:grid-cols-2 gap-8 items-start">
         <Card>
-            <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)}>
+            <Form {...violationForm}>
+                <form onSubmit={violationForm.handleSubmit(onViolationSubmit)}>
                     <CardHeader>
                         <CardTitle>Report a Violation</CardTitle>
-                        <CardDescription>Fill in the details and upload an image to check for a parking violation.</CardDescription>
+                        <CardDescription>Fill in the details to check for a parking violation.</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-3">
                         <FormField
-                            control={form.control}
+                            control={violationForm.control}
                             name="slotNumber"
                             render={({ field }) => (
                             <FormItem>
@@ -198,7 +260,7 @@ export function ViolationChecker() {
                             )}
                         />
                         <FormField
-                            control={form.control}
+                            control={violationForm.control}
                             name="violationType"
                             render={({ field }) => (
                             <FormItem>
@@ -219,7 +281,7 @@ export function ViolationChecker() {
                             )}
                         />
                         <FormField
-                            control={form.control}
+                            control={violationForm.control}
                             name="details"
                             render={({ field }) => (
                             <FormItem>
@@ -235,33 +297,6 @@ export function ViolationChecker() {
                             </FormItem>
                             )}
                         />
-                        <FormField
-                            control={form.control}
-                            name="image"
-                            render={({ field }) => (
-                                <FormItem>
-                                <FormLabel>Upload Image</FormLabel>
-                                <FormControl>
-                                    <Input
-                                    type="file"
-                                    accept="image/*"
-                                    {...register('image')}
-                                    />
-                                </FormControl>
-                                <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        {preview && (
-                        <div className="mt-4 relative aspect-video w-full">
-                            <Image
-                            src={preview}
-                            alt="Image preview"
-                            fill
-                            className="rounded-md object-cover"
-                            />
-                        </div>
-                        )}
                     </CardContent>
                         <CardFooter>
                         <Button type="submit" disabled={isLoading}>
@@ -275,12 +310,9 @@ export function ViolationChecker() {
         <Card className="flex flex-col min-h-[550px]">
             <CardHeader>
                 <CardTitle>Analysis Result</CardTitle>
-                <CardDescription>
-                    The AI-powered analysis will be displayed here.
-                </CardDescription>
             </CardHeader>
-            <CardContent className="flex-1 flex items-center justify-center rounded-lg border-dashed border-2 m-6 mt-0 p-4">
-                {isLoading ? <Loader2 className="h-8 w-8 animate-spin text-primary" /> : renderResult()}
+            <CardContent className="flex-1 flex items-center justify-center rounded-lg m-6 mt-0 p-4">
+                {isLoading && !violationResult ? <Loader2 className="h-8 w-8 animate-spin text-primary" /> : renderResult()}
             </CardContent>
         </Card>
     </div>

@@ -12,18 +12,15 @@ import {
   type ExtractVehicleInfoOutput,
 } from '@/ai/flows/extract-vehicle-info';
 
-export type CombinedAnalysisResult = {
-    violationResult: DetectParkingViolationOutput;
-    vehicleResult: ExtractVehicleInfoOutput;
+export async function analyzeViolationText(
+    violationInput: DetectParkingViolationInput
+): Promise<DetectParkingViolationOutput> {
+  return await detectParkingViolation(violationInput);
 }
 
-export async function analyzeCombinedViolation(
-    violationInput: DetectParkingViolationInput,
+export async function analyzeVehicleImage(
     imageInput: ExtractVehicleInfoInput
-): Promise<CombinedAnalysisResult> {
-  const [violationResult, vehicleResult] = await Promise.all([
-    detectParkingViolation(violationInput),
-    extractVehicleInfo(imageInput),
-  ]);
-  return { violationResult, vehicleResult };
+): Promise<ExtractVehicleInfoOutput> {
+    return await extractVehicleInfo(imageInput);
 }
+
