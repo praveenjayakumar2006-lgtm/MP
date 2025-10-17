@@ -28,7 +28,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { format } from 'date-fns';
+import { format, isToday } from 'date-fns';
 import { Calendar as CalendarIcon, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useForm } from 'react-hook-form';
@@ -68,10 +68,16 @@ export default function BookingPage() {
     resolver: zodResolver(bookingSchema),
   });
 
+  const selectedDate = form.watch('date');
+
   function onSubmit(values: BookingFormValues) {
     console.log(values);
     router.push('/select-spot');
   }
+
+  const now = new Date();
+  const currentHour = now.getHours();
+  const currentMinute = now.getMinutes();
 
   return (
     <section id="booking" className="py-12 md:py-24 lg:py-32 flex flex-col items-center justify-center flex-1 bg-background">
@@ -119,7 +125,10 @@ export default function BookingPage() {
                                     <Calendar
                                     mode="single"
                                     selected={field.value}
-                                    onSelect={field.onChange}
+                                    onSelect={(date) => {
+                                      field.onChange(date);
+                                      form.resetField('startTime');
+                                    }}
                                     disabled={(date) =>
                                         date < new Date(new Date().setHours(0, 0, 0, 0))
                                     }
@@ -137,7 +146,7 @@ export default function BookingPage() {
                         render={({ field }) => (
                             <FormItem>
                             <FormLabel>Start Time</FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
                                 <FormControl>
                                 <SelectTrigger>
                                     <Clock className="mr-2 h-4 w-4" />
@@ -145,11 +154,15 @@ export default function BookingPage() {
                                 </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
-                                {timeSlots.map((time) => (
-                                    <SelectItem key={time.value} value={time.value}>
-                                    {time.label}
+                                {timeSlots.map((time) => {
+                                  const [hour, minute] = time.value.split(':').map(Number);
+                                  const isPast = selectedDate && isToday(selectedDate) && (hour < currentHour || (hour === currentHour && minute < currentMinute));
+                                  return (
+                                    <SelectItem key={time.value} value={time.value} disabled={isPast}>
+                                      {time.label}
                                     </SelectItem>
-                                ))}
+                                  )
+                                })}
                                 </SelectContent>
                             </Select>
                             <FormMessage />
