@@ -1,4 +1,5 @@
 
+
 export type ParkingSlotStatus = 'available' | 'occupied' | 'reserved';
 export type VehicleType = 'car' | 'bike';
 
@@ -7,15 +8,19 @@ export type ParkingSlot = {
   type: VehicleType;
   status?: ParkingSlotStatus;
   reservedBy?: 'user' | 'other';
+  reservationId?: string;
 };
 
 export type Reservation = {
   id: string;
+  userId: string;
   slotId: string;
   vehiclePlate: string;
   startTime: Date;
   endTime: Date;
   status: 'Active' | 'Completed' | 'Upcoming';
+  createdAt: Date;
+  updatedAt: Date;
 };
 
 export type ViolationType = 'overstaying' | 'unauthorized_parking';

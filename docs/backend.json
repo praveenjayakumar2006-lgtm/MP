@@ -1,0 +1,60 @@
+{
+  "entities": {
+    "Reservation": {
+      "title": "Reservation",
+      "description": "A booking for a parking slot.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "The ID of the user who made the reservation."
+        },
+        "slotId": {
+          "type": "string",
+          "description": "The ID of the parking slot."
+        },
+        "vehiclePlate": {
+          "type": "string",
+          "description": "The vehicle plate number for the reservation."
+        },
+        "startTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The start time of the reservation."
+        },
+        "endTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The end time of the reservation."
+        },
+        "status": {
+          "type": "string",
+          "enum": ["Active", "Completed", "Upcoming"],
+          "description": "The status of the reservation."
+        },
+        "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "The timestamp when the reservation was created."
+        },
+        "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "The timestamp when the reservation was last updated."
+        }
+      },
+      "required": ["userId", "slotId", "startTime", "endTime", "status"]
+    }
+  },
+  "auth": {
+    "providers": ["anonymous"]
+  },
+  "firestore": {
+    "/reservations/{reservationId}": {
+      "schema": {
+        "$ref": "#/entities/Reservation"
+      },
+      "description": "Stores all reservation documents."
+    }
+  }
+}
