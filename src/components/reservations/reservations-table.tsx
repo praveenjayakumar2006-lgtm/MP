@@ -10,16 +10,18 @@ import {
 } from '@/components/ui/table';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { reservations } from '@/lib/data';
 import { format } from 'date-fns';
-import { cn } from '@/lib/utils';
 import { useState } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { useReservations } from '@/context/reservations-context';
+import type { Reservation } from '@/lib/types';
+
 
 type Status = 'Active' | 'Completed' | 'Upcoming';
 
 export function ReservationsTable() {
   const [filter, setFilter] = useState<Status | 'all'>('all');
+  const { reservations } = useReservations();
 
   const getStatusVariant = (status: Status) => {
     switch (status) {
@@ -70,10 +72,10 @@ export function ReservationsTable() {
                     </TableCell>
                     <TableCell>{reservation.vehiclePlate}</TableCell>
                     <TableCell>
-                      {format(reservation.startTime, 'MMM d, yyyy, h:mm a')}
+                      {format(new Date(reservation.startTime), 'MMM d, yyyy, h:mm a')}
                     </TableCell>
                     <TableCell>
-                      {format(reservation.endTime, 'MMM d, yyyy, h:mm a')}
+                      {format(new Date(reservation.endTime), 'MMM d, yyyy, h:mm a')}
                     </TableCell>
                     <TableCell>
                       <Badge variant={getStatusVariant(reservation.status)}>

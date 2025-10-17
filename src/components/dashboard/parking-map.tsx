@@ -1,8 +1,8 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Car, Bike, CheckCircle2, XCircle } from 'lucide-react';
+import { useState } from 'react';
+import { Car, Bike, CheckCircle2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
   Card,
@@ -23,7 +23,7 @@ import { parkingSlots as initialSlots } from '@/lib/data';
 import type { ParkingSlot } from '@/lib/types';
 import { Separator } from '@/components/ui/separator';
 import { motion } from 'framer-motion';
-
+import { useReservations } from '@/context/reservations-context';
 
 export function ParkingMap() {
   const [slots, setSlots] = useState<ParkingSlot[]>(initialSlots);
@@ -31,6 +31,8 @@ export function ParkingMap() {
   const [slotToCancel, setSlotToCancel] = useState<ParkingSlot | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
   const { toast } = useToast();
+  const { addReservation, removeReservation } = useReservations();
+
 
   const carSlots = slots.filter((slot) => slot.type === 'car');
   const bikeSlots = slots.filter((slot) => slot.type === 'bike');
@@ -49,6 +51,17 @@ export function ParkingMap() {
 
     setShowSuccess(true);
 
+    const newReservation = {
+      id: `RES-${Date.now()}`,
+      slotId: selectedSlot.id,
+      vehiclePlate: `USER-${Math.floor(Math.random() * 1000)}`,
+      startTime: new Date(),
+      endTime: new Date(new Date().getTime() + 2 * 60 * 60 * 1000), // 2 hours from now
+      status: 'Active' as const,
+    };
+    addReservation(newReservation);
+
+
     setSlots((prevSlots) =>
       prevSlots.map((s) =>
         s.id === selectedSlot.id ? { ...s, status: 'reserved', reservedBy: 'user' } : s
@@ -63,6 +76,8 @@ export function ParkingMap() {
   
   const handleConfirmCancellation = () => {
     if (!slotToCancel) return;
+
+    removeReservation(slotToCancel.id);
 
     setSlots((prevSlots) =>
       prevSlots.map((s) =>
@@ -79,7 +94,6 @@ export function ParkingMap() {
   }
 
   const getSlotClasses = (slot: ParkingSlot) => {
-    const isClickable = slot.status === 'available' || (slot.status === 'reserved' && slot.reservedBy === 'user');
     return cn(
       'relative flex flex-col items-center justify-center rounded-md border-2 transition-all duration-300',
       {
@@ -120,7 +134,7 @@ export function ParkingMap() {
                     className={getSlotClasses(slot)}
                     onClick={() => handleSlotClick(slot)}
                     role="button"
-                    tabIndex={slot.status === 'available' ? 0 : -1}
+                    tabIndex={slot.status === 'available' || (slot.status === 'reserved' && slot.reservedBy === 'user') ? 0 : -1}
                     aria-label={`Parking slot ${slot.id}, status: ${slot.status}`}
                 >
                     {slot.status === 'reserved' && slot.reservedBy === 'user' && (
@@ -149,7 +163,7 @@ export function ParkingMap() {
                     className={getSlotClasses(slot)}
                     onClick={() => handleSlotClick(slot)}
                     role="button"
-                    tabIndex={slot.status === 'available' ? 0 : -1}
+                     tabIndex={slot.status === 'available' || (slot.status === 'reserved' && slot.reservedBy === 'user') ? 0 : -1}
                     aria-label={`Parking slot ${slot.id}, status: ${slot.status}`}
                     >
                     {slot.status === 'reserved' && slot.reservedBy === 'user' && (
@@ -174,7 +188,7 @@ export function ParkingMap() {
                     className={getSlotClasses(slot)}
                     onClick={() => handleSlotClick(slot)}
                     role="button"
-                    tabIndex={slot.status === 'available' ? 0 : -1}
+                     tabIndex={slot.status === 'available' || (slot.status === 'reserved' && slot.reservedBy === 'user') ? 0 : -1}
                     aria-label={`Parking slot ${slot.id}, status: ${slot.status}`}
                     >
                     {slot.status === 'reserved' && slot.reservedBy === 'user' && (
