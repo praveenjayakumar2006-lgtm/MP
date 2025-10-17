@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Car, Bike, CheckCircle2 } from 'lucide-react';
+import { Car, Bike, CheckCircle2, XCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
   Card,
@@ -28,6 +28,7 @@ import { motion } from 'framer-motion';
 export function ParkingMap() {
   const [slots, setSlots] = useState<ParkingSlot[]>(initialSlots);
   const [selectedSlot, setSelectedSlot] = useState<ParkingSlot | null>(null);
+  const [slotToCancel, setSlotToCancel] = useState<ParkingSlot | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
   const { toast } = useToast();
 
@@ -38,6 +39,8 @@ export function ParkingMap() {
     if (slot.status === 'available') {
       setSelectedSlot(slot);
       setShowSuccess(false);
+    } else if (slot.status === 'reserved' && slot.reservedBy === 'user') {
+      setSlotToCancel(slot);
     }
   };
 
@@ -57,8 +60,26 @@ export function ParkingMap() {
         setShowSuccess(false);
     }, 1500)
   };
+  
+  const handleConfirmCancellation = () => {
+    if (!slotToCancel) return;
+
+    setSlots((prevSlots) =>
+      prevSlots.map((s) =>
+        s.id === slotToCancel.id ? { ...s, status: 'available', reservedBy: undefined } : s
+      )
+    );
+
+    toast({
+        title: 'Reservation Cancelled',
+        description: `Your reservation for slot ${slotToCancel.id} has been cancelled.`,
+    });
+
+    setSlotToCancel(null);
+  }
 
   const getSlotClasses = (slot: ParkingSlot) => {
+    const isClickable = slot.status === 'available' || (slot.status === 'reserved' && slot.reservedBy === 'user');
     return cn(
       'relative flex flex-col items-center justify-center rounded-md border-2 transition-all duration-300',
       {
@@ -68,7 +89,7 @@ export function ParkingMap() {
           slot.status === 'occupied',
         'bg-blue-100 border-blue-400 text-blue-800 opacity-90 cursor-not-allowed':
           slot.status === 'reserved' && slot.reservedBy !== 'user',
-         'bg-yellow-100 border-yellow-400 text-yellow-800':
+         'bg-yellow-100 border-yellow-400 text-yellow-800 cursor-pointer hover:bg-yellow-200':
           slot.status === 'reserved' && slot.reservedBy === 'user',
         'h-24 w-16': slot.type === 'car',
         'h-20 w-16': slot.type === 'bike',
@@ -235,6 +256,34 @@ export function ParkingMap() {
                 </AlertDialogFooter>
             </>
             )}
+        </AlertDialogContent>
+      </AlertDialog>
+
+       <AlertDialog
+        open={!!slotToCancel}
+        onOpenChange={(open) => {
+          if (!open) {
+            setSlotToCancel(null);
+          }
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Cancel Reservation</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to cancel your reservation for parking slot{' '}
+              <span className="font-bold text-foreground">{slotToCancel?.id}</span>?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Keep Reservation</AlertDialogCancel>
+            <AlertDialogAction
+              variant="destructive"
+              onClick={handleConfirmCancellation}
+            >
+              Cancel Reservation
+            </AlertDialogAction>
+          </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
     </>
