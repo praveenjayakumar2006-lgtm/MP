@@ -94,14 +94,14 @@ export function AppHeader() {
             </DropdownMenu>
         </nav>
         <div className="flex items-center gap-4 ml-auto">
-            {!isMobile && isClient && (
+            {isClient && !isMobile && (
               <Link href="/login">
                 <Button variant="ghost" size="icon" className="hover:bg-white/10 [&_svg]:size-8">
                   <LogOut className="text-primary-foreground/80 hover:text-primary-foreground" />
                 </Button>
               </Link>
             )}
-            {isMobile && isClient && (
+            {isClient && isMobile && (
             <Sheet>
               <SheetTrigger asChild>
                   <Button variant="outline" size="icon" className="shrink-0 md:hidden bg-transparent border-primary-foreground/80 text-primary-foreground hover:bg-white/10 hover:text-primary-foreground">
