@@ -122,6 +122,7 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
     toast({
       title: 'Reservation Cancelled',
       description: `Your booking for slot ${reservationToCancel.slotId} has been cancelled.`,
+      duration: 2000,
     });
     setReservationToCancel(null);
   };
