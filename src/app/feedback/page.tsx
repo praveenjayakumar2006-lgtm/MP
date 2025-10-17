@@ -22,11 +22,11 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Textarea } from '@/components/ui/textarea';
-import { useToast } from '@/hooks/use-toast';
 import { Star } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
+import { useRouter } from 'next/navigation';
 
 const feedbackSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters.'),
@@ -38,7 +38,7 @@ const feedbackSchema = z.object({
 type FeedbackFormValues = z.infer<typeof feedbackSchema>;
 
 export default function FeedbackPage() {
-  const { toast } = useToast();
+  const router = useRouter();
   const [hoverRating, setHoverRating] = useState(0);
 
   const form = useForm<FeedbackFormValues>({
@@ -51,11 +51,7 @@ export default function FeedbackPage() {
 
   function onSubmit(values: FeedbackFormValues) {
     console.log(values);
-    toast({
-      title: 'Feedback Submitted',
-      description: 'Thank you for your feedback!',
-    });
-    form.reset();
+    router.push('/feedback/success');
   }
 
   return (
