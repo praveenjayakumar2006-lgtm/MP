@@ -213,8 +213,8 @@ export function ViolationChecker() {
   }
 
   return (
-    <>
-      <div className="mb-4 text-center">
+     <div className="grid md:grid-cols-2 gap-12 items-center max-w-4xl mx-auto">
+      <div className="space-y-2">
         <h1 className="text-3xl font-semibold">Report a Violation</h1>
         <p className="text-muted-foreground">Fill in the details to check for a parking violation.</p>
       </div>
@@ -293,6 +293,6 @@ export function ViolationChecker() {
               </form>
           </Form>
       </Card>
-    </>
+    </div>
   );
 }
