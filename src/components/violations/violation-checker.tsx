@@ -33,8 +33,10 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { Loader2, Car, User, Phone, Home, ShieldCheck, ShieldX, Upload } from 'lucide-react';
 import { analyzeVehicleImage, analyzeViolationText } from '@/app/violations/actions';
-import type { DetectParkingViolationOutput, ExtractVehicleInfoOutput } from '@/ai/flows/detect-parking-violations';
+import type { DetectParkingViolationOutput } from '@/ai/flows/detect-parking-violations';
+import type { ExtractVehicleInfoOutput } from '@/ai/flows/extract-vehicle-info';
 import Image from 'next/image';
+import { Separator } from '../ui/separator';
 
 const violationSchema = z.object({
   slotNumber: z.string().min(1, 'Slot number is required.'),
@@ -65,6 +67,7 @@ export function ViolationChecker() {
   const [violationResult, setViolationResult] = useState<DetectParkingViolationOutput | null>(null);
   const [vehicleResult, setVehicleResult] = useState<ExtractVehicleInfoOutput | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
 
   const violationForm = useForm<ViolationFormValues>({
@@ -115,7 +118,7 @@ export function ViolationChecker() {
   }
 
   async function onImageSubmit(values: ImageFormValues) {
-      setIsLoading(true);
+      setIsUploading(true);
       setVehicleResult(null);
       const file = values.image[0];
       if (!file) return;
@@ -127,21 +130,23 @@ export function ViolationChecker() {
       } catch (error) {
         console.error('Error analyzing vehicle:', error);
       } finally {
-        setIsLoading(false);
+        setIsUploading(false);
       }
   }
 
   const renderResult = () => {
+    if (isLoading) {
+      return <Loader2 className="h-8 w-8 animate-spin text-primary" />;
+    }
+
     if (!violationResult) {
-        return (
-            <div className='text-center text-muted-foreground'>
-                <p>The AI-powered analysis will be displayed here.</p>
-            </div>
-        )
+      return null;
     }
 
     return (
         <div className="w-full space-y-4 text-sm">
+            <Separator className='my-4' />
+             <h3 className="text-lg font-semibold text-center">Analysis Result</h3>
             <div className="flex flex-col items-center gap-2 text-center border-b pb-4">
                 {violationResult.isViolationDetected ? (
                     <ShieldCheck className="h-10 w-10 text-green-500" />
@@ -224,8 +229,8 @@ export function ViolationChecker() {
                                 />
                             </div>
                             )}
-                            <Button type="submit" disabled={isLoading}>
-                                {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
+                            <Button type="submit" disabled={isUploading}>
+                                {isUploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
                                 Analyze Vehicle
                             </Button>
                         </form>
@@ -237,7 +242,6 @@ export function ViolationChecker() {
   }
 
   return (
-    <div className="w-full grid md:grid-cols-2 gap-8 items-start">
         <Card>
             <Form {...violationForm}>
                 <form onSubmit={violationForm.handleSubmit(onViolationSubmit)}>
@@ -297,24 +301,15 @@ export function ViolationChecker() {
                             </FormItem>
                             )}
                         />
+                         <div className="pt-4">
+                            <Button type="submit" disabled={isLoading} className='w-full'>
+                                {isLoading && !violationResult ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : 'Analyze Violation'}
+                            </Button>
+                        </div>
+                        {renderResult()}
                     </CardContent>
-                        <CardFooter>
-                        <Button type="submit" disabled={isLoading}>
-                            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                            Analyze Violation
-                        </Button>
-                    </CardFooter>
                 </form>
             </Form>
         </Card>
-        <Card className="flex flex-col min-h-[550px]">
-            <CardHeader>
-                <CardTitle>Analysis Result</CardTitle>
-            </CardHeader>
-            <CardContent className="flex-1 flex items-center justify-center rounded-lg m-6 mt-0 p-4">
-                {isLoading && !violationResult ? <Loader2 className="h-8 w-8 animate-spin text-primary" /> : renderResult()}
-            </CardContent>
-        </Card>
-    </div>
   );
 }
