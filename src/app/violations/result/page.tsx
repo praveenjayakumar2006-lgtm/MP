@@ -15,6 +15,20 @@ function ViolationResultContent() {
   const searchParams = useSearchParams();
   const licensePlate = searchParams.get('licensePlate');
 
+  // Simple formatter for Indian license plates, can be adjusted.
+  // e.g. HR26DQ05551 -> HR 26 DQ 05551
+  const formatLicensePlate = (plate: string | null) => {
+    if (!plate) return null;
+    const cleaned = plate.replace(/\s/g, '').toUpperCase();
+    const match = cleaned.match(/^([A-Z]{2})(\d{2})([A-Z]{1,2})(.*)$/);
+    if (match) {
+        return `${match[1]} ${match[2]} ${match[3]} ${match[4]}`;
+    }
+    return plate;
+  }
+
+  const formattedLicensePlate = formatLicensePlate(licensePlate);
+
   return (
     <div className="flex flex-1 items-center justify-center">
       <Card className="max-w-md w-full text-center p-6">
@@ -28,9 +42,9 @@ function ViolationResultContent() {
           <p className="text-muted-foreground mb-6">
             Your violation report has been submitted successfully. We appreciate you taking the time to help us improve safety.
           </p>
-          {licensePlate && (
+          {formattedLicensePlate && (
             <p className="text-sm text-foreground mb-6">
-              Detected License Plate: <span className="font-semibold bg-primary/10 text-primary px-2 py-1 rounded-md">{licensePlate}</span>
+              Detected License Plate: <span className="font-semibold bg-primary/10 text-primary px-2 py-1 rounded-md">{formattedLicensePlate}</span>
             </p>
           )}
           <div className="flex justify-center gap-4">
