@@ -24,10 +24,6 @@ export default function SignupPage() {
       <CardContent>
         <div className="grid gap-4">
           <div className="grid gap-2">
-            <Label htmlFor="id-number">ID Number</Label>
-            <Input id="id-number" placeholder="e.g. 12345" required />
-          </div>
-          <div className="grid gap-2">
             <Label htmlFor="full-name">Full name</Label>
             <Input id="full-name" placeholder="Max Robinson" required />
           </div>
