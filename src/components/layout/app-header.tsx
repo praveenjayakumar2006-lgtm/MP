@@ -15,12 +15,14 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useEffect, useState } from 'react';
-
+import { useFirebase } from '@/firebase';
+import { signOut } from 'firebase/auth';
+import { useToast } from '@/hooks/use-toast';
 
 const navItems = [
   { href: '/home', label: 'Home' },
@@ -37,10 +39,24 @@ export function AppHeader() {
   const pathname = usePathname();
   const isMobile = useIsMobile();
   const [isClient, setIsClient] = useState(false);
+  const { auth, user } = useFirebase();
+  const router = useRouter();
+  const { toast } = useToast();
+
 
   useEffect(() => {
     setIsClient(true);
   }, []);
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      toast({ title: 'Logged out successfully.' });
+      router.push('/login');
+    } catch (error) {
+      toast({ variant: 'destructive', title: 'Failed to log out.' });
+    }
+  };
 
   const isOtherItemActive = otherItems.some(item => pathname.startsWith(item.href));
 
@@ -73,8 +89,7 @@ export function AppHeader() {
               className="font-medium"
             >
               {item.label}
-            </NavLink>
-          ))}
+            </NavLink>))}
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className={cn(
@@ -94,12 +109,10 @@ export function AppHeader() {
             </DropdownMenu>
         </nav>
         <div className="flex items-center gap-4 ml-auto">
-            {isClient && !isMobile && (
-              <Link href="/login">
-                <Button variant="ghost" size="icon" className="hover:bg-white/10 [&_svg]:size-8">
+            {isClient && !isMobile && user && (
+              <Button onClick={handleLogout} variant="ghost" size="icon" className="hover:bg-white/10 [&_svg]:size-8">
                   <LogOut className="text-primary-foreground/80 hover:text-primary-foreground" />
-                </Button>
-              </Link>
+              </Button>
             )}
             {isClient && isMobile && (
             <Sheet>
@@ -138,9 +151,13 @@ export function AppHeader() {
                       </NavLink>
                   ))}
                   </div>
-                  <Link href="/login">
-                      <Button variant="outline" className="w-full mt-4">Sign In</Button>
-                  </Link>
+                  {user ? (
+                    <Button onClick={handleLogout} variant="outline" className="w-full mt-4">Sign Out</Button>
+                  ) : (
+                    <Link href="/login">
+                        <Button variant="outline" className="w-full mt-4">Sign In</Button>
+                    </Link>
+                  )}
                   </nav>
               </SheetContent>
             </Sheet>

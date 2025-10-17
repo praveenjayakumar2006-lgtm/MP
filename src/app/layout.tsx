@@ -6,29 +6,52 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { AppHeader } from '@/components/layout/app-header';
-import { Providers } from '@/components/layout/providers';
 import { PageTransition } from '@/components/layout/page-transition';
 import { ReservationsProvider } from '@/context/reservations-context';
-import { usePathname } from 'next/navigation';
-import { useMemo } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
+import { useEffect, useMemo } from 'react';
+import { FirebaseClientProvider, useUser } from '@/firebase';
+import Loading from './loading';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
-// export const metadata: Metadata = {
-//   title: 'ParkEasy',
-//   description: 'Your one-stop solution for hassle-free parking.',
-// };
+function AppContent({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const router = useRouter();
+  const { user, isUserLoading } = useUser();
+
+  const isAuthPage = useMemo(() => ['/login', '/signup'].includes(pathname), [pathname]);
+  const showHeader = useMemo(() => !isAuthPage, [isAuthPage]);
+
+  useEffect(() => {
+    if (!isUserLoading) {
+      if (user && isAuthPage) {
+        router.replace('/home');
+      } else if (!user && !isAuthPage) {
+        router.replace('/login');
+      }
+    }
+  }, [user, isUserLoading, isAuthPage, router]);
+
+  if (isUserLoading || (!user && !isAuthPage) || (user && isAuthPage)) {
+    return <Loading />;
+  }
+
+  return (
+    <>
+      {showHeader && <AppHeader />}
+      <main className="flex flex-1 flex-col">
+        <PageTransition>{children}</PageTransition>
+      </main>
+    </>
+  );
+}
 
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const pathname = usePathname();
-  const showHeader = useMemo(() => {
-    return !['/login', '/signup'].includes(pathname);
-  }, [pathname]);
-
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -36,17 +59,14 @@ export default function RootLayout({
         <meta name="description" content="Your one-stop solution for hassle-free parking." />
       </head>
       <body className={`${inter.variable} font-sans antialiased`}>
-        <Providers>
+        <FirebaseClientProvider>
           <ReservationsProvider>
             <div className="flex min-h-screen w-full flex-col bg-muted">
-              {showHeader && <AppHeader />}
-              <main className="flex flex-1 flex-col">
-                <PageTransition>{children}</PageTransition>
-              </main>
+              <AppContent>{children}</AppContent>
             </div>
             <Toaster />
           </ReservationsProvider>
-        </Providers>
+        </FirebaseClientProvider>
       </body>
     </html>
   );
