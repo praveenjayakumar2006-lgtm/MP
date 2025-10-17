@@ -38,23 +38,6 @@ function SelectSpotContent() {
                     </p>
                 </div>
 
-                {bookingDetails && (
-                   <div className="w-full flex items-center justify-center gap-x-8 gap-y-2 mb-6 text-sm text-muted-foreground">
-                        <div className="flex items-center gap-2">
-                            <Calendar className="h-4 w-4 text-primary" />
-                            <span className="font-medium text-foreground">{formattedDate}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <Clock className="h-4 w-4 text-primary" />
-                            <span className="font-medium text-foreground">{formattedTime(startTime)}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <Hourglass className="h-4 w-4 text-primary" />
-                            <span className="font-medium text-foreground">{duration} hour{duration && parseInt(duration) > 1 ? 's' : ''}</span>
-                        </div>
-                    </div>
-                )}
-
                 <div className="w-full flex justify-center">
                     <ParkingMap bookingDetails={bookingDetails} />
                 </div>
