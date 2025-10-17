@@ -39,7 +39,7 @@ function SelectSpotContent() {
                 </div>
 
                 {bookingDetails && (
-                   <div className="w-full flex items-center justify-center gap-x-6 gap-y-2 mb-6 text-sm text-muted-foreground bg-background/50 border rounded-full p-3 px-6 shadow-sm">
+                   <div className="w-full flex items-center justify-center gap-x-8 gap-y-2 mb-6 text-sm text-muted-foreground">
                         <div className="flex items-center gap-2">
                             <Calendar className="h-4 w-4 text-primary" />
                             <span className="font-medium text-foreground">{formattedDate}</span>
