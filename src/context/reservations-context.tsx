@@ -4,39 +4,24 @@
 import React, { createContext, useState, ReactNode, useEffect } from 'react';
 import type { Reservation } from '@/lib/types';
 
+const today = new Date();
+const startTime = new Date(today);
+startTime.setHours(startTime.getHours() - 1);
+
+const endTime = new Date(today);
+endTime.setHours(endTime.getHours() + 2);
+
 const mockReservations: Reservation[] = [
     {
         id: '1',
         slotId: 'C2',
         userId: 'user-123',
         vehiclePlate: 'USER-195',
-        startTime: new Date('2025-10-17T21:00:00'),
-        endTime: new Date('2025-10-17T22:00:00'),
-        status: 'Upcoming',
+        startTime: startTime,
+        endTime: endTime,
+        status: 'Active',
         createdAt: new Date(),
         updatedAt: new Date(),
-    },
-    {
-        id: '2',
-        slotId: 'B3',
-        userId: 'user-123',
-        vehiclePlate: 'USER-163',
-        startTime: new Date('2025-10-17T21:00:00'),
-        endTime: new Date('2025-10-17T22:00:00'),
-        status: 'Upcoming',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-    },
-    {
-        id: '3',
-        slotId: 'C1',
-        userId: 'user-123',
-        vehiclePlate: 'USER-482',
-        startTime: new Date('2024-01-15T10:00:00'),
-        endTime: new Date('2024-01-15T12:00:00'),
-        status: 'Completed',
-        createdAt: new Date('2024-01-15T09:00:00'),
-        updatedAt: new Date('2024-01-15T09:00:00'),
     },
     {
         id: '4',
