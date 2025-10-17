@@ -57,12 +57,12 @@ export default function FeedbackPage() {
   }
 
   return (
-    <div className="mx-auto grid w-full max-w-2xl gap-2">
+    <div className="mx-auto grid w-full max-w-2xl gap-4">
       <div>
         <h1 className="text-3xl font-semibold">Submit Feedback</h1>
         <p className="text-muted-foreground">We'd love to hear what you think.</p>
       </div>
-      <Card className="mt-4">
+      <Card>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <CardContent className="pt-6 space-y-4">
