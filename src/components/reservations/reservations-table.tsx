@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/table';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { format } from 'date-fns';
+import { format, isSameDay } from 'date-fns';
 import { useState, useContext, useEffect } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import type { Reservation } from '@/lib/types';
@@ -44,11 +44,14 @@ export function ReservationsTable() {
       const updatedReservations = context.reservations.map(res => {
         const startTime = new Date(res.startTime);
         const endTime = new Date(res.endTime);
-        let status: Status = 'Upcoming';
-        if (now >= startTime && now <= endTime) {
-          status = 'Active';
-        } else if (now > endTime) {
+        let status: Status;
+
+        if (now > endTime) {
           status = 'Completed';
+        } else if (isSameDay(startTime, now) || (now > startTime && now < endTime)) {
+            status = 'Active';
+        } else {
+          status = 'Upcoming';
         }
         return { ...res, status };
       });
