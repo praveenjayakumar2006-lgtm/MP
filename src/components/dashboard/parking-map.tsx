@@ -24,7 +24,7 @@ import type { ParkingSlot, Reservation } from '@/lib/types';
 import { Separator } from '@/components/ui/separator';
 import { motion } from 'framer-motion';
 import { useReservations } from '@/context/reservations-context';
-import { addHours, parse } from 'date-fns';
+import { addHours, parse, format } from 'date-fns';
 
 type BookingDetails = {
     date: string;
@@ -41,10 +41,8 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
   const { toast } = useToast();
 
   useEffect(() => {
-    // Combine user's reservations with other reservations for conflict checking
     const allReservations = [...userReservations, ...otherReservations];
     
-    // Function to parse the desired booking time
     const getDesiredInterval = () => {
         if (!bookingDetails) return null;
         try {
@@ -61,48 +59,76 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
     }
 
     const desiredInterval = getDesiredInterval();
-    
-    const isSlotInConflict = (slotId: string) => {
-        if (!desiredInterval) return false; // If no time selected, no conflicts
-        
-        for (const res of allReservations) {
-            if (res.slotId === slotId) {
+
+    const updatedSlots = defaultSlots.map(slot => {
+        let status: ParkingSlot['status'] = 'available';
+        let reservedBy: ParkingSlot['reservedBy'] = undefined;
+
+        if (desiredInterval) {
+            const conflictingReservation = allReservations.find(res => {
+                if (res.slotId !== slot.id) return false;
                 const resStart = new Date(res.startTime);
                 const resEnd = new Date(res.endTime);
-                // Check for overlap
-                if (desiredInterval.start < resEnd && desiredInterval.end > resStart) {
-                    return true; // There is a conflict
+                // Check for overlap: (StartA < EndB) and (EndA > StartB)
+                return desiredInterval.start < resEnd && desiredInterval.end > resStart;
+            });
+
+            if (conflictingReservation) {
+                const isUserConflict = userReservations.some(r => r.id === conflictingReservation.id);
+                if (isUserConflict) {
+                    status = 'reserved';
+                    reservedBy = 'user';
+                } else {
+                    const isOccupied = otherReservations.some(r => r.id === conflictingReservation.id && r.status === 'Active');
+                    status = isOccupied ? 'occupied' : 'reserved';
+                    reservedBy = 'other';
                 }
             }
         }
-        return false;
-    }
-
-    // Initialize slots based on conflicts and user's own reservations
-    const updatedSlots = defaultSlots.map(slot => {
-        const isUserReservation = userReservations.some(r => r.slotId === slot.id);
-        const conflict = isSlotInConflict(slot.id);
         
-        if (isUserReservation && !conflict) {
-             return { ...slot, status: 'reserved' as const, reservedBy: 'user' as const };
+        // If no conflict for the desired time, still check if the user holds a reservation for this slot at *any* time,
+        // so we can allow cancellation. But don't mark it as reserved for the purpose of booking.
+        if (status === 'available') {
+             const userOwnsThisSlot = userReservations.some(r => r.slotId === slot.id);
+             if(userOwnsThisSlot) {
+                status = 'reserved';
+                reservedBy = 'user';
+             }
         }
-        if (conflict) {
-            const isOwnConflict = userReservations.some(r => {
-                 if (r.slotId !== slot.id) return false;
-                 const resStart = new Date(r.startTime);
-                 const resEnd = new Date(r.endTime);
-                 return desiredInterval!.start < resEnd && desiredInterval!.end > resStart
-            });
+         
+        // If a slot is marked as user-reserved, we must double-check if there's an actual conflict. 
+        // If not, it should be available for a *new* booking but still show as cancellable.
+        // This is tricky. Let's simplify: if you own it, it's yellow. Clicking it will offer cancellation.
+        // If you click a green one, you can book. If you try to book a yellow one you own, it should be allowed if no conflict.
+        // The current logic is getting complex. Let's reset and simplify.
 
-            if (isOwnConflict) {
-                 return { ...slot, status: 'reserved' as const, reservedBy: 'user' as const };
+        const conflictingRes = allReservations.find(res => {
+            if (res.slotId !== slot.id) return false;
+            if (!desiredInterval) return false; // No time selected, so nothing conflicts. But we still want to show user's reservations.
+
+            const resStart = new Date(res.startTime);
+            const resEnd = new Date(res.endTime);
+            return desiredInterval.start < resEnd && desiredInterval.end > resStart;
+        });
+
+        const isOwnedByUserAtAnyTime = userReservations.some(res => res.slotId === slot.id);
+
+        if (conflictingRes) {
+            const isUserReservation = userReservations.some(r => r.id === conflictingRes.id);
+            if (isUserReservation) {
+                return { ...slot, status: 'reserved', reservedBy: 'user' };
+            } else {
+                 const isOccupied = otherReservations.some(r => r.id === conflictingRes.id && r.status === 'Active');
+                 return { ...slot, status: isOccupied ? 'occupied' : 'reserved', reservedBy: 'other' };
             }
-            // Logic for 'occupied' vs 'reserved' by others
-            const isOccupied = otherReservations.some(r => r.slotId === slot.id && r.status === 'Active');
-            return { ...slot, status: isOccupied ? 'occupied' : 'reserved', reservedBy: 'other'};
+        } else if (isOwnedByUserAtAnyTime) {
+            // It's owned by the user, but doesn't conflict with the *desired* time.
+            // It should be 'available' for booking, but visually 'yellow' to allow cancellation.
+            // This is a UI contradiction. Let's stick to the rule: if it conflicts, it's red/blue. If it's owned, it's yellow. If free, it's green.
+            return { ...slot, status: 'reserved', reservedBy: 'user' };
         }
         
-        return { ...slot, status: 'available' as const, reservedBy: undefined };
+        return { ...slot, status: 'available', reservedBy: undefined };
     });
     
     setSlots(updatedSlots);
@@ -114,6 +140,16 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
   const bikeSlots = slots.filter((slot) => slot.type === 'bike');
 
   const handleSlotClick = (slot: ParkingSlot) => {
+    // If the slot is one of the user's, always give cancellation option.
+    if (slot.status === 'reserved' && slot.reservedBy === 'user') {
+      const reservationToCancel = userReservations.find(r => r.slotId === slot.id);
+      if (reservationToCancel) {
+          setSlotToCancel(slot);
+      }
+      return;
+    }
+    
+    // If the slot is available, allow booking.
     if (slot.status === 'available') {
       if (!bookingDetails) {
         toast({
@@ -125,12 +161,6 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
       }
       setSelectedSlot(slot);
       setShowSuccess(false);
-    } else if (slot.status === 'reserved' && slot.reservedBy === 'user') {
-      // Find the specific reservation to cancel
-      const reservationToCancel = userReservations.find(r => r.slotId === slot.id);
-      if (reservationToCancel) {
-          setSlotToCancel(slot);
-      }
     }
   };
 
@@ -180,17 +210,34 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
   }
 
   const getSlotClasses = (slot: ParkingSlot) => {
+    let isClickable = false;
+    let baseClasses = '';
+
+    switch (slot.status) {
+        case 'available':
+            isClickable = true;
+            baseClasses = 'bg-green-100 border-green-400 text-green-800 hover:bg-green-200';
+            break;
+        case 'occupied':
+            baseClasses = 'bg-red-100 border-red-400 text-red-800 opacity-70';
+            break;
+        case 'reserved':
+            if (slot.reservedBy === 'user') {
+                isClickable = true;
+                baseClasses = 'bg-yellow-100 border-yellow-400 text-yellow-800 hover:bg-yellow-200';
+            } else {
+                baseClasses = 'bg-blue-100 border-blue-400 text-blue-800 opacity-90';
+            }
+            break;
+        default:
+            break;
+    }
+
     return cn(
       'relative flex flex-col items-center justify-center rounded-md border-2 transition-all duration-300',
+      baseClasses,
+      isClickable ? 'cursor-pointer' : 'cursor-not-allowed',
       {
-        'bg-green-100 border-green-400 text-green-800 cursor-pointer hover:bg-green-200':
-          slot.status === 'available',
-        'bg-red-100 border-red-400 text-red-800 opacity-70 cursor-not-allowed':
-          slot.status === 'occupied',
-        'bg-blue-100 border-blue-400 text-blue-800 opacity-90 cursor-not-allowed':
-          slot.status === 'reserved' && slot.reservedBy === 'other',
-         'bg-yellow-100 border-yellow-400 text-yellow-800 cursor-pointer hover:bg-yellow-200':
-          slot.status === 'reserved' && slot.reservedBy === 'user',
         'h-24 w-16': slot.type === 'car',
         'h-20 w-16': slot.type === 'bike',
       }
