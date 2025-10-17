@@ -28,6 +28,8 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
+import { useRouter } from 'next/navigation';
+import { cn } from '@/lib/utils';
 
 type Status = 'Active' | 'Completed' | 'Upcoming';
 
@@ -37,6 +39,7 @@ export function ReservationsTable() {
   const [displayReservations, setDisplayReservations] = useState<Reservation[]>([]);
   const [reservationToCancel, setReservationToCancel] = useState<Reservation | null>(null);
   const { toast } = useToast();
+  const router = useRouter();
 
   useEffect(() => {
     if (context?.reservations) {
@@ -79,7 +82,12 @@ export function ReservationsTable() {
     }
   };
 
-  const handleCancelReservation = () => {
+  const handleCancelReservation = (e: React.MouseEvent, reservation: Reservation) => {
+    e.stopPropagation();
+    setReservationToCancel(reservation);
+  };
+  
+  const confirmCancelReservation = () => {
     if (!reservationToCancel) return;
     removeReservation(reservationToCancel.id);
     toast({
@@ -88,6 +96,23 @@ export function ReservationsTable() {
     });
     setReservationToCancel(null);
   };
+
+  const handleRowClick = (reservation: Reservation) => {
+    if (reservation.status === 'Active' || reservation.status === 'Upcoming') {
+      const startTime = new Date(reservation.startTime);
+      const endTime = new Date(reservation.endTime);
+      const durationInMs = endTime.getTime() - startTime.getTime();
+      const durationInHours = Math.round(durationInMs / (1000 * 60 * 60));
+
+      const params = new URLSearchParams({
+        date: startTime.toISOString(),
+        startTime: `${startTime.getHours().toString().padStart(2, '0')}:${startTime.getMinutes().toString().padStart(2, '0')}`,
+        duration: String(durationInHours),
+      });
+      router.push(`/select-spot?${params.toString()}`);
+    }
+  }
+
 
   const filteredReservations = displayReservations?.filter((res) => {
     if (filter === 'all') return true;
@@ -135,7 +160,13 @@ export function ReservationsTable() {
                 <TableBody>
                   {(!isClient || isLoading) && renderSkeletons()}
                   {isClient && !isLoading && filteredReservations?.map((reservation) => (
-                    <TableRow key={reservation.id}>
+                    <TableRow 
+                      key={reservation.id}
+                      onClick={() => handleRowClick(reservation)}
+                      className={cn({
+                        'cursor-pointer': reservation.status === 'Active' || reservation.status === 'Upcoming',
+                      })}
+                    >
                       <TableCell className="font-medium">
                         {reservation.slotId}
                       </TableCell>
@@ -155,7 +186,7 @@ export function ReservationsTable() {
                         <Button
                           variant="destructive"
                           size="sm"
-                          onClick={() => setReservationToCancel(reservation)}
+                          onClick={(e) => handleCancelReservation(e, reservation)}
                           disabled={reservation.status === 'Completed'}
                         >
                           Cancel
@@ -186,7 +217,7 @@ export function ReservationsTable() {
           <AlertDialogFooter>
             <AlertDialogCancel>Back</AlertDialogCancel>
             <AlertDialogAction
-              onClick={handleCancelReservation}
+              onClick={confirmCancelReservation}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               Yes, Cancel
