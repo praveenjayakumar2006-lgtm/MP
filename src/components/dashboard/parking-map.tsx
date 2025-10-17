@@ -19,14 +19,21 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
-import { parkingSlots as initialSlots } from '@/lib/data';
-import type { ParkingSlot } from '@/lib/types';
+import { parkingSlots as defaultSlots, reservations as otherReservations } from '@/lib/data';
+import type { ParkingSlot, Reservation } from '@/lib/types';
 import { Separator } from '@/components/ui/separator';
 import { motion } from 'framer-motion';
 import { useReservations } from '@/context/reservations-context';
+import { addHours, parse } from 'date-fns';
 
-export function ParkingMap() {
-  const { reservations, addReservation, removeReservation } = useReservations();
+type BookingDetails = {
+    date: string;
+    startTime: string;
+    duration: string;
+}
+
+export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails }) {
+  const { reservations: userReservations, addReservation, removeReservation } = useReservations();
   const [slots, setSlots] = useState<ParkingSlot[]>([]);
   const [selectedSlot, setSelectedSlot] = useState<ParkingSlot | null>(null);
   const [slotToCancel, setSlotToCancel] = useState<ParkingSlot | null>(null);
@@ -34,15 +41,73 @@ export function ParkingMap() {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Initialize slots based on context reservations
-    const userReservedSlotIds = new Set(reservations.map(r => r.slotId));
-    const updatedSlots = initialSlots.map(slot => 
-      userReservedSlotIds.has(slot.id)
-        ? { ...slot, status: 'reserved' as const, reservedBy: 'user' as const }
-        : slot
-    );
+    // Combine user's reservations with other reservations for conflict checking
+    const allReservations = [...userReservations, ...otherReservations];
+    
+    // Function to parse the desired booking time
+    const getDesiredInterval = () => {
+        if (!bookingDetails) return null;
+        try {
+            const baseDate = parse(bookingDetails.date.substring(0,10), 'yyyy-MM-dd', new Date());
+            const [hour, minute] = bookingDetails.startTime.split(':');
+            baseDate.setHours(parseInt(hour), parseInt(minute));
+            
+            const start = baseDate;
+            const end = addHours(start, parseInt(bookingDetails.duration));
+            return { start, end };
+        } catch {
+            return null;
+        }
+    }
+
+    const desiredInterval = getDesiredInterval();
+    
+    const isSlotInConflict = (slotId: string) => {
+        if (!desiredInterval) return false; // If no time selected, no conflicts
+        
+        for (const res of allReservations) {
+            if (res.slotId === slotId) {
+                const resStart = new Date(res.startTime);
+                const resEnd = new Date(res.endTime);
+                // Check for overlap
+                if (desiredInterval.start < resEnd && desiredInterval.end > resStart) {
+                    return true; // There is a conflict
+                }
+            }
+        }
+        return false;
+    }
+
+    // Initialize slots based on conflicts and user's own reservations
+    const updatedSlots = defaultSlots.map(slot => {
+        const isUserReservation = userReservations.some(r => r.slotId === slot.id);
+        const conflict = isSlotInConflict(slot.id);
+        
+        if (isUserReservation && !conflict) {
+             return { ...slot, status: 'reserved' as const, reservedBy: 'user' as const };
+        }
+        if (conflict) {
+            const isOwnConflict = userReservations.some(r => {
+                 if (r.slotId !== slot.id) return false;
+                 const resStart = new Date(r.startTime);
+                 const resEnd = new Date(r.endTime);
+                 return desiredInterval!.start < resEnd && desiredInterval!.end > resStart
+            });
+
+            if (isOwnConflict) {
+                 return { ...slot, status: 'reserved' as const, reservedBy: 'user' as const };
+            }
+            // Logic for 'occupied' vs 'reserved' by others
+            const isOccupied = otherReservations.some(r => r.slotId === slot.id && r.status === 'Active');
+            return { ...slot, status: isOccupied ? 'occupied' : 'reserved', reservedBy: 'other'};
+        }
+        
+        return { ...slot, status: 'available' as const, reservedBy: undefined };
+    });
+    
     setSlots(updatedSlots);
-  }, [reservations]);
+
+  }, [bookingDetails, userReservations]);
 
 
   const carSlots = slots.filter((slot) => slot.type === 'car');
@@ -50,55 +115,65 @@ export function ParkingMap() {
 
   const handleSlotClick = (slot: ParkingSlot) => {
     if (slot.status === 'available') {
+      if (!bookingDetails) {
+        toast({
+            variant: 'destructive',
+            title: 'Booking Time Required',
+            description: 'Please go back to the booking page and select a date, time, and duration.',
+        })
+        return;
+      }
       setSelectedSlot(slot);
       setShowSuccess(false);
     } else if (slot.status === 'reserved' && slot.reservedBy === 'user') {
-      setSlotToCancel(slot);
+      // Find the specific reservation to cancel
+      const reservationToCancel = userReservations.find(r => r.slotId === slot.id);
+      if (reservationToCancel) {
+          setSlotToCancel(slot);
+      }
     }
   };
 
   const handleConfirmReservation = () => {
-    if (!selectedSlot) return;
+    if (!selectedSlot || !bookingDetails) return;
 
     setShowSuccess(true);
+    
+    const { date, startTime, duration } = bookingDetails;
+    const startDate = new Date(date);
+    const [hour, minute] = startTime.split(':').map(Number);
+    startDate.setHours(hour, minute, 0, 0);
 
-    const newReservation = {
+    const newReservation: Reservation = {
       id: `RES-${Date.now()}`,
       slotId: selectedSlot.id,
       vehiclePlate: `USER-${Math.floor(Math.random() * 1000)}`,
-      startTime: new Date(),
-      endTime: new Date(new Date().getTime() + 2 * 60 * 60 * 1000), // 2 hours from now
-      status: 'Active' as const,
+      startTime: startDate,
+      endTime: addHours(startDate, parseInt(duration)),
+      status: 'Upcoming' as const,
     };
     addReservation(newReservation);
-
-
-    setSlots((prevSlots) =>
-      prevSlots.map((s) =>
-        s.id === selectedSlot.id ? { ...s, status: 'reserved', reservedBy: 'user' } : s
-      )
-    );
 
     setTimeout(() => {
         setSelectedSlot(null);
         setShowSuccess(false);
+        toast({
+            title: 'Reservation Successful!',
+            description: `Slot ${selectedSlot.id} reserved for ${format(newReservation.startTime, 'MMM d, h:mm a')}.`,
+        })
     }, 1500)
   };
   
   const handleConfirmCancellation = () => {
     if (!slotToCancel) return;
 
+    // Here we remove ALL reservations for this slotId made by the user.
+    // A more advanced implementation might let you pick which one to cancel.
     removeReservation(slotToCancel.id);
-
-    setSlots((prevSlots) =>
-      prevSlots.map((s) =>
-        s.id === slotToCancel.id ? { ...s, status: 'available', reservedBy: undefined } : s
-      )
-    );
 
     toast({
         title: 'Reservation Cancelled',
-        description: `Your reservation for slot ${slotToCancel.id} has been cancelled.`,
+        description: `Your reservation(s) for slot ${slotToCancel.id} have been cancelled.`,
     });
 
     setSlotToCancel(null);
@@ -113,7 +188,7 @@ export function ParkingMap() {
         'bg-red-100 border-red-400 text-red-800 opacity-70 cursor-not-allowed':
           slot.status === 'occupied',
         'bg-blue-100 border-blue-400 text-blue-800 opacity-90 cursor-not-allowed':
-          slot.status === 'reserved' && slot.reservedBy !== 'user',
+          slot.status === 'reserved' && slot.reservedBy === 'other',
          'bg-yellow-100 border-yellow-400 text-yellow-800 cursor-pointer hover:bg-yellow-200':
           slot.status === 'reserved' && slot.reservedBy === 'user',
         'h-24 w-16': slot.type === 'car',
@@ -264,13 +339,13 @@ export function ParkingMap() {
             ) : (
             <>
                 <AlertDialogHeader>
-                    <AlertDialogTitle>Confirm Instant Reservation</AlertDialogTitle>
+                    <AlertDialogTitle>Confirm Reservation</AlertDialogTitle>
                     <AlertDialogDescription>
                     Are you sure you want to reserve parking slot{' '}
                     <span className="font-bold text-foreground">
                         {selectedSlot?.id}
                     </span>{' '}
-                    for right now?
+                    for your selected time?
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
@@ -296,7 +371,7 @@ export function ParkingMap() {
           <AlertDialogHeader>
             <AlertDialogTitle>Cancel Reservation</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to cancel your reservation for parking slot{' '}
+              Are you sure you want to cancel all your reservations for parking slot{' '}
               <span className="font-bold text-foreground">{slotToCancel?.id}</span>?
             </AlertDialogDescription>
           </AlertDialogHeader>
@@ -306,7 +381,7 @@ export function ParkingMap() {
               variant="destructive"
               onClick={handleConfirmCancellation}
             >
-              Cancel Reservation
+              Cancel Reservation(s)
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
