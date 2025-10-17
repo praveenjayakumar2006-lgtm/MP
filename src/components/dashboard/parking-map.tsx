@@ -107,6 +107,7 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
     toast({
         title: 'Reservation Successful!',
         description: `Parking slot ${selectedSlot.id} is now yours.`,
+        duration: 2000,
     });
 
     setTimeout(() => {
