@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -38,11 +39,9 @@ const detectParkingViolationPrompt = ai.definePrompt({
   Analyze the following parking violation data:
   Slot Number: {{{slotNumber}}}
   Violation Type: {{{violationType}}}
-  Timestamp: {{{timestamp}}}
-  Details: {{{details}}}
 
-  Determine if a violation has occurred based on the provided data. Provide a detailed analysis in violationDetails. If no violation return an empty string in the violationDetails field.
-  Return isViolationDetected as true is a violation has occurred and false otherwise.
+  Determine if a violation has occurred. If it has, set isViolationDetected to true and set violationDetails to a short confirmation, like "{{{violationType}}} in slot {{{slotNumber}}}".
+  If no violation is detected, set isViolationDetected to false and violationDetails to an empty string.
 `,
 });
 
