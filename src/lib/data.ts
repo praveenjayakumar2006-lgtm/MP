@@ -1,3 +1,4 @@
+
 import type { ParkingSlot } from './types';
 
 export const parkingSlots: ParkingSlot[] = [
@@ -5,17 +6,17 @@ export const parkingSlots: ParkingSlot[] = [
   { id: 'C1', type: 'car', status: 'available' },
   { id: 'C2', type: 'car', status: 'available' },
   { id: 'C3', type: 'car', status: 'available' },
-  { id: 'C4', type: 'car', status: 'occupied' },
+  { id: 'C4', type: 'car', status: 'available' },
   { id: 'C5', type: 'car', status: 'available' },
   // Bike slots
   { id: 'B1', type: 'bike', status: 'available' },
-  { id: 'B2', type: 'bike', status: 'reserved' },
+  { id: 'B2', type: 'bike', status: 'available' },
   { id: 'B3', type: 'bike', status: 'available' },
   { id: 'B4', type: 'bike', status: 'available' },
-  { id: 'B5', type: 'bike', status: 'occupied' },
+  { id: 'B5', type: 'bike', status: 'available' },
   { id: 'B6', type: 'bike', status: 'available' },
   { id: 'B7', type: 'bike', status: 'available' },
   { id: 'B8', type: 'bike', status: 'available' },
-  { id: 'B9', type: 'bike', status: 'reserved' },
+  { id: 'B9', type: 'bike', status: 'available' },
   { id: 'B10', type: 'bike', status: 'available' },
 ];

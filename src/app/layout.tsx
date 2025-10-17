@@ -6,6 +6,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { AppHeader } from '@/components/layout/app-header';
 import { Providers } from '@/components/layout/providers';
 import { PageTransition } from '@/components/layout/page-transition';
+import { ReservationsProvider } from '@/context/reservations-context';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
@@ -23,6 +24,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} font-sans antialiased`}>
         <Providers>
+          <ReservationsProvider>
             <div className="flex min-h-screen w-full flex-col bg-muted">
               <AppHeader />
               <main className="flex flex-1 flex-col">
@@ -30,7 +32,8 @@ export default function RootLayout({
               </main>
             </div>
             <Toaster />
-          </Providers>
+          </ReservationsProvider>
+        </Providers>
       </body>
     </html>
   );

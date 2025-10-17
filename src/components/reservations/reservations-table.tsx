@@ -11,43 +11,34 @@ import {
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
-import { useState } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import type { Reservation } from '@/lib/types';
 import { Skeleton } from '../ui/skeleton';
+import { ReservationsContext } from '@/context/reservations-context';
 
 type Status = 'Active' | 'Completed' | 'Upcoming';
 
-const mockReservations: Reservation[] = [
-    {
-        id: '1',
-        slotId: 'C2',
-        userId: 'user-123',
-        vehiclePlate: 'USER-195',
-        startTime: new Date('2025-10-17T21:00:00'),
-        endTime: new Date('2025-10-17T22:00:00'),
-        status: 'Upcoming',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-    },
-    {
-        id: '2',
-        slotId: 'B3',
-        userId: 'user-123',
-        vehiclePlate: 'USER-163',
-        startTime: new Date('2025-10-17T21:00:00'),
-        endTime: new Date('2025-10-17T22:00:00'),
-        status: 'Upcoming',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-    }
-];
-
-
 export function ReservationsTable() {
+  const { reservations, isLoading } = useContext(ReservationsContext)!;
   const [filter, setFilter] = useState<Status | 'all'>('all');
-  const [loading, setLoading] = useState(false);
-  const [reservations, setReservations] = useState(mockReservations);
+  const [displayReservations, setDisplayReservations] = useState<Reservation[]>([]);
+
+  useEffect(() => {
+    const now = new Date();
+    const updatedReservations = reservations.map(res => {
+      const startTime = new Date(res.startTime);
+      const endTime = new Date(res.endTime);
+      let status: Status = 'Upcoming';
+      if (now >= startTime && now <= endTime) {
+        status = 'Active';
+      } else if (now > endTime) {
+        status = 'Completed';
+      }
+      return { ...res, status };
+    });
+    setDisplayReservations(updatedReservations);
+  }, [reservations]);
 
 
   const getStatusVariant = (status: Status) => {
@@ -63,10 +54,10 @@ export function ReservationsTable() {
     }
   };
 
-  const filteredReservations = reservations?.filter((res) => {
+  const filteredReservations = displayReservations?.filter((res) => {
     if (filter === 'all') return true;
     return res.status === filter;
-  }).sort((a, b) => b.startTime.getTime() - a.startTime.getTime());
+  }).sort((a, b) => new Date(b.startTime).getTime() - new Date(a.startTime).getTime());
 
   return (
     <Card>
@@ -92,7 +83,7 @@ export function ReservationsTable() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {loading && Array.from({ length: 3 }).map((_, i) => (
+                {isLoading && Array.from({ length: 3 }).map((_, i) => (
                     <TableRow key={i}>
                         <TableCell><Skeleton className="h-6 w-16" /></TableCell>
                         <TableCell><Skeleton className="h-6 w-24" /></TableCell>
@@ -101,7 +92,7 @@ export function ReservationsTable() {
                         <TableCell><Skeleton className="h-6 w-20" /></TableCell>
                     </TableRow>
                 ))}
-                {!loading && filteredReservations?.map((reservation) => (
+                {!isLoading && filteredReservations?.map((reservation) => (
                   <TableRow key={reservation.id}>
                     <TableCell className="font-medium">
                       {reservation.slotId}
@@ -122,7 +113,7 @@ export function ReservationsTable() {
                 ))}
               </TableBody>
             </Table>
-            {!loading && (!filteredReservations || filteredReservations.length === 0) && (
+            {!isLoading && (!filteredReservations || filteredReservations.length === 0) && (
               <div className="text-center p-8 text-muted-foreground">
                 No {filter !== 'all' ? filter.toLowerCase() : ''} reservations found.
               </div>
