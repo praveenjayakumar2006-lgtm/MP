@@ -97,7 +97,7 @@ export function AppHeader() {
             {!isMobile && isClient && (
               <Link href="/login">
                 <Button variant="ghost" size="icon" className="hover:bg-white/10">
-                  <LogOut className="h-10 w-10 text-primary-foreground/80 hover:text-primary-foreground" />
+                  <LogOut className="h-8 w-8 text-primary-foreground/80 hover:text-primary-foreground" />
                 </Button>
               </Link>
             )}
