@@ -18,9 +18,14 @@ export default function FeedbackSuccessPage() {
           <p className="text-muted-foreground mb-6">
             Your feedback has been submitted successfully. We appreciate you taking the time to help us improve.
           </p>
-          <Link href="/home">
-            <Button>Return to Home</Button>
-          </Link>
+          <div className="flex justify-center gap-4">
+            <Link href="/home">
+              <Button>Return to Home</Button>
+            </Link>
+            <Link href="/reservations">
+              <Button variant="outline">View My Bookings</Button>
+            </Link>
+          </div>
         </CardContent>
       </Card>
     </div>
