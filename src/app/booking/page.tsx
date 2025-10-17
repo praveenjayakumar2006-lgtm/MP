@@ -70,6 +70,7 @@ export default function BookingPage() {
   });
 
   const selectedDate = form.watch('date');
+  const selectedStartTime = form.watch('startTime');
   
   function onSubmit(values: BookingFormValues) {
     const params = new URLSearchParams({
@@ -133,6 +134,7 @@ export default function BookingPage() {
                                       onSelect={(date) => {
                                         field.onChange(date);
                                         form.resetField('startTime');
+                                        form.resetField('duration');
                                       }}
                                       disabled={(date) =>
                                           date < new Date(new Date().setHours(0, 0, 0, 0))
@@ -151,7 +153,14 @@ export default function BookingPage() {
                           render={({ field }) => (
                               <FormItem>
                               <FormLabel>Start Time</FormLabel>
-                              <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
+                              <Select 
+                                onValueChange={(value) => {
+                                    field.onChange(value);
+                                    form.resetField('duration');
+                                }} 
+                                value={field.value}
+                                disabled={!selectedDate}
+                              >
                                   <FormControl>
                                   <SelectTrigger>
                                       <Clock className="mr-2 h-4 w-4" />
@@ -180,7 +189,7 @@ export default function BookingPage() {
                           render={({ field }) => (
                               <FormItem>
                               <FormLabel>Duration (Hours)</FormLabel>
-                              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <Select onValueChange={field.onChange} value={field.value} disabled={!selectedStartTime}>
                                   <FormControl>
                                   <SelectTrigger>
                                       <SelectValue placeholder="Select hours" />
