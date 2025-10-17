@@ -102,9 +102,14 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
       createdAt: new Date(),
       updatedAt: new Date(),
     };
+    
+    addReservation(newReservation);
+    toast({
+        title: 'Reservation Successful!',
+        description: `Parking slot ${selectedSlot.id} is now yours.`,
+    });
 
     setTimeout(() => {
-      addReservation(newReservation);
       setSelectedSlot(null);
       setShowSuccess(false);
     }, 1500);
@@ -276,6 +281,7 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
         onOpenChange={(open) => {
           if (!open) setSelectedSlot(null);
         }}
+        key={selectedSlot?.id}
       >
         <AlertDialogContent>
           {showSuccess ? (
