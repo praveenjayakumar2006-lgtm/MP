@@ -70,11 +70,7 @@ export default function BookingPage() {
   });
 
   const selectedDate = form.watch('date');
-  const startTimeValue = form.watch('startTime');
-  const durationValue = form.watch('duration');
   
-  const startTimeLabel = timeSlots.find(slot => slot.value === startTimeValue)?.label;
-
   function onSubmit(values: BookingFormValues) {
     const params = new URLSearchParams({
       date: values.date.toISOString(),
@@ -87,8 +83,6 @@ export default function BookingPage() {
   const now = new Date();
   const currentHour = now.getHours();
   const currentMinute = now.getMinutes();
-
-  const isSelectionMade = selectedDate && startTimeValue && durationValue;
 
   return (
     <section id="booking" className="py-12 md:py-24 lg:py-32 flex flex-col items-center justify-center flex-1 bg-background">
@@ -205,25 +199,6 @@ export default function BookingPage() {
                           )}
                           />
                       </div>
-                      {isSelectionMade && (
-                        <div className="mt-6 pt-4 border-t">
-                            <h3 className="text-lg font-medium mb-2 text-center">Your Selection</h3>
-                            <div className="flex justify-around text-center text-sm text-muted-foreground">
-                                <div>
-                                    <p className="font-semibold text-foreground">{selectedDate ? format(selectedDate, 'PPP') : '---'}</p>
-                                    <p>Date</p>
-                                </div>
-                                <div>
-                                    <p className="font-semibold text-foreground">{startTimeLabel || '---'}</p>
-                                    <p>Start Time</p>
-                                </div>
-                                <div>
-                                    <p className="font-semibold text-foreground">{durationValue ? `${durationValue} hour${durationValue > '1' ? 's' : ''}` : '---'}</p>
-                                    <p>Duration</p>
-                                </div>
-                            </div>
-                        </div>
-                      )}
                     </CardContent>
                     <CardFooter className="justify-center">
                       <Button type="submit">Proceed to Select Slot</Button>
