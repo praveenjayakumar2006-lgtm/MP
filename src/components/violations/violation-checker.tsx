@@ -10,6 +10,7 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
+  CardDescription,
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
@@ -28,7 +29,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Loader2, Car, User, Phone, Home, ShieldCheck, ShieldX, Upload } from 'lucide-react';
+import { Loader2, ShieldCheck, ShieldX, Car, User, Phone, Home } from 'lucide-react';
 import { analyzeVehicleImage, analyzeViolationText } from '@/app/violations/actions';
 import type { DetectParkingViolationOutput } from '@/ai/flows/detect-parking-violations';
 import type { ExtractVehicleInfoOutput } from '@/ai/flows/extract-vehicle-info';
@@ -214,20 +215,26 @@ export function ViolationChecker() {
 
   return (
      <div className="grid md:grid-cols-2 gap-12 items-center max-w-4xl mx-auto">
-      <div className="space-y-2">
+      <div>
         <h1 className="text-3xl font-semibold">Report a Violation</h1>
-        <p className="text-muted-foreground">Fill in the details to check for a parking violation.</p>
+        <p className="text-muted-foreground mt-2">Fill in the details to check for a parking violation.</p>
       </div>
       <Card className="w-full max-w-md">
+          <CardHeader>
+            <CardTitle>Violation Details</CardTitle>
+            <CardDescription>
+                Fill in the details to check for a parking violation.
+            </CardDescription>
+          </CardHeader>
           <Form {...violationForm}>
               <form onSubmit={violationForm.handleSubmit(onViolationSubmit)}>
-                  <CardContent className="space-y-3 pt-6">
+                  <CardContent className="space-y-3">
                       <FormField
                           control={violationForm.control}
                           name="slotNumber"
                           render={({ field }) => (
                           <FormItem>
-                              <FormLabel>Slot Number</FormLabel>
+                              <FormLabel>Slot Number <span className="text-destructive">*</span></FormLabel>
                               <FormControl>
                               <Input placeholder="e.g., C5" {...field} />
                               </FormControl>
@@ -240,7 +247,7 @@ export function ViolationChecker() {
                           name="violationType"
                           render={({ field }) => (
                           <FormItem>
-                              <FormLabel>Violation Type</FormLabel>
+                              <FormLabel>Violation Type <span className="text-destructive">*</span></FormLabel>
                               <Select onValueChange={field.onChange} defaultValue={field.value}>
                               <FormControl>
                                   <SelectTrigger>
