@@ -1,0 +1,182 @@
+{
+  "entities": {
+    "User": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "User",
+      "type": "object",
+      "description": "Represents a user account for the ParkSmart Reserve app.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the user entity."
+        },
+        "firstName": {
+          "type": "string",
+          "description": "The user's first name."
+        },
+        "lastName": {
+          "type": "string",
+          "description": "The user's last name."
+        },
+        "email": {
+          "type": "string",
+          "description": "The user's email address.",
+          "format": "email"
+        },
+        "signUpDate": {
+          "type": "string",
+          "description": "The date and time the user signed up.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "firstName",
+        "lastName",
+        "email",
+        "signUpDate"
+      ]
+    },
+    "ParkingSlot": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "ParkingSlot",
+      "type": "object",
+      "description": "Represents a parking slot in the ParkSmart Reserve system.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the parking slot."
+        },
+        "location": {
+          "type": "string",
+          "description": "The location of the parking slot, could be a street address."
+        },
+        "latitude": {
+          "type": "number",
+          "description": "The latitude coordinate of the parking slot."
+        },
+        "longitude": {
+          "type": "number",
+          "description": "The longitude coordinate of the parking slot."
+        },
+        "isAvailable": {
+          "type": "boolean",
+          "description": "Indicates whether the parking slot is currently available."
+        }
+      },
+      "required": [
+        "id",
+        "location",
+        "latitude",
+        "longitude",
+        "isAvailable"
+      ]
+    },
+    "Reservation": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Reservation",
+      "type": "object",
+      "description": "Represents a parking reservation made by a user.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the reservation."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to User. (Relationship: User 1:N Reservation)"
+        },
+        "parkingSlotId": {
+          "type": "string",
+          "description": "Reference to ParkingSlot. (Relationship: ParkingSlot 1:N Reservation)"
+        },
+        "startTime": {
+          "type": "string",
+          "description": "The start time of the reservation.",
+          "format": "date-time"
+        },
+        "endTime": {
+          "type": "string",
+          "description": "The end time of the reservation.",
+          "format": "date-time"
+        },
+        "reservationDate": {
+          "type": "string",
+          "description": "The date the reservation was made.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "parkingSlotId",
+        "startTime",
+        "endTime",
+        "reservationDate"
+      ]
+    },
+    "Violation": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Violation",
+      "type": "object",
+      "description": "Represents a parking violation detected by the AI system.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the violation."
+        },
+        "parkingSlotId": {
+          "type": "string",
+          "description": "Reference to ParkingSlot. (Relationship: ParkingSlot 1:N Violation)"
+        },
+        "violationTime": {
+          "type": "string",
+          "description": "The time the violation occurred.",
+          "format": "date-time"
+        },
+        "violationType": {
+          "type": "string",
+          "description": "The type of violation (e.g., overstaying, unauthorized parking)."
+        },
+        "description": {
+          "type": "string",
+          "description": "Detailed description of the violation."
+        }
+      },
+      "required": [
+        "id",
+        "parkingSlotId",
+        "violationTime",
+        "violationType",
+        "description"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/users/{userId}",
+        "definition": {
+          "entityName": "User",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Stores user profiles, with access restricted to the user themselves. This path implements path-based ownership for private user data.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user, corresponding to their Firebase Authentication UID."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore data structure is designed to support user authentication and basic parking reservation features while adhering to the principles of Authorization Independence, Structural Segregation, and Access Modeling. Since the initial request is mainly for login and signup, the structure focuses on user data.  A `users` collection stores user profiles, secured via path-based ownership.  This approach enables secure list operations (QAPs) as each user's data is isolated. No denormalization is required at this stage as the reservation and parking slot information can be implemented later, each with its own ownership structure."
+  }
+}

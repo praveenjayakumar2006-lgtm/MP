@@ -1,51 +1,77 @@
 /**
- * @fileoverview Firestore Security Rules for the Parking Reservation app.
+ * @file Firestore Security Rules for ParkSmart Reserve - Prototyping Mode
  *
- * Core Philosophy:
- * This ruleset enforces a user-ownership model for reservations. Each reservation
- * is associated with a specific user, and only that user can modify or delete
- * their reservations. Reservations are publicly readable.
+ * @core_philosophy:
+ * This ruleset enforces a strict user-ownership model for user profiles. Each user can only
+ * access their own data. Data validation is relaxed to allow for rapid prototyping.
  *
- * Data Structure:
- * Reservations are stored in the top-level `/reservations` collection. Each
- * document contains a `userId` field indicating the owner.
+ * @data_structure:
+ * - /users/{userId}: Stores user profiles.  `userId` corresponds to the Firebase Authentication UID.
  *
- * Key Security Decisions:
- * - Users can only create, update, and delete their own reservations.
- * - Listing reservations is allowed for all users.
- * - The schema of the reservations are flexible on data shapes to allow for rapid iteration.
+ * @key_security_decisions:
+ * - Users cannot list other user profiles.
+ * - Data validation is minimal, focusing on authorization-critical fields (ownership).
+ *
+ * @denormalization_for_authorization:
+ * Not applicable at this stage.
+ *
+ * @structural_segregation:
+ * All user-specific data is stored under the /users/{userId} path, ensuring clear separation and
+ * access control.
  */
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
     /**
-     * @description Secures the /reservations collection, enforcing user ownership for writes.
-     * @path /reservations/{reservationId}
-     * @allow (get, list): Anyone can read all reservations.
-     * @allow (create): User with auth `uid: "user_abc"` can create a reservation where `userId: "user_abc"`.
-     * @deny (create): User with auth `uid: "user_def"` cannot create a reservation where `userId: "user_abc"`.
-     * @allow (update, delete): User with auth `uid: "user_abc"` can update/delete a reservation where `userId: "user_abc"`.
-     * @deny (update, delete): User with auth `uid: "user_def"` cannot update/delete a reservation where `userId: "user_abc"`.
-     * @principle Enforces document ownership for writes and public read access.
+     * @description Controls access to user profiles.
+     * @path /users/{userId}
+     * @allow (create) User with UID 'user123' can create their profile at /users/user123.
+     * @deny (create) User with UID 'user123' cannot create a profile at /users/user456.
+     * @allow (get) User with UID 'user123' can read their profile at /users/user123.
+     * @deny (get) User with UID 'user123' cannot read the profile at /users/user456.
+     * @allow (update) User with UID 'user123' can update their profile at /users/user123.
+     * @deny (update) User with UID 'user123' cannot update the profile at /users/user456.
+     * @allow (delete) User with UID 'user123' can delete their profile at /users/user123.
+     * @deny (delete) User with UID 'user123' cannot delete the profile at /users/user456.
+     * @principle Enforces user-ownership: only the authenticated user can access their own profile.
      */
-    match /reservations/{reservationId} {
-      allow get, list: if true;
-      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
-      allow update, delete: if isSignedIn() && isExistingOwner(resource.data.userId);
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow list: if false;
+      allow create: if isOwner(userId) && request.resource.data.id == userId;
+      allow update: if isExistingOwner(userId) && request.resource.data.id == resource.data.id;
+      allow delete: if isExistingOwner(userId);
     }
 
-    // Helper functions
-    function isSignedIn() {
-      return request.auth != null;
-    }
+    // --- Helper Functions ---
 
+    /**
+     * @description Checks if the request is made by the owner of the resource.
+     * @param {string} userId - The user ID to compare against the request's authentication UID.
+     * @return {bool} True if the user is signed in and the UID matches the provided userId, false otherwise.
+     * @example isOwner('user123') returns true if request.auth.uid is 'user123'.
+     */
     function isOwner(userId) {
-      return request.auth.uid == userId;
+      return isSignedIn() && request.auth.uid == userId;
     }
 
+    /**
+     * @description Checks if the request is made by the owner of the resource and that the resource exists.
+     * @param {string} userId - The user ID to compare against the request's authentication UID.
+     * @return {bool} True if the user is signed in, the UID matches the provided userId, and the resource exists.
+     * @example isExistingOwner('user123') returns true if request.auth.uid is 'user123' and the resource exists.
+     */
     function isExistingOwner(userId) {
         return isOwner(userId) && resource != null;
+    }
+
+    /**
+     * @description Checks if the user is signed in.
+     * @return {bool} True if the user is signed in, false otherwise.
+     */
+    function isSignedIn() {
+      return request.auth != null;
     }
   }
 }
