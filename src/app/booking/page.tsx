@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import {
   Card,
   CardContent,
+  CardFooter,
 } from '@/components/ui/card';
 import {
   Form,
@@ -98,7 +99,7 @@ export default function BookingPage() {
                 <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)}>
                     <CardContent className="pt-6">
-                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                           <FormField
                               control={form.control}
                               name="date"
@@ -196,9 +197,11 @@ export default function BookingPage() {
                               </FormItem>
                           )}
                           />
-                          <Button type="submit">Proceed to Select Slot</Button>
                       </div>
                     </CardContent>
+                    <CardFooter>
+                      <Button type="submit">Proceed to Select Slot</Button>
+                    </CardFooter>
                 </form>
                 </Form>
             </Card>
