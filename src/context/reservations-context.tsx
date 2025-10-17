@@ -1,7 +1,7 @@
 
 'use client';
 
-import React, { createContext, useState, ReactNode } from 'react';
+import React, { createContext, useState, ReactNode, useEffect } from 'react';
 import type { Reservation } from '@/lib/types';
 
 const mockReservations: Reservation[] = [
@@ -34,6 +34,7 @@ interface ReservationsContextType {
   addReservation: (reservation: Reservation) => void;
   removeReservation: (reservationId: string) => void;
   isLoading: boolean;
+  isClient: boolean;
 }
 
 export const ReservationsContext = createContext<ReservationsContextType | undefined>(undefined);
@@ -41,6 +42,11 @@ export const ReservationsContext = createContext<ReservationsContextType | undef
 export const ReservationsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [reservations, setReservations] = useState<Reservation[]>(mockReservations);
   const [isLoading, setIsLoading] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const addReservation = (reservation: Reservation) => {
     setReservations(prev => [...prev, reservation]);
@@ -51,7 +57,7 @@ export const ReservationsProvider: React.FC<{ children: ReactNode }> = ({ childr
   }
 
   return (
-    <ReservationsContext.Provider value={{ reservations, addReservation, removeReservation, isLoading }}>
+    <ReservationsContext.Provider value={{ reservations, addReservation, removeReservation, isLoading, isClient }}>
       {children}
     </ReservationsContext.Provider>
   );

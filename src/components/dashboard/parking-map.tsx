@@ -24,6 +24,7 @@ import { addHours, parseISO } from 'date-fns';
 import { ReservationsContext } from '@/context/reservations-context';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
+import { Skeleton } from '../ui/skeleton';
 
 type BookingDetails = {
   date: string;
@@ -32,7 +33,7 @@ type BookingDetails = {
 };
 
 export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails }) {
-  const { addReservation, reservations, removeReservation } = useContext(ReservationsContext)!;
+  const { addReservation, reservations, removeReservation, isClient } = useContext(ReservationsContext)!;
   const [slots] = useState<ParkingSlot[]>(defaultSlots);
   const [selectedSlot, setSelectedSlot] = useState<ParkingSlot | null>(null);
   const [reservationToCancel, setReservationToCancel] = useState<Reservation | null>(null);
@@ -165,6 +166,10 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
 
   const carSlots = slots.filter((slot) => slot.type === 'car');
   const bikeSlots = slots.filter((slot) => slot.type === 'bike');
+
+  if (!isClient) {
+    return <Skeleton className="h-[450px] w-full max-w-2xl" />;
+  }
 
   return (
     <>

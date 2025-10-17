@@ -32,27 +32,35 @@ import { useToast } from '@/hooks/use-toast';
 type Status = 'Active' | 'Completed' | 'Upcoming';
 
 export function ReservationsTable() {
-  const { reservations, isLoading, removeReservation } = useContext(ReservationsContext)!;
+  const context = useContext(ReservationsContext);
   const [filter, setFilter] = useState<Status | 'all'>('all');
   const [displayReservations, setDisplayReservations] = useState<Reservation[]>([]);
   const [reservationToCancel, setReservationToCancel] = useState<Reservation | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
-    const now = new Date();
-    const updatedReservations = reservations.map(res => {
-      const startTime = new Date(res.startTime);
-      const endTime = new Date(res.endTime);
-      let status: Status = 'Upcoming';
-      if (now >= startTime && now <= endTime) {
-        status = 'Active';
-      } else if (now > endTime) {
-        status = 'Completed';
-      }
-      return { ...res, status };
-    });
-    setDisplayReservations(updatedReservations);
-  }, [reservations]);
+    if (context?.reservations) {
+      const now = new Date();
+      const updatedReservations = context.reservations.map(res => {
+        const startTime = new Date(res.startTime);
+        const endTime = new Date(res.endTime);
+        let status: Status = 'Upcoming';
+        if (now >= startTime && now <= endTime) {
+          status = 'Active';
+        } else if (now > endTime) {
+          status = 'Completed';
+        }
+        return { ...res, status };
+      });
+      setDisplayReservations(updatedReservations);
+    }
+  }, [context?.reservations]);
+
+  if (!context) {
+    return null; 
+  }
+  
+  const { removeReservation, isLoading, isClient } = context;
 
 
   const getStatusVariant = (status: Status) => {
@@ -82,6 +90,19 @@ export function ReservationsTable() {
     if (filter === 'all') return true;
     return res.status === filter;
   }).sort((a, b) => new Date(b.startTime).getTime() - new Date(a.startTime).getTime());
+  
+  const renderSkeletons = () => (
+    Array.from({ length: 3 }).map((_, i) => (
+      <TableRow key={`skel-${i}`}>
+        <TableCell><Skeleton className="h-6 w-16" /></TableCell>
+        <TableCell><Skeleton className="h-6 w-24" /></TableCell>
+        <TableCell><Skeleton className="h-6 w-40" /></TableCell>
+        <TableCell><Skeleton className="h-6 w-40" /></TableCell>
+        <TableCell><Skeleton className="h-6 w-20" /></TableCell>
+        <TableCell><Skeleton className="h-8 w-24 float-right" /></TableCell>
+      </TableRow>
+    ))
+  );
 
   return (
     <>
@@ -109,17 +130,8 @@ export function ReservationsTable() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {isLoading && Array.from({ length: 3 }).map((_, i) => (
-                      <TableRow key={i}>
-                          <TableCell><Skeleton className="h-6 w-16" /></TableCell>
-                          <TableCell><Skeleton className="h-6 w-24" /></TableCell>
-                          <TableCell><Skeleton className="h-6 w-40" /></TableCell>
-                          <TableCell><Skeleton className="h-6 w-40" /></TableCell>
-                          <TableCell><Skeleton className="h-6 w-20" /></TableCell>
-                          <TableCell><Skeleton className="h-8 w-24 float-right" /></TableCell>
-                      </TableRow>
-                  ))}
-                  {!isLoading && filteredReservations?.map((reservation) => (
+                  {(!isClient || isLoading) && renderSkeletons()}
+                  {isClient && !isLoading && filteredReservations?.map((reservation) => (
                     <TableRow key={reservation.id}>
                       <TableCell className="font-medium">
                         {reservation.slotId}
@@ -150,7 +162,7 @@ export function ReservationsTable() {
                   ))}
                 </TableBody>
               </Table>
-              {!isLoading && (!filteredReservations || filteredReservations.length === 0) && (
+              {isClient && !isLoading && (!filteredReservations || filteredReservations.length === 0) && (
                 <div className="text-center p-8 text-muted-foreground">
                   No {filter !== 'all' ? filter.toLowerCase() : ''} reservations found.
                 </div>
