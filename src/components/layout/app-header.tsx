@@ -32,7 +32,7 @@ const navItems = [
 const otherItems = [
     { href: '/reservations', label: 'My Bookings' },
     { href: '/feedback', label: 'Feedback' },
-    { href: '/violations', label: 'Violation' },
+    { href: '/violations', label: 'Violations' },
 ];
 
 export function AppHeader() {
