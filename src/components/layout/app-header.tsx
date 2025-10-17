@@ -27,12 +27,12 @@ import { useToast } from '@/hooks/use-toast';
 const navItems = [
   { href: '/home', label: 'Home' },
   { href: '/booking', label: 'Booking' },
+  { href: '/violations', label: 'AI Violations' },
 ];
 
 const otherItems = [
     { href: '/reservations', label: 'My Bookings' },
     { href: '/feedback', label: 'Feedback' },
-    { href: '/violations', label: 'AI Violations' },
 ];
 
 export function AppHeader() {
@@ -61,7 +61,7 @@ export function AppHeader() {
   const isOtherItemActive = otherItems.some(item => pathname.startsWith(item.href));
 
   const NavLink = ({ href, children, className }: { href: string, children: React.ReactNode, className?: string }) => {
-    const isActive = href === '/booking' ? pathname.startsWith('/booking') || pathname.startsWith('/select-spot') : pathname === href;
+    const isActive = href === '/booking' ? pathname.startsWith('/booking') || pathname.startsWith('/select-spot') : pathname.startsWith(href);
     return (
       <Link
         href={href}
