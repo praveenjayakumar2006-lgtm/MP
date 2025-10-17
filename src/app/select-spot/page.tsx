@@ -6,8 +6,7 @@ import { useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { format, parseISO } from 'date-fns';
-import { Card, CardContent } from '@/components/ui/card';
-import { Calendar, Clock, Hourglass } from 'lucide-react';
+import { Calendar, Clock, Hourglass, Info } from 'lucide-react';
 
 function SelectSpotContent() {
     const searchParams = useSearchParams();
@@ -40,27 +39,20 @@ function SelectSpotContent() {
                 </div>
 
                 {bookingDetails && (
-                    <Card className="w-full mb-6 bg-background shadow-lg">
-                        <CardContent className="p-3">
-                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-center">
-                                <div className="flex flex-col items-center justify-center p-1.5 rounded-md bg-muted">
-                                    <Calendar className="h-4 w-4 mb-1 text-primary" />
-                                    <p className="font-semibold text-xs text-foreground">{formattedDate}</p>
-                                    <p className="text-[10px] text-muted-foreground">Date</p>
-                                </div>
-                                <div className="flex flex-col items-center justify-center p-1.5 rounded-md bg-muted">
-                                    <Clock className="h-4 w-4 mb-1 text-primary" />
-                                    <p className="font-semibold text-xs text-foreground">{formattedTime(startTime)}</p>
-                                    <p className="text-[10px] text-muted-foreground">Start Time</p>
-                                </div>
-                                <div className="flex flex-col items-center justify-center p-1.5 rounded-md bg-muted">
-                                    <Hourglass className="h-4 w-4 mb-1 text-primary" />
-                                    <p className="font-semibold text-xs text-foreground">{duration} hour{duration && parseInt(duration) > 1 ? 's' : ''}</p>
-                                    <p className="text-[10px] text-muted-foreground">Duration</p>
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
+                   <div className="w-full flex items-center justify-center gap-x-6 gap-y-2 mb-6 text-sm text-muted-foreground bg-background/50 border rounded-full p-3 px-6 shadow-sm">
+                        <div className="flex items-center gap-2">
+                            <Calendar className="h-4 w-4 text-primary" />
+                            <span className="font-medium text-foreground">{formattedDate}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <Clock className="h-4 w-4 text-primary" />
+                            <span className="font-medium text-foreground">{formattedTime(startTime)}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <Hourglass className="h-4 w-4 text-primary" />
+                            <span className="font-medium text-foreground">{duration} hour{duration && parseInt(duration) > 1 ? 's' : ''}</span>
+                        </div>
+                    </div>
                 )}
 
                 <div className="w-full flex justify-center">
