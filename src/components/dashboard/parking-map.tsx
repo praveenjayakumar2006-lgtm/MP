@@ -64,7 +64,6 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
         let status: ParkingSlot['status'] = 'available';
         let reservedBy: ParkingSlot['reservedBy'] = undefined;
 
-        // Find a reservation that conflicts with the desired time
         const conflictingReservation = desiredInterval ? allReservations.find(res => {
             if (res.slotId !== slot.id) return false;
             const resStart = new Date(res.startTime);
@@ -84,14 +83,13 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
                 reservedBy = 'other';
             }
         } else {
-            // No time conflict, the slot is available for booking at the desired time.
-            // But we still need to know if the user owns it for cancellation purposes.
-            const userOwnsThisSlot = userReservations.some(r => r.slotId === slot.id);
-            if (userOwnsThisSlot) {
-                // Mark as reserved by user so it appears yellow, but status is available for booking.
-                // This is a UI hint for cancellation. The click handler will know what to do.
+            // No time conflict for the desired slot. The slot is available for booking.
+            status = 'available';
+            // We can still give a hint if the user owns this slot for a *different* time.
+             const userOwnsThisSlot = userReservations.some(r => r.slotId === slot.id);
+             if (userOwnsThisSlot) {
                 reservedBy = 'user';
-            }
+             }
         }
         
         return { ...slot, status, reservedBy };
@@ -177,15 +175,13 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
     let isClickable = false;
     let baseClasses = '';
 
-    const isOwnedByUser = userReservations.some(r => r.slotId === slot.id);
-
     switch (slot.status) {
         case 'available':
-            if (isOwnedByUser) { // It's available now, but you own it at some other time.
-                isClickable = true;
+            isClickable = true;
+            // If user owns it at a non-conflicting time, still show it as a user slot, but it's available.
+            if (slot.reservedBy === 'user') {
                 baseClasses = 'bg-yellow-100 border-yellow-400 text-yellow-800 hover:bg-yellow-200';
             } else {
-                isClickable = true;
                 baseClasses = 'bg-green-100 border-green-400 text-green-800 hover:bg-green-200';
             }
             break;
@@ -193,14 +189,16 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
             baseClasses = 'bg-red-100 border-red-400 text-red-800 opacity-70';
             break;
         case 'reserved':
-            if (slot.reservedBy === 'user') { // It conflicts with your desired time AND you own it.
-                isClickable = true; // Clickable to cancel.
+             // If reserved by user for the conflicting time, it's a user slot. Clickable to cancel.
+            if (slot.reservedBy === 'user') {
+                isClickable = true; 
                 baseClasses = 'bg-yellow-100 border-yellow-400 text-yellow-800 hover:bg-yellow-200';
             } else { // Reserved by someone else at the desired time.
                 baseClasses = 'bg-blue-100 border-blue-400 text-blue-800 opacity-90';
             }
             break;
         default:
+            baseClasses = 'bg-gray-100 border-gray-400 text-gray-800';
             break;
     }
 
@@ -226,11 +224,11 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
   };
   
   const showVehicleIcon = (slot: ParkingSlot) => {
-    const isOwnedByUser = userReservations.some(r => r.slotId === slot.id);
     if (slot.status === 'occupied' || slot.status === 'reserved') {
         return true;
     }
-    if (slot.status === 'available' && isOwnedByUser) {
+    // Also show if it's available now, but user owns it at a different time
+    if (slot.status === 'available' && slot.reservedBy === 'user') {
         return true;
     }
     return false;
