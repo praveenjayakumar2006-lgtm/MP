@@ -51,7 +51,7 @@ export function ReservationsTable() {
 
         if (now > endTime) {
           status = 'Completed';
-        } else if (isSameDay(startTime, now) || (now > startTime && now < endTime)) {
+        } else if (now >= startTime && now < endTime) {
             status = 'Active';
         } else {
           status = 'Upcoming';
@@ -101,6 +101,17 @@ export function ReservationsTable() {
   const handleRowClick = (reservation: Reservation) => {
     if (reservation.status === 'Active' || reservation.status === 'Upcoming') {
       const startTime = new Date(reservation.startTime);
+      
+      if (startTime < new Date()) {
+        toast({
+          variant: 'destructive',
+          title: 'Booking Not Allowed',
+          description: 'This reservation has already started and cannot be modified.',
+          duration: 2000,
+        });
+        return;
+      }
+      
       const endTime = new Date(reservation.endTime);
       const durationInMs = endTime.getTime() - startTime.getTime();
       const durationInHours = Math.round(durationInMs / (1000 * 60 * 60));
