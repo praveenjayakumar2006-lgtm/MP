@@ -98,10 +98,6 @@ function ViolationResultContent() {
                             <Car className="h-4 w-4 mr-2 text-primary" />
                             <span><strong>Make & Model:</strong> {vehicleResult.make} {vehicleResult.model}</span>
                         </div>
-                        <div className="flex items-center">
-                            <Car className="h-4 w-4 mr-2 text-primary" />
-                            <span><strong>Color:</strong> {vehicleResult.color}</span>
-                        </div>
                         </div>
                     </div>
                      <Separator />
