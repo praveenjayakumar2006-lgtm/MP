@@ -59,6 +59,7 @@ export default function LoginPage() {
       toast({
         title: 'Login Successful',
         description: 'Welcome back!',
+        duration: 2000,
       });
       // The onAuthStateChanged listener in the layout will handle the redirect
     } catch (error: any) {

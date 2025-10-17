@@ -79,6 +79,7 @@ export default function SignupPage() {
       toast({
         title: 'Account Created!',
         description: "You've been successfully signed up.",
+        duration: 2000,
       });
       
     } catch (error: any) {

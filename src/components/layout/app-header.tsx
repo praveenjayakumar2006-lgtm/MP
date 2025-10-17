@@ -51,7 +51,7 @@ export function AppHeader() {
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      toast({ title: 'Logged out successfully.' });
+      toast({ title: 'Logged out successfully.', duration: 2000 });
       router.push('/login');
     } catch (error) {
       toast({ variant: 'destructive', title: 'Failed to log out.' });
