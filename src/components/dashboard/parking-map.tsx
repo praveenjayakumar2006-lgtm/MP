@@ -85,8 +85,9 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
   };
   
   const getSlotStatus = (slotId: string): { status: 'available' | 'occupied' | 'reserved', isUser: boolean } => {
+    const isOccupied = slots.find(s => s.id === slotId)?.status === 'occupied';
+    
     if (!bookingDetails) {
-        const isOccupied = slots.find(s => s.id === slotId)?.status === 'occupied';
         return { status: isOccupied ? 'occupied' : 'available', isUser: false };
     }
 
@@ -110,7 +111,6 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
         return { status: 'reserved', isUser: conflictingReservation.userId === 'user-123' };
     }
 
-    const isOccupied = slots.find(s => s.id === slotId)?.status === 'occupied';
     if(isOccupied) return { status: 'occupied', isUser: false };
     
     return { status: 'available', isUser: false };
@@ -150,7 +150,6 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
               {carSlots.map((slot) => {
                 const { status, isUser } = getSlotStatus(slot.id);
                 const hasIcon = status === 'occupied' || status === 'reserved';
-                const userHasReservation = reservations.some(r => r.slotId === slot.id && r.userId === 'user-123');
 
                 return (
                   <div
@@ -164,9 +163,6 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
                     {hasIcon && <VehicleIcon type={slot.type} />}
                      {status === 'reserved' && isUser && (
                         <Badge variant="default" className="absolute -top-2 -right-2 text-xs px-1 py-0">You</Badge>
-                     )}
-                     {status === 'available' && userHasReservation && (
-                        <Badge variant="secondary" className="absolute -top-2 -right-2 text-xs px-1 py-0">You</Badge>
                      )}
                     <span className="absolute bottom-1 right-2 text-xs font-bold">
                       {slot.id}
@@ -183,7 +179,6 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
                     {bikeSlots.slice(0, 5).map((slot) => {
                       const { status, isUser } = getSlotStatus(slot.id);
                       const hasIcon = status === 'occupied' || status === 'reserved';
-                      const userHasReservation = reservations.some(r => r.slotId === slot.id && r.userId === 'user-123');
 
                       return (
                         <div
@@ -198,9 +193,6 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
                           {status === 'reserved' && isUser && (
                               <Badge variant="default" className="absolute -top-2 -right-2 text-xs px-1 py-0">You</Badge>
                           )}
-                          {status === 'available' && userHasReservation && (
-                              <Badge variant="secondary" className="absolute -top-2 -right-2 text-xs px-1 py-0">You</Badge>
-                          )}
                           <span className="absolute bottom-1 right-1 text-xs font-bold">
                             {slot.id}
                           </span>
@@ -212,7 +204,6 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
                     {bikeSlots.slice(5, 10).map((slot) => {
                       const { status, isUser } = getSlotStatus(slot.id);
                       const hasIcon = status === 'occupied' || status === 'reserved';
-                      const userHasReservation = reservations.some(r => r.slotId === slot.id && r.userId === 'user-123');
                       
                       return (
                         <div
@@ -226,9 +217,6 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
                           {hasIcon && <VehicleIcon type={slot.type} />}
                           {status === 'reserved' && isUser && (
                               <Badge variant="default" className="absolute -top-2 -right-2 text-xs px-1 py-0">You</Badge>
-                          )}
-                          {status === 'available' && userHasReservation && (
-                              <Badge variant="secondary" className="absolute -top-2 -right-2 text-xs px-1 py-0">You</Badge>
                           )}
                           <span className="absolute bottom-1 right-1 text-xs font-bold">
                             {slot.id}
