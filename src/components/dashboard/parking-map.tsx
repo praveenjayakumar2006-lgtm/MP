@@ -23,6 +23,7 @@ import { motion } from 'framer-motion';
 import { addHours, parseISO } from 'date-fns';
 import { ReservationsContext } from '@/context/reservations-context';
 import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
 
 type BookingDetails = {
   date: string;
@@ -31,24 +32,52 @@ type BookingDetails = {
 };
 
 export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails }) {
-  const { addReservation, reservations } = useContext(ReservationsContext)!;
-  const [slots, setSlots] = useState<ParkingSlot[]>(defaultSlots);
+  const { addReservation, reservations, removeReservation } = useContext(ReservationsContext)!;
+  const [slots] = useState<ParkingSlot[]>(defaultSlots);
   const [selectedSlot, setSelectedSlot] = useState<ParkingSlot | null>(null);
+  const [reservationToCancel, setReservationToCancel] = useState<Reservation | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
   const { toast } = useToast();
 
+  const getConflictingReservation = (slotId: string) => {
+    if (!bookingDetails) return null;
+
+    const [hour, minute] = bookingDetails.startTime.split(':').map(Number);
+    const searchStartTime = parseISO(bookingDetails.date);
+    searchStartTime.setHours(hour, minute);
+    const searchEndTime = addHours(searchStartTime, parseInt(bookingDetails.duration, 10));
+
+    return reservations.find(res => {
+        if (res.slotId !== slotId) return false;
+        const resStartTime = new Date(res.startTime);
+        const resEndTime = new Date(res.endTime);
+        return (
+            (searchStartTime >= resStartTime && searchStartTime < resEndTime) ||
+            (searchEndTime > resStartTime && searchEndTime <= resEndTime) ||
+            (resStartTime >= searchStartTime && resEndTime <= searchEndTime)
+        );
+    });
+  }
+
   const handleSlotClick = (slot: ParkingSlot) => {
-    if (getSlotStatus(slot.id).status === 'available') {
-        if (!bookingDetails) {
-            toast({
-              variant: 'destructive',
-              title: 'Booking Time Required',
-              description: 'Please go back to the booking page and select a date, time, and duration.',
-            });
-            return;
-        }
+    const status = getSlotStatus(slot.id);
+    
+    if (status.status === 'available') {
+      if (!bookingDetails) {
+          toast({
+            variant: 'destructive',
+            title: 'Booking Time Required',
+            description: 'Please go back to the booking page and select a date, time, and duration.',
+          });
+          return;
+      }
       setSelectedSlot(slot);
       setShowSuccess(false);
+    } else if (status.status === 'reserved' && status.isUser) {
+        const conflictingRes = getConflictingReservation(slot.id);
+        if (conflictingRes) {
+            setReservationToCancel(conflictingRes);
+        }
     }
   };
 
@@ -84,6 +113,16 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
     }, 1500);
   };
   
+  const handleCancelReservation = () => {
+    if (!reservationToCancel) return;
+    removeReservation(reservationToCancel.id);
+    toast({
+      title: 'Reservation Cancelled',
+      description: `Your booking for slot ${reservationToCancel.slotId} has been cancelled.`,
+    });
+    setReservationToCancel(null);
+  };
+  
   const getSlotStatus = (slotId: string): { status: 'available' | 'occupied' | 'reserved', isUser: boolean } => {
     const isOccupied = slots.find(s => s.id === slotId)?.status === 'occupied';
     
@@ -91,21 +130,7 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
         return { status: isOccupied ? 'occupied' : 'available', isUser: false };
     }
 
-    const [hour, minute] = bookingDetails.startTime.split(':').map(Number);
-    const searchStartTime = parseISO(bookingDetails.date);
-    searchStartTime.setHours(hour, minute);
-    const searchEndTime = addHours(searchStartTime, parseInt(bookingDetails.duration, 10));
-
-    const conflictingReservation = reservations.find(res => {
-        if (res.slotId !== slotId) return false;
-        const resStartTime = new Date(res.startTime);
-        const resEndTime = new Date(res.endTime);
-        return (
-            (searchStartTime >= resStartTime && searchStartTime < resEndTime) ||
-            (searchEndTime > resStartTime && searchEndTime <= resEndTime) ||
-            (resStartTime >= searchStartTime && resEndTime <= searchEndTime)
-        );
-    });
+    const conflictingReservation = getConflictingReservation(slotId);
 
     if (conflictingReservation) {
         return { status: 'reserved', isUser: conflictingReservation.userId === 'user-123' };
@@ -124,7 +149,7 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
       {
         'bg-green-100 border-green-400 text-green-800 hover:bg-green-200 cursor-pointer': status === 'available',
         'bg-red-100 border-red-400 text-red-800 cursor-not-allowed opacity-70': status === 'occupied' || (status === 'reserved' && !isUser),
-        'bg-yellow-100 border-yellow-400 text-yellow-800 cursor-not-allowed': status === 'reserved' && isUser,
+        'bg-yellow-100 border-yellow-400 text-yellow-800 hover:bg-yellow-200 cursor-pointer': status === 'reserved' && isUser,
         'h-24 w-16': slot.type === 'car',
         'h-20 w-16': slot.type === 'bike',
       }
@@ -281,6 +306,29 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
           )}
         </AlertDialogContent>
       </AlertDialog>
+
+      <AlertDialog open={!!reservationToCancel} onOpenChange={(open) => !open && setReservationToCancel(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Cancel Reservation?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will cancel your reservation for slot{' '}
+              <span className="font-bold">{reservationToCancel?.slotId}</span>. Are you sure?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Back</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleCancelReservation}
+              asChild
+            >
+              <Button variant="destructive">Yes, Cancel</Button>
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }
+
+    
