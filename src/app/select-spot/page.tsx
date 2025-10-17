@@ -41,22 +41,22 @@ function SelectSpotContent() {
 
                 {bookingDetails && (
                     <Card className="w-full mb-6 bg-background shadow-lg">
-                        <CardContent className="p-4">
-                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
-                                <div className="flex flex-col items-center justify-center p-2 rounded-lg bg-muted">
-                                    <Calendar className="h-5 w-5 mb-1 text-primary" />
-                                    <p className="font-semibold text-sm text-foreground">{formattedDate}</p>
-                                    <p className="text-xs text-muted-foreground">Date</p>
+                        <CardContent className="p-3">
+                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-center">
+                                <div className="flex flex-col items-center justify-center p-1.5 rounded-md bg-muted">
+                                    <Calendar className="h-4 w-4 mb-1 text-primary" />
+                                    <p className="font-semibold text-xs text-foreground">{formattedDate}</p>
+                                    <p className="text-[10px] text-muted-foreground">Date</p>
                                 </div>
-                                <div className="flex flex-col items-center justify-center p-2 rounded-lg bg-muted">
-                                    <Clock className="h-5 w-5 mb-1 text-primary" />
-                                    <p className="font-semibold text-sm text-foreground">{formattedTime(startTime)}</p>
-                                    <p className="text-xs text-muted-foreground">Start Time</p>
+                                <div className="flex flex-col items-center justify-center p-1.5 rounded-md bg-muted">
+                                    <Clock className="h-4 w-4 mb-1 text-primary" />
+                                    <p className="font-semibold text-xs text-foreground">{formattedTime(startTime)}</p>
+                                    <p className="text-[10px] text-muted-foreground">Start Time</p>
                                 </div>
-                                <div className="flex flex-col items-center justify-center p-2 rounded-lg bg-muted">
-                                    <Hourglass className="h-5 w-5 mb-1 text-primary" />
-                                    <p className="font-semibold text-sm text-foreground">{duration} hour{duration && parseInt(duration) > 1 ? 's' : ''}</p>
-                                    <p className="text-xs text-muted-foreground">Duration</p>
+                                <div className="flex flex-col items-center justify-center p-1.5 rounded-md bg-muted">
+                                    <Hourglass className="h-4 w-4 mb-1 text-primary" />
+                                    <p className="font-semibold text-xs text-foreground">{duration} hour{duration && parseInt(duration) > 1 ? 's' : ''}</p>
+                                    <p className="text-[10px] text-muted-foreground">Duration</p>
                                 </div>
                             </div>
                         </CardContent>
