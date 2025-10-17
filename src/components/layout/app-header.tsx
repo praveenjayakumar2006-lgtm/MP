@@ -2,7 +2,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Car, Menu, ChevronDown } from 'lucide-react';
+import { Car, Menu, ChevronDown, LogOut } from 'lucide-react';
 import {
   Sheet,
   SheetContent,
@@ -96,7 +96,9 @@ export function AppHeader() {
         <div className="flex items-center gap-4">
             {!isMobile && isClient && (
               <Link href="/login">
-                  <Image src="https://picsum.photos/seed/usericon/40/40" alt="Sign In" width={40} height={40} className="rounded-full border-2 border-primary-foreground/50" data-ai-hint="user icon" />
+                <Button variant="ghost" size="icon" className="hover:bg-white/10">
+                  <LogOut className="h-6 w-6 text-primary-foreground/80 hover:text-primary-foreground" />
+                </Button>
               </Link>
             )}
             {isMobile && isClient && (
