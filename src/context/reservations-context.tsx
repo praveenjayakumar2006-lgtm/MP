@@ -32,6 +32,7 @@ const mockReservations: Reservation[] = [
 interface ReservationsContextType {
   reservations: Reservation[];
   addReservation: (reservation: Reservation) => void;
+  removeReservation: (reservationId: string) => void;
   isLoading: boolean;
 }
 
@@ -45,8 +46,12 @@ export const ReservationsProvider: React.FC<{ children: ReactNode }> = ({ childr
     setReservations(prev => [...prev, reservation]);
   };
 
+  const removeReservation = (reservationId: string) => {
+    setReservations(prev => prev.filter(res => res.id !== reservationId));
+  }
+
   return (
-    <ReservationsContext.Provider value={{ reservations, addReservation, isLoading }}>
+    <ReservationsContext.Provider value={{ reservations, addReservation, removeReservation, isLoading }}>
       {children}
     </ReservationsContext.Provider>
   );
