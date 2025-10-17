@@ -242,74 +242,76 @@ export function ViolationChecker() {
   }
 
   return (
-        <Card>
-            <Form {...violationForm}>
-                <form onSubmit={violationForm.handleSubmit(onViolationSubmit)}>
-                    <CardHeader>
-                        <CardTitle>Report a Violation</CardTitle>
-                        <CardDescription>Fill in the details to check for a parking violation.</CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-3">
-                        <FormField
-                            control={violationForm.control}
-                            name="slotNumber"
-                            render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Slot Number</FormLabel>
-                                <FormControl>
-                                <Input placeholder="e.g., C5" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={violationForm.control}
-                            name="violationType"
-                            render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Violation Type</FormLabel>
-                                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                <FormControl>
-                                    <SelectTrigger>
-                                    <SelectValue placeholder="Select a violation type" />
-                                    </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                    <SelectItem value="overstaying">Overstaying</SelectItem>
-                                    <SelectItem value="unauthorized_parking">Unauthorized Parking</SelectItem>
-                                </SelectContent>
-                                </Select>
-                                <FormMessage />
-                            </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={violationForm.control}
-                            name="details"
-                            render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Details</FormLabel>
-                                <FormControl>
-                                <Textarea
-                                    placeholder="Provide more details about the violation..."
-                                    {...field}
-                                    rows={3}
-                                />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                            )}
-                        />
-                         <div className="pt-4">
-                            <Button type="submit" disabled={isLoading} className='w-full'>
-                                {isLoading && !violationResult ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : 'Analyze Violation'}
-                            </Button>
-                        </div>
-                        {renderResult()}
-                    </CardContent>
-                </form>
-            </Form>
-        </Card>
+    <>
+      <div className="mb-4">
+        <h1 className="text-3xl font-semibold">Report a Violation</h1>
+        <p className="text-muted-foreground">Fill in the details to check for a parking violation.</p>
+      </div>
+      <Card>
+          <Form {...violationForm}>
+              <form onSubmit={violationForm.handleSubmit(onViolationSubmit)}>
+                  <CardContent className="space-y-3 pt-6">
+                      <FormField
+                          control={violationForm.control}
+                          name="slotNumber"
+                          render={({ field }) => (
+                          <FormItem>
+                              <FormLabel>Slot Number</FormLabel>
+                              <FormControl>
+                              <Input placeholder="e.g., C5" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                          </FormItem>
+                          )}
+                      />
+                      <FormField
+                          control={violationForm.control}
+                          name="violationType"
+                          render={({ field }) => (
+                          <FormItem>
+                              <FormLabel>Violation Type</FormLabel>
+                              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                                  <SelectTrigger>
+                                  <SelectValue placeholder="Select a violation type" />
+                                  </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                  <SelectItem value="overstaying">Overstaying</SelectItem>
+                                  <SelectItem value="unauthorized_parking">Unauthorized Parking</SelectItem>
+                              </SelectContent>
+                              </Select>
+                              <FormMessage />
+                          </FormItem>
+                          )}
+                      />
+                      <FormField
+                          control={violationForm.control}
+                          name="details"
+                          render={({ field }) => (
+                          <FormItem>
+                              <FormLabel>Details</FormLabel>
+                              <FormControl>
+                              <Textarea
+                                  placeholder="Provide more details about the violation..."
+                                  {...field}
+                                  rows={3}
+                              />
+                              </FormControl>
+                              <FormMessage />
+                          </FormItem>
+                          )}
+                      />
+                        <div className="pt-4">
+                          <Button type="submit" disabled={isLoading} className='w-full'>
+                              {isLoading && !violationResult ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : 'Analyze Violation'}
+                          </Button>
+                      </div>
+                      {renderResult()}
+                  </CardContent>
+              </form>
+          </Form>
+      </Card>
+    </>
   );
 }
