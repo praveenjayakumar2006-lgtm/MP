@@ -27,12 +27,12 @@ import { useToast } from '@/hooks/use-toast';
 const navItems = [
   { href: '/home', label: 'Home' },
   { href: '/booking', label: 'Booking' },
+  { href: '/violations', label: 'Report a Violation' },
 ];
 
 const otherItems = [
     { href: '/reservations', label: 'My Bookings' },
     { href: '/feedback', label: 'Feedback' },
-    { href: '/violations', label: 'Violations' },
 ];
 
 export function AppHeader() {
