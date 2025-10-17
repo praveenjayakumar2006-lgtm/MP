@@ -27,7 +27,7 @@ import { useToast } from '@/hooks/use-toast';
 const navItems = [
   { href: '/home', label: 'Home' },
   { href: '/booking', label: 'Booking' },
-  { href: '/violations', label: 'AI Violations' },
+  { href: '/violations', label: 'Violation' },
 ];
 
 const otherItems = [
