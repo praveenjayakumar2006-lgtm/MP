@@ -6,10 +6,11 @@ import type { Reservation } from '@/lib/types';
 
 const today = new Date();
 const startTime = new Date(today);
-startTime.setHours(startTime.getHours() - 1);
+startTime.setMinutes(startTime.getMinutes() - 25);
 
 const endTime = new Date(today);
 endTime.setHours(endTime.getHours() + 2);
+endTime.setMinutes(endTime.getMinutes() + 35);
 
 const mockReservations: Reservation[] = [
     {
