@@ -64,71 +64,37 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
         let status: ParkingSlot['status'] = 'available';
         let reservedBy: ParkingSlot['reservedBy'] = undefined;
 
-        if (desiredInterval) {
-            const conflictingReservation = allReservations.find(res => {
-                if (res.slotId !== slot.id) return false;
-                const resStart = new Date(res.startTime);
-                const resEnd = new Date(res.endTime);
-                // Check for overlap: (StartA < EndB) and (EndA > StartB)
-                return desiredInterval.start < resEnd && desiredInterval.end > resStart;
-            });
-
-            if (conflictingReservation) {
-                const isUserConflict = userReservations.some(r => r.id === conflictingReservation.id);
-                if (isUserConflict) {
-                    status = 'reserved';
-                    reservedBy = 'user';
-                } else {
-                    const isOccupied = otherReservations.some(r => r.id === conflictingReservation.id && r.status === 'Active');
-                    status = isOccupied ? 'occupied' : 'reserved';
-                    reservedBy = 'other';
-                }
-            }
-        }
-        
-        // If no conflict for the desired time, still check if the user holds a reservation for this slot at *any* time,
-        // so we can allow cancellation. But don't mark it as reserved for the purpose of booking.
-        if (status === 'available') {
-             const userOwnsThisSlot = userReservations.some(r => r.slotId === slot.id);
-             if(userOwnsThisSlot) {
-                status = 'reserved';
-                reservedBy = 'user';
-             }
-        }
-         
-        // If a slot is marked as user-reserved, we must double-check if there's an actual conflict. 
-        // If not, it should be available for a *new* booking but still show as cancellable.
-        // This is tricky. Let's simplify: if you own it, it's yellow. Clicking it will offer cancellation.
-        // If you click a green one, you can book. If you try to book a yellow one you own, it should be allowed if no conflict.
-        // The current logic is getting complex. Let's reset and simplify.
-
-        const conflictingRes = allReservations.find(res => {
+        // Find a reservation that conflicts with the desired time
+        const conflictingReservation = desiredInterval ? allReservations.find(res => {
             if (res.slotId !== slot.id) return false;
-            if (!desiredInterval) return false; // No time selected, so nothing conflicts. But we still want to show user's reservations.
-
             const resStart = new Date(res.startTime);
             const resEnd = new Date(res.endTime);
+            // Check for overlap: (StartA < EndB) and (EndA > StartB)
             return desiredInterval.start < resEnd && desiredInterval.end > resStart;
-        });
-
-        const isOwnedByUserAtAnyTime = userReservations.some(res => res.slotId === slot.id);
-
-        if (conflictingRes) {
-            const isUserReservation = userReservations.some(r => r.id === conflictingRes.id);
+        }) : undefined;
+        
+        if (conflictingReservation) {
+            const isUserReservation = userReservations.some(r => r.id === conflictingReservation.id);
             if (isUserReservation) {
-                return { ...slot, status: 'reserved', reservedBy: 'user' };
+                status = 'reserved';
+                reservedBy = 'user';
             } else {
-                 const isOccupied = otherReservations.some(r => r.id === conflictingRes.id && r.status === 'Active');
-                 return { ...slot, status: isOccupied ? 'occupied' : 'reserved', reservedBy: 'other' };
+                const isOccupied = otherReservations.some(r => r.id === conflictingReservation.id && r.status === 'Active');
+                status = isOccupied ? 'occupied' : 'reserved';
+                reservedBy = 'other';
             }
-        } else if (isOwnedByUserAtAnyTime) {
-            // It's owned by the user, but doesn't conflict with the *desired* time.
-            // It should be 'available' for booking, but visually 'yellow' to allow cancellation.
-            // This is a UI contradiction. Let's stick to the rule: if it conflicts, it's red/blue. If it's owned, it's yellow. If free, it's green.
-            return { ...slot, status: 'reserved', reservedBy: 'user' };
+        } else {
+            // No time conflict, the slot is available for booking at the desired time.
+            // But we still need to know if the user owns it for cancellation purposes.
+            const userOwnsThisSlot = userReservations.some(r => r.slotId === slot.id);
+            if (userOwnsThisSlot) {
+                // Mark as reserved by user so it appears yellow, but status is available for booking.
+                // This is a UI hint for cancellation. The click handler will know what to do.
+                reservedBy = 'user';
+            }
         }
         
-        return { ...slot, status: 'available', reservedBy: undefined };
+        return { ...slot, status, reservedBy };
     });
     
     setSlots(updatedSlots);
@@ -141,11 +107,9 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
 
   const handleSlotClick = (slot: ParkingSlot) => {
     // If the slot is one of the user's, always give cancellation option.
-    if (slot.status === 'reserved' && slot.reservedBy === 'user') {
-      const reservationToCancel = userReservations.find(r => r.slotId === slot.id);
-      if (reservationToCancel) {
-          setSlotToCancel(slot);
-      }
+    const isOwnedByUser = userReservations.some(r => r.slotId === slot.id);
+    if (isOwnedByUser) {
+      setSlotToCancel(slot);
       return;
     }
     
@@ -213,19 +177,26 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
     let isClickable = false;
     let baseClasses = '';
 
+    const isOwnedByUser = userReservations.some(r => r.slotId === slot.id);
+
     switch (slot.status) {
         case 'available':
-            isClickable = true;
-            baseClasses = 'bg-green-100 border-green-400 text-green-800 hover:bg-green-200';
+            if (isOwnedByUser) { // It's available now, but you own it at some other time.
+                isClickable = true;
+                baseClasses = 'bg-yellow-100 border-yellow-400 text-yellow-800 hover:bg-yellow-200';
+            } else {
+                isClickable = true;
+                baseClasses = 'bg-green-100 border-green-400 text-green-800 hover:bg-green-200';
+            }
             break;
         case 'occupied':
             baseClasses = 'bg-red-100 border-red-400 text-red-800 opacity-70';
             break;
         case 'reserved':
-            if (slot.reservedBy === 'user') {
-                isClickable = true;
+            if (slot.reservedBy === 'user') { // It conflicts with your desired time AND you own it.
+                isClickable = true; // Clickable to cancel.
                 baseClasses = 'bg-yellow-100 border-yellow-400 text-yellow-800 hover:bg-yellow-200';
-            } else {
+            } else { // Reserved by someone else at the desired time.
                 baseClasses = 'bg-blue-100 border-blue-400 text-blue-800 opacity-90';
             }
             break;
@@ -253,6 +224,17 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
     iconClass = cn('h-2/3 w-2/3', className);
     return <Bike className={iconClass} />;
   };
+  
+  const showVehicleIcon = (slot: ParkingSlot) => {
+    const isOwnedByUser = userReservations.some(r => r.slotId === slot.id);
+    if (slot.status === 'occupied' || slot.status === 'reserved') {
+        return true;
+    }
+    if (slot.status === 'available' && isOwnedByUser) {
+        return true;
+    }
+    return false;
+  }
 
   return (
     <>
@@ -267,17 +249,14 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
                     className={getSlotClasses(slot)}
                     onClick={() => handleSlotClick(slot)}
                     role="button"
-                    tabIndex={slot.status === 'available' || (slot.status === 'reserved' && slot.reservedBy === 'user') ? 0 : -1}
+                    tabIndex={0}
                     aria-label={`Parking slot ${slot.id}, status: ${slot.status}`}
                 >
-                    {slot.status === 'reserved' && slot.reservedBy === 'user' && (
+                    {showVehicleIcon(slot) && (
                        <>
-                        <span className="absolute top-1 left-2 text-xs font-bold">You</span>
+                        {slot.reservedBy === 'user' && <span className="absolute top-1 left-2 text-xs font-bold">You</span>}
                         <VehicleIcon type={slot.type} />
                        </>
-                    )}
-                    {slot.status !== 'available' && slot.reservedBy !== 'user' && (
-                       <VehicleIcon type={slot.type} />
                     )}
                     <span className="absolute bottom-1 right-2 text-xs font-bold">
                     {slot.id}
@@ -296,17 +275,14 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
                     className={getSlotClasses(slot)}
                     onClick={() => handleSlotClick(slot)}
                     role="button"
-                     tabIndex={slot.status === 'available' || (slot.status === 'reserved' && slot.reservedBy === 'user') ? 0 : -1}
+                     tabIndex={0}
                     aria-label={`Parking slot ${slot.id}, status: ${slot.status}`}
                     >
-                    {slot.status === 'reserved' && slot.reservedBy === 'user' && (
+                    {showVehicleIcon(slot) && (
                        <>
-                        <span className="absolute top-1 left-2 text-xs font-bold">You</span>
+                        {slot.reservedBy === 'user' && <span className="absolute top-1 left-2 text-xs font-bold">You</span>}
                         <VehicleIcon type={slot.type} />
                        </>
-                    )}
-                    {slot.status !== 'available' && slot.reservedBy !== 'user' && (
-                       <VehicleIcon type={slot.type} />
                     )}
                     <span className="absolute bottom-1 right-1 text-xs font-bold">
                         {slot.id}
@@ -321,17 +297,14 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
                     className={getSlotClasses(slot)}
                     onClick={() => handleSlotClick(slot)}
                     role="button"
-                     tabIndex={slot.status === 'available' || (slot.status === 'reserved' && slot.reservedBy === 'user') ? 0 : -1}
+                     tabIndex={0}
                     aria-label={`Parking slot ${slot.id}, status: ${slot.status}`}
                     >
-                    {slot.status === 'reserved' && slot.reservedBy === 'user' && (
+                    {showVehicleIcon(slot) && (
                        <>
-                        <span className="absolute top-1 left-2 text-xs font-bold">You</span>
+                        {slot.reservedBy === 'user' && <span className="absolute top-1 left-2 text-xs font-bold">You</span>}
                         <VehicleIcon type={slot.type} />
                        </>
-                    )}
-                    {slot.status !== 'available' && slot.reservedBy !== 'user' && (
-                       <VehicleIcon type={slot.type} />
                     )}
                     <span className="absolute bottom-1 right-1 text-xs font-bold">
                         {slot.id}
@@ -436,3 +409,5 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
     </>
   );
 }
+
+    
