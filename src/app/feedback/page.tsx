@@ -44,6 +44,8 @@ export default function FeedbackPage() {
   const form = useForm<FeedbackFormValues>({
     resolver: zodResolver(feedbackSchema),
     defaultValues: {
+      name: '',
+      email: '',
       rating: 0,
       feedback: '',
     },
