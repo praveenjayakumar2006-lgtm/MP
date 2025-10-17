@@ -93,11 +93,11 @@ export function AppHeader() {
                 </DropdownMenuContent>
             </DropdownMenu>
         </nav>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 ml-auto">
             {!isMobile && isClient && (
               <Link href="/login">
-                <Button variant="ghost" size="icon" className="hover:bg-white/10">
-                  <LogOut className="h-8 w-8 text-primary-foreground/80 hover:text-primary-foreground" />
+                <Button variant="ghost" size="icon" className="hover:bg-white/10 [&_svg]:size-8">
+                  <LogOut className="text-primary-foreground/80 hover:text-primary-foreground" />
                 </Button>
               </Link>
             )}
