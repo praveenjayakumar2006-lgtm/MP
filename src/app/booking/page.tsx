@@ -199,7 +199,7 @@ export default function BookingPage() {
                           />
                       </div>
                     </CardContent>
-                    <CardFooter>
+                    <CardFooter className="justify-center">
                       <Button type="submit">Proceed to Select Slot</Button>
                     </CardFooter>
                 </form>
