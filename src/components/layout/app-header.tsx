@@ -33,6 +33,7 @@ const navItems = [
 const otherItems = [
     { href: '/reservations', label: 'My Bookings' },
     { href: '/feedback', label: 'Feedback' },
+    { href: '/help', label: 'Help' },
 ];
 
 export function AppHeader() {
