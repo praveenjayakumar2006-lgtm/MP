@@ -44,19 +44,19 @@ function SelectSpotContent() {
                         <CardContent className="p-4">
                              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
                                 <div className="flex flex-col items-center justify-center p-2 rounded-lg bg-muted">
-                                    <Calendar className="h-6 w-6 mb-2 text-primary" />
-                                    <p className="font-semibold text-foreground">{formattedDate}</p>
-                                    <p className="text-sm text-muted-foreground">Date</p>
+                                    <Calendar className="h-5 w-5 mb-1 text-primary" />
+                                    <p className="font-semibold text-sm text-foreground">{formattedDate}</p>
+                                    <p className="text-xs text-muted-foreground">Date</p>
                                 </div>
                                 <div className="flex flex-col items-center justify-center p-2 rounded-lg bg-muted">
-                                    <Clock className="h-6 w-6 mb-2 text-primary" />
-                                    <p className="font-semibold text-foreground">{formattedTime(startTime)}</p>
-                                    <p className="text-sm text-muted-foreground">Start Time</p>
+                                    <Clock className="h-5 w-5 mb-1 text-primary" />
+                                    <p className="font-semibold text-sm text-foreground">{formattedTime(startTime)}</p>
+                                    <p className="text-xs text-muted-foreground">Start Time</p>
                                 </div>
                                 <div className="flex flex-col items-center justify-center p-2 rounded-lg bg-muted">
-                                    <Hourglass className="h-6 w-6 mb-2 text-primary" />
-                                    <p className="font-semibold text-foreground">{duration} hour{duration && parseInt(duration) > 1 ? 's' : ''}</p>
-                                    <p className="text-sm text-muted-foreground">Duration</p>
+                                    <Hourglass className="h-5 w-5 mb-1 text-primary" />
+                                    <p className="font-semibold text-sm text-foreground">{duration} hour{duration && parseInt(duration) > 1 ? 's' : ''}</p>
+                                    <p className="text-xs text-muted-foreground">Duration</p>
                                 </div>
                             </div>
                         </CardContent>
