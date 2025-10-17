@@ -32,26 +32,21 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Loader2, Car, User, Phone, Home, ShieldCheck, ShieldX } from 'lucide-react';
-import type { ExtractVehicleInfoOutput } from '@/ai/flows/extract-vehicle-info';
-import type { DetectParkingViolationOutput } from '@/ai/flows/detect-parking-violations';
-import { analyzeVehicleImage, analyzeViolation } from '@/app/violations/actions';
+import type { CombinedAnalysisResult } from '@/app/violations/actions';
+import { analyzeCombinedViolation } from '@/app/violations/actions';
 import Image from 'next/image';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const violationSchema = z.object({
   slotNumber: z.string().min(1, 'Slot number is required.'),
   violationType: z.enum(['overstaying', 'unauthorized_parking']),
   details: z.string().min(10, 'Details must be at least 10 characters.'),
-});
-type ViolationFormValues = z.infer<typeof violationSchema>;
-
-const imageSchema = z.object({
   image: z.any().refine(
     (files) => files instanceof FileList && files.length > 0,
     'An image is required.'
   ),
 });
-type ImageFormValues = z.infer<typeof imageSchema>;
+type ViolationFormValues = z.infer<typeof violationSchema>;
+
 
 function fileToDataUrl(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -63,12 +58,11 @@ function fileToDataUrl(file: File): Promise<string> {
 }
 
 export function ViolationChecker() {
-  const [analysisResult, setAnalysisResult] = useState<ExtractVehicleInfoOutput | DetectParkingViolationOutput | null>(null);
+  const [analysisResult, setAnalysisResult] = useState<CombinedAnalysisResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState('report');
 
-  const violationForm = useForm<ViolationFormValues>({
+  const form = useForm<ViolationFormValues>({
     resolver: zodResolver(violationSchema),
     defaultValues: {
       slotNumber: '',
@@ -77,13 +71,9 @@ export function ViolationChecker() {
     },
   });
 
-  const imageForm = useForm<ImageFormValues>({
-    resolver: zodResolver(imageSchema),
-  });
+  const { register, watch } = form;
   
-  const { register: registerImage, watch: watchImage } = imageForm;
-  
-  const imageFiles = watchImage('image');
+  const imageFiles = watch('image');
   
   useState(() => {
     if (imageFiles && imageFiles[0]) {
@@ -96,20 +86,7 @@ export function ViolationChecker() {
   }, [imageFiles]);
 
 
-  async function onViolationSubmit(values: ViolationFormValues) {
-    setIsLoading(true);
-    setAnalysisResult(null);
-    try {
-      const result = await analyzeViolation({ ...values, timestamp: new Date().toISOString() });
-      setAnalysisResult(result);
-    } catch (error) {
-      console.error('Error analyzing violation:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  }
-
-  async function onImageSubmit(values: ImageFormValues) {
+  async function onSubmit(values: ViolationFormValues) {
     setIsLoading(true);
     setAnalysisResult(null);
 
@@ -118,10 +95,18 @@ export function ViolationChecker() {
 
     try {
       const imageDataUri = await fileToDataUrl(file);
-      const result = await analyzeVehicleImage({ imageDataUri });
+      const result = await analyzeCombinedViolation(
+        {
+          slotNumber: values.slotNumber,
+          violationType: values.violationType,
+          details: values.details,
+          timestamp: new Date().toISOString(),
+        },
+        { imageDataUri }
+      );
       setAnalysisResult(result);
     } catch (error) {
-      console.error('Error analyzing vehicle image:', error);
+      console.error('Error analyzing violation:', error);
     } finally {
       setIsLoading(false);
     }
@@ -129,211 +114,175 @@ export function ViolationChecker() {
 
   const renderResult = () => {
     if (!analysisResult) {
-        return <p className="text-xs text-muted-foreground">Submit a report to see the analysis.</p>;
+        return null;
     }
     
-    // Type guard for DetectParkingViolationOutput
-    if ('isViolationDetected' in analysisResult) {
-        return (
-            <div className="flex flex-col items-center gap-4 text-center">
-                {analysisResult.isViolationDetected ? (
-                    <ShieldCheck className="h-12 w-12 text-green-500" />
+    const {violationResult, vehicleResult} = analysisResult;
+
+    return (
+        <div className="w-full space-y-6 text-sm">
+            <div className="flex flex-col items-center gap-2 text-center border-b pb-4">
+                {violationResult.isViolationDetected ? (
+                    <ShieldCheck className="h-10 w-10 text-green-500" />
                 ) : (
-                    <ShieldX className="h-12 w-12 text-red-500" />
+                    <ShieldX className="h-10 w-10 text-red-500" />
                 )}
                 <div className='space-y-1'>
-                    <h3 className="text-xl font-semibold">
-                        {analysisResult.isViolationDetected ? 'Violation Detected' : 'No Violation Detected'}
+                    <h3 className="text-lg font-semibold">
+                        {violationResult.isViolationDetected ? 'Violation Detected' : 'No Violation Detected'}
                     </h3>
-                    <p className="text-sm text-muted-foreground">{analysisResult.violationDetails}</p>
+                    <p className="text-xs text-muted-foreground">{violationResult.violationDetails}</p>
                 </div>
             </div>
-        );
-    }
-
-    // Type guard for ExtractVehicleInfoOutput
-    if ('licensePlate' in analysisResult) {
-        const result = analysisResult; // for type safety
-        return (
-             <div className="w-full space-y-6">
+             <div className="w-full space-y-4">
               <div>
-                <h3 className="font-semibold text-lg">Vehicle Details</h3>
-                <div className="mt-2 space-y-2 text-sm text-muted-foreground">
+                <h3 className="font-semibold text-base">Vehicle Details</h3>
+                <div className="mt-2 space-y-1 text-muted-foreground">
                   <div className="flex items-center">
                     <Car className="h-4 w-4 mr-2" />
-                    <span><strong>License Plate:</strong> {result.licensePlate}</span>
+                    <span><strong>License Plate:</strong> {vehicleResult.licensePlate}</span>
                   </div>
                   <div className="flex items-center">
                     <Car className="h-4 w-4 mr-2" />
-                    <span><strong>Make & Model:</strong> {result.make} {result.model}</span>
+                    <span><strong>Make & Model:</strong> {vehicleResult.make} {vehicleResult.model}</span>
                   </div>
                    <div className="flex items-center">
                     <Car className="h-4 w-4 mr-2" />
-                    <span><strong>Color:</strong> {result.color}</span>
+                    <span><strong>Color:</strong> {vehicleResult.color}</span>
                   </div>
                 </div>
               </div>
               <div>
-                <h3 className="font-semibold text-lg">Owner Details (Fictional)</h3>
-                 <div className="mt-2 space-y-2 text-sm text-muted-foreground">
+                <h3 className="font-semibold text-base">Owner Details (Fictional)</h3>
+                 <div className="mt-2 space-y-1 text-muted-foreground">
                   <div className="flex items-center">
                     <User className="h-4 w-4 mr-2" />
-                    <span>{result.owner.name}</span>
+                    <span>{vehicleResult.owner.name}</span>
                   </div>
                   <div className="flex items-center">
                     <Home className="h-4 w-4 mr-2" />
-                    <span>{result.owner.address}</span>
+                    <span>{vehicleResult.owner.address}</span>
                   </div>
                    <div className="flex items-center">
                     <Phone className="h-4 w-4 mr-2" />
-                    <span>{result.owner.phone}</span>
+                    <span>{vehicleResult.owner.phone}</span>
                   </div>
                 </div>
               </div>
             </div>
-          );
-    }
-    
-    return <p className="text-sm text-muted-foreground">Analysis result is in an unknown format.</p>;
+        </div>
+    );
   }
 
   return (
-    <div className="w-full grid md:grid-cols-2 gap-8 items-stretch">
-      <div className="flex flex-col">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full flex flex-col flex-1">
-            <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="report">Report Violation</TabsTrigger>
-                <TabsTrigger value="image">Analyze Vehicle Image</TabsTrigger>
-            </TabsList>
-            <TabsContent value="report" className="flex-1">
-                <Card className="flex flex-col h-full">
-                    <Form {...violationForm}>
-                        <form onSubmit={violationForm.handleSubmit(onViolationSubmit)} className="flex flex-col flex-1">
-                            <CardHeader className="p-4">
-                                <CardTitle>Report a Violation</CardTitle>
-                                <CardDescription>Fill in the details to check for a parking violation using our AI tool.</CardDescription>
-                            </CardHeader>
-                            <CardContent className="p-4 flex-1">
-                                <FormField
-                                    control={violationForm.control}
-                                    name="slotNumber"
-                                    render={({ field }) => (
-                                    <FormItem className='mb-2'>
-                                        <FormLabel>Slot Number</FormLabel>
-                                        <FormControl>
-                                        <Input placeholder="e.g., C5" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                    )}
+    <div className="w-full grid md:grid-cols-2 gap-8 items-start">
+        <Card>
+            <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)}>
+                    <CardHeader>
+                        <CardTitle>Report a Violation</CardTitle>
+                        <CardDescription>Fill in the details and upload an image to check for a parking violation.</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                        <FormField
+                            control={form.control}
+                            name="slotNumber"
+                            render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Slot Number</FormLabel>
+                                <FormControl>
+                                <Input placeholder="e.g., C5" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="violationType"
+                            render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Violation Type</FormLabel>
+                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <FormControl>
+                                    <SelectTrigger>
+                                    <SelectValue placeholder="Select a violation type" />
+                                    </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                    <SelectItem value="overstaying">Overstaying</SelectItem>
+                                    <SelectItem value="unauthorized_parking">Unauthorized Parking</SelectItem>
+                                </SelectContent>
+                                </Select>
+                                <FormMessage />
+                            </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="details"
+                            render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Details</FormLabel>
+                                <FormControl>
+                                <Textarea
+                                    placeholder="Provide more details about the violation..."
+                                    {...field}
+                                    rows={3}
                                 />
-                                <FormField
-                                    control={violationForm.control}
-                                    name="violationType"
-                                    render={({ field }) => (
-                                    <FormItem className='mb-2'>
-                                        <FormLabel>Violation Type</FormLabel>
-                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                        <FormControl>
-                                            <SelectTrigger>
-                                            <SelectValue placeholder="Select a violation type" />
-                                            </SelectTrigger>
-                                        </FormControl>
-                                        <SelectContent>
-                                            <SelectItem value="overstaying">Overstaying</SelectItem>
-                                            <SelectItem value="unauthorized_parking">Unauthorized Parking</SelectItem>
-                                        </SelectContent>
-                                        </Select>
-                                        <FormMessage />
-                                    </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={violationForm.control}
-                                    name="details"
-                                    render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Details</FormLabel>
-                                        <FormControl>
-                                        <Textarea
-                                            placeholder="Provide more details about the violation..."
-                                            {...field}
-                                            rows={4}
-                                        />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                    )}
-                                />
-                            </CardContent>
-                             <CardFooter className="p-4">
-                                <Button type="submit" disabled={isLoading}>
-                                    {isLoading && activeTab === 'report' && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                    Analyze Violation
-                                </Button>
-                            </CardFooter>
-                        </form>
-                    </Form>
-                </Card>
-            </TabsContent>
-            <TabsContent value="image" className="flex-1">
-                <Card className="flex flex-col h-full">
-                    <Form {...imageForm}>
-                        <form onSubmit={imageForm.handleSubmit(onImageSubmit)} className="flex flex-col flex-1">
-                            <CardContent className="p-6 space-y-4 flex-1">
-                               <FormField
-                                control={imageForm.control}
-                                name="image"
-                                render={({ field }) => (
-                                  <FormItem>
-                                    <FormLabel>Vehicle Image</FormLabel>
-                                    <FormControl>
-                                      <Input
-                                        type="file"
-                                        accept="image/*"
-                                        {...registerImage('image')}
-                                      />
-                                    </FormControl>
-                                    <FormMessage />
-                                  </FormItem>
-                                )}
-                              />
-                              {preview && (
-                                <div className="mt-4 relative aspect-video w-full">
-                                  <Image
-                                    src={preview}
-                                    alt="Image preview"
-                                    fill
-                                    className="rounded-md object-cover"
-                                  />
-                                </div>
-                              )}
-                            </CardContent>
-                            <CardFooter>
-                                <Button type="submit" disabled={isLoading || !imageForm.formState.isValid}>
-                                    {isLoading && activeTab === 'image' && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                    Analyze Image
-                                </Button>
-                            </CardFooter>
-                        </form>
-                    </Form>
-                </Card>
-            </TabsContent>
-        </Tabs>
-      </div>
-      <div className="flex flex-col">
-          <Card className="flex-1 flex flex-col">
-              <CardHeader>
-                  <CardTitle>Analysis Result</CardTitle>
-                  <CardDescription>
-                      The AI-powered analysis will be displayed here.
-                  </CardDescription>
-              </CardHeader>
-              <CardContent className="flex-1 flex items-center justify-center rounded-lg border-dashed border-2 m-6 mt-0 p-6 h-[350px]">
-                  {isLoading ? <Loader2 className="h-8 w-8 animate-spin text-primary" /> : renderResult()}
-              </CardContent>
-          </Card>
-      </div>
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="image"
+                            render={({ field }) => (
+                                <FormItem>
+                                <FormLabel>Upload Image</FormLabel>
+                                <FormControl>
+                                    <Input
+                                    type="file"
+                                    accept="image/*"
+                                    {...register('image')}
+                                    />
+                                </FormControl>
+                                <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        {preview && (
+                        <div className="mt-4 relative aspect-video w-full">
+                            <Image
+                            src={preview}
+                            alt="Image preview"
+                            fill
+                            className="rounded-md object-cover"
+                            />
+                        </div>
+                        )}
+                    </CardContent>
+                        <CardFooter>
+                        <Button type="submit" disabled={isLoading}>
+                            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                            Analyze Violation
+                        </Button>
+                    </CardFooter>
+                </form>
+            </Form>
+        </Card>
+        <Card className="flex flex-col min-h-[550px]">
+            <CardHeader>
+                <CardTitle>Analysis Result</CardTitle>
+                <CardDescription>
+                    The AI-powered analysis will be displayed here.
+                </CardDescription>
+            </CardHeader>
+            <CardContent className="flex-1 flex items-center justify-center rounded-lg border-dashed border-2 m-6 mt-0 p-4">
+                {isLoading ? <Loader2 className="h-8 w-8 animate-spin text-primary" /> : renderResult()}
+            </CardContent>
+        </Card>
     </div>
   );
 }

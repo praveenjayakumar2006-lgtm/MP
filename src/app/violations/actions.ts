@@ -4,18 +4,26 @@
 import {
   detectParkingViolation,
   type DetectParkingViolationInput,
+  type DetectParkingViolationOutput,
 } from '@/ai/flows/detect-parking-violations';
 import {
   extractVehicleInfo,
   type ExtractVehicleInfoInput,
+  type ExtractVehicleInfoOutput,
 } from '@/ai/flows/extract-vehicle-info';
 
-export async function analyzeViolation(input: DetectParkingViolationInput) {
-  const result = await detectParkingViolation(input);
-  return result;
+export type CombinedAnalysisResult = {
+    violationResult: DetectParkingViolationOutput;
+    vehicleResult: ExtractVehicleInfoOutput;
 }
 
-export async function analyzeVehicleImage(input: ExtractVehicleInfoInput) {
-  const result = await extractVehicleInfo(input);
-  return result;
+export async function analyzeCombinedViolation(
+    violationInput: DetectParkingViolationInput,
+    imageInput: ExtractVehicleInfoInput
+): Promise<CombinedAnalysisResult> {
+  const [violationResult, vehicleResult] = await Promise.all([
+    detectParkingViolation(violationInput),
+    extractVehicleInfo(imageInput),
+  ]);
+  return { violationResult, vehicleResult };
 }
