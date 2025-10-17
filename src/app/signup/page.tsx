@@ -1,4 +1,3 @@
-
 'use client';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -10,7 +9,6 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -24,12 +22,9 @@ import {
 } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
-import {
-  initiateEmailSignUp,
-  setDocumentNonBlocking,
-  useFirebase,
-} from '@/firebase';
-import { doc } from 'firebase/firestore';
+import { useFirebase, setDocumentNonBlocking } from '@/firebase';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { doc, serverTimestamp } from 'firebase/firestore';
 
 const signupSchema = z.object({
   fullName: z.string().min(2, 'Full name must be at least 2 characters.'),
@@ -56,24 +51,45 @@ export default function SignupPage() {
   });
 
   async function onSubmit(values: SignupFormValues) {
+    if (!auth || !firestore) {
+       toast({
+        variant: 'destructive',
+        title: 'Firebase not initialized',
+        description: 'Authentication or Firestore service is not available.',
+      });
+      return;
+    }
     try {
-      initiateEmailSignUp(auth, values.email, values.password);
+      const userCredential = await createUserWithEmailAndPassword(auth, values.email, values.password);
+      const user = userCredential.user;
 
-      // We can't get the user immediately, but we can listen for auth state changes.
-      // For now, let's assume success and create the user doc.
-      // A more robust solution would use onAuthStateChanged listener to get the user
-      // and then create the document.
+      if (user) {
+        const userDocRef = doc(firestore, 'users', user.uid);
+        const [firstName, ...lastName] = values.fullName.split(' ');
+        
+        setDocumentNonBlocking(userDocRef, {
+          id: user.uid,
+          firstName: firstName,
+          lastName: lastName.join(' '),
+          email: values.email,
+          signUpDate: serverTimestamp(),
+        }, { merge: true });
+      }
 
       toast({
         title: 'Account Created!',
         description: "You've been successfully signed up.",
       });
-      router.push('/home');
+      
     } catch (error: any) {
+       let description = 'There was a problem with your request.';
+       if (error.code === 'auth/email-already-in-use') {
+        description = 'This email is already in use. Please try another one.';
+       }
       toast({
         variant: 'destructive',
         title: 'Uh oh! Something went wrong.',
-        description: error.message || 'There was a problem with your request.',
+        description: description,
       });
     }
   }

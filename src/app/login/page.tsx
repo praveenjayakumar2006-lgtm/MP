@@ -1,4 +1,3 @@
-
 'use client';
 
 import Link from 'next/link';
@@ -11,7 +10,6 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -25,7 +23,8 @@ import {
 } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
-import { initiateEmailSignIn, useFirebase } from '@/firebase';
+import { useFirebase } from '@/firebase';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 
 const loginSchema = z.object({
   email: z.string().email('Please enter a valid email address.'),
@@ -48,18 +47,29 @@ export default function LoginPage() {
   });
 
   async function onSubmit(values: LoginFormValues) {
+    if (!auth) {
+      toast({
+        variant: 'destructive',
+        title: 'Authentication service not available.',
+      });
+      return;
+    }
     try {
-      initiateEmailSignIn(auth, values.email, values.password);
+      await signInWithEmailAndPassword(auth, values.email, values.password);
       toast({
         title: 'Login Successful',
         description: 'Welcome back!',
       });
-      router.push('/home');
+      // The onAuthStateChanged listener in the layout will handle the redirect
     } catch (error: any) {
+      let description = 'There was a problem with your request.';
+      if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
+        description = 'Invalid email or password. Please try again.';
+      }
       toast({
         variant: 'destructive',
         title: 'Uh oh! Something went wrong.',
-        description: error.message || 'There was a problem with your request.',
+        description: description,
       });
     }
   }
