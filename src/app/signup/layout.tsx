@@ -12,10 +12,10 @@ export default function AuthLayout({
     <div className="flex flex-1 flex-col items-center justify-center bg-background gap-6">
       <Link
           href="/home"
-          className="flex items-center gap-2 text-lg font-semibold"
+          className="flex items-center gap-4 text-lg font-semibold"
         >
-          <Car className="h-10 w-10 text-primary" />
-          <span className="font-bold text-2xl">ParkEasy</span>
+          <Car className="h-14 w-14 text-primary" />
+          <span className="font-bold text-4xl">ParkEasy</span>
         </Link>
       {children}
     </div>
