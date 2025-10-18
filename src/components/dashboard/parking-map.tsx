@@ -222,7 +222,7 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
               </div>
 
 
-              <Separator orientation="vertical" className="mx-2 bg-gray-400 w-1 h-40" />
+              <Separator orientation="vertical" className="mx-2 bg-gray-400 w-1 h-44" />
 
               <div className="flex flex-col items-center gap-2">
                   <p className="font-semibold text-muted-foreground text-sm">Bike Parking</p>
