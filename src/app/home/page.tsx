@@ -11,8 +11,8 @@ export default function HomePage() {
     <div className="flex flex-col flex-1">
       <section id="home" className="flex flex-col items-center justify-center text-center bg-background flex-1">
         <div className="container px-4 md:px-6">
-          <div className="flex flex-col justify-center space-y-4">
-            <div className="space-y-2">
+          <div className="flex flex-col justify-center space-y-6">
+            <div className="space-y-4">
               <Car className="h-16 w-16 text-primary mx-auto" />
               <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none">
                 Welcome to ParkEasy
