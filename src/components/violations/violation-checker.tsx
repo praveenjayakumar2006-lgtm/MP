@@ -129,8 +129,8 @@ export function ViolationChecker() {
   return (
     <div className="grid md:grid-cols-2 gap-12 items-center max-w-4xl mx-auto flex-1">
       <div>
-        <h1 className="text-3xl font-semibold">Report a Violation</h1>
-        <p className="text-muted-foreground mt-2">
+        <h1 className="text-4xl font-semibold">Report a Violation</h1>
+        <p className="text-lg text-muted-foreground mt-2">
           Fill in the details to check for a parking violation using our AI-powered system.
         </p>
       </div>
