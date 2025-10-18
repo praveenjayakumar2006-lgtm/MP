@@ -35,8 +35,8 @@ const faqs = [
 
 export default function HelpPage() {
   return (
-    <div className="mx-auto w-full max-w-4xl space-y-8">
-      <div className="text-center">
+    <div className="w-full flex-1 flex flex-col items-center">
+      <div className="text-center mb-8">
         <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
           Help & Support
         </h1>
@@ -45,61 +45,65 @@ export default function HelpPage() {
         </p>
       </div>
       
-      <Card>
-        <CardHeader>
-            <CardTitle>Frequently Asked Questions</CardTitle>
-        </CardHeader>
-        <CardContent>
-            <Accordion type="single" collapsible className="w-full">
-            {faqs.map((faq, index) => (
-                <AccordionItem value={`item-${index}`} key={index}>
-                <AccordionTrigger>{faq.question}</AccordionTrigger>
-                <AccordionContent>{faq.answer}</AccordionContent>
-                </AccordionItem>
-            ))}
-            </Accordion>
-        </CardContent>
-      </Card>
+      <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <Card>
+          <CardHeader>
+              <CardTitle>Frequently Asked Questions</CardTitle>
+          </CardHeader>
+          <CardContent>
+              <Accordion type="single" collapsible className="w-full">
+              {faqs.map((faq, index) => (
+                  <AccordionItem value={`item-${index}`} key={index}>
+                  <AccordionTrigger>{faq.question}</AccordionTrigger>
+                  <AccordionContent>{faq.answer}</AccordionContent>
+                  </AccordionItem>
+              ))}
+              </Accordion>
+          </CardContent>
+        </Card>
 
-       <Card>
-        <CardHeader>
-          <CardTitle>Contact Us</CardTitle>
-        </CardHeader>
-        <CardContent className="grid md:grid-cols-2 gap-6">
-          <div className="flex items-start gap-4">
-            <div className="flex-shrink-0">
-              <div className="flex h-12 w-12 items-center justify-center rounded-md bg-primary text-primary-foreground">
-                <Mail className="h-6 w-6" />
-              </div>
+        <div className="flex flex-col gap-8">
+            <Card>
+            <CardHeader>
+            <CardTitle>Contact Us</CardTitle>
+            </CardHeader>
+            <CardContent className="grid sm:grid-cols-2 gap-6">
+            <div className="flex items-start gap-4">
+                <div className="flex-shrink-0">
+                <div className="flex h-12 w-12 items-center justify-center rounded-md bg-primary text-primary-foreground">
+                    <Mail className="h-6 w-6" />
+                </div>
+                </div>
+                <div>
+                <h3 className="text-lg font-semibold">Email Support</h3>
+                <p className="text-sm text-muted-foreground">
+                    For general inquiries and support.
+                </p>
+                <a href="mailto:support@parkeasy.com" className="mt-1 inline-block text-sm font-medium text-primary hover:underline">
+                    support@parkeasy.com
+                </a>
+                </div>
             </div>
-            <div>
-              <h3 className="text-lg font-semibold">Email Support</h3>
-              <p className="text-muted-foreground">
-                For general inquiries and support, please email us.
-              </p>
-              <a href="mailto:support@parkeasy.com" className="mt-2 inline-block text-sm font-medium text-primary hover:underline">
-                support@parkeasy.com
-              </a>
+            <div className="flex items-start gap-4">
+                <div className="flex-shrink-0">
+                <div className="flex h-12 w-12 items-center justify-center rounded-md bg-primary text-primary-foreground">
+                    <Phone className="h-6 w-6" />
+                </div>
+                </div>
+                <div>
+                <h3 className="text-lg font-semibold">Phone Support</h3>
+                <p className="text-sm text-muted-foreground">
+                    Available 24/7 to assist you.
+                </p>
+                <a href="tel:+18001234567" className="mt-1 inline-block text-sm font-medium text-primary hover:underline">
+                    1-800-123-4567
+                </a>
+                </div>
             </div>
-          </div>
-          <div className="flex items-start gap-4">
-            <div className="flex-shrink-0">
-              <div className="flex h-12 w-12 items-center justify-center rounded-md bg-primary text-primary-foreground">
-                <Phone className="h-6 w-6" />
-              </div>
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold">Phone Support</h3>
-              <p className="text-muted-foreground">
-                Our support team is available 24/7 to assist you.
-              </p>
-              <a href="tel:+18001234567" className="mt-2 inline-block text-sm font-medium text-primary hover:underline">
-                1-800-123-4567
-              </a>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+            </CardContent>
+        </Card>
+        </div>
+      </div>
     </div>
   );
 }
