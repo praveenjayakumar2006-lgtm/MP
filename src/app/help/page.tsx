@@ -40,7 +40,7 @@ export default function HelpPage() {
         <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
           Help & Support
         </h1>
-        <p className="mt-4 text-lg text-muted-foreground">
+        <p className="mt-2 text-lg text-muted-foreground">
           Have questions? We're here to help.
         </p>
       </div>
