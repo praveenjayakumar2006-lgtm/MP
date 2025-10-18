@@ -34,7 +34,7 @@ function SelectSpotContent() {
                 <div className="text-center mb-6">
                     <h3 className="text-3xl font-bold tracking-tighter sm:text-4xl">Select Your Spot</h3>
                     <p className="max-w-2xl text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed mt-2">
-                        Select an available green slot from the map below to make a reservation for your chosen time.
+                        Select an available green slot from the map below to make a reservation
                     </p>
                 </div>
 
