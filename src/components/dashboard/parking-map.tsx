@@ -62,7 +62,8 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
 
   const handleSlotClick = (slot: ParkingSlot) => {
     const status = getSlotStatus(slot.id);
-    
+    const conflictingRes = getConflictingReservation(slot.id);
+
     if (status.status === 'available') {
       if (!bookingDetails) {
           toast({
@@ -74,9 +75,20 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
       }
       setSelectedSlot(slot);
       setShowSuccess(false);
-    } else if (status.status === 'reserved' && status.isUser) {
-        const conflictingRes = getConflictingReservation(slot.id);
-        if (conflictingRes) {
+    } else if (status.status === 'reserved' && status.isUser && conflictingRes) {
+        if (conflictingRes.status === 'Completed') {
+             toast({
+                variant: 'destructive',
+                title: 'Action Not Allowed',
+                description: 'This reservation is completed and cannot be cancelled.',
+             });
+        } else if (conflictingRes.status === 'Active') {
+            toast({
+                variant: 'destructive',
+                title: 'Action Not Allowed',
+                description: 'This reservation is active and cannot be cancelled.',
+            });
+        } else {
             setReservationToCancel(conflictingRes);
         }
     }

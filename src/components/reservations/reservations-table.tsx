@@ -84,6 +84,15 @@ export function ReservationsTable() {
 
   const handleCancelReservation = (e: React.MouseEvent, reservation: Reservation) => {
     e.stopPropagation();
+    if (reservation.status === 'Completed') {
+      toast({
+        variant: 'destructive',
+        title: 'Cannot Cancel',
+        description: 'Completed reservations cannot be cancelled.',
+        duration: 3000,
+      });
+      return;
+    }
     setReservationToCancel(reservation);
   };
   
@@ -99,30 +108,38 @@ export function ReservationsTable() {
   };
 
   const handleRowClick = (reservation: Reservation) => {
-    if (reservation.status === 'Active' || reservation.status === 'Upcoming') {
-      const startTime = new Date(reservation.startTime);
-      
-      if (startTime < new Date()) {
-        toast({
-          variant: 'destructive',
-          title: 'Booking Not Allowed',
-          description: 'This reservation has already started and cannot be modified.',
-          duration: 2000,
-        });
-        return;
-      }
-      
-      const endTime = new Date(reservation.endTime);
-      const durationInMs = endTime.getTime() - startTime.getTime();
-      const durationInHours = Math.round(durationInMs / (1000 * 60 * 60));
-
-      const params = new URLSearchParams({
-        date: startTime.toISOString(),
-        startTime: `${startTime.getHours().toString().padStart(2, '0')}:${startTime.getMinutes().toString().padStart(2, '0')}`,
-        duration: String(durationInHours),
+    if (reservation.status === 'Completed') {
+      toast({
+        variant: 'destructive',
+        title: 'Action Not Allowed',
+        description: 'This reservation is already completed and cannot be modified.',
+        duration: 3000,
       });
-      router.push(`/select-spot?${params.toString()}`);
+      return;
     }
+
+    if (reservation.status === 'Active') {
+      toast({
+        variant: 'destructive',
+        title: 'Action Not Allowed',
+        description: 'This reservation is already active and cannot be modified.',
+        duration: 3000,
+      });
+      return;
+    }
+    
+    // Only 'Upcoming' reservations can be modified
+    const startTime = new Date(reservation.startTime);
+    const endTime = new Date(reservation.endTime);
+    const durationInMs = endTime.getTime() - startTime.getTime();
+    const durationInHours = Math.round(durationInMs / (1000 * 60 * 60));
+
+    const params = new URLSearchParams({
+      date: startTime.toISOString(),
+      startTime: `${startTime.getHours().toString().padStart(2, '0')}:${startTime.getMinutes().toString().padStart(2, '0')}`,
+      duration: String(durationInHours),
+    });
+    router.push(`/select-spot?${params.toString()}`);
   }
 
 
@@ -176,7 +193,8 @@ export function ReservationsTable() {
                       key={reservation.id}
                       onClick={() => handleRowClick(reservation)}
                       className={cn({
-                        'cursor-pointer': reservation.status === 'Active' || reservation.status === 'Upcoming',
+                        'cursor-pointer hover:bg-muted/50': reservation.status === 'Upcoming',
+                        'cursor-not-allowed': reservation.status === 'Active' || reservation.status === 'Completed'
                       })}
                     >
                       <TableCell className="font-medium">
@@ -199,7 +217,7 @@ export function ReservationsTable() {
                           variant="destructive"
                           size="sm"
                           onClick={(e) => handleCancelReservation(e, reservation)}
-                          disabled={reservation.status === 'Completed'}
+                          disabled={reservation.status === 'Completed' || reservation.status === 'Active'}
                         >
                           Cancel
                         </Button>
