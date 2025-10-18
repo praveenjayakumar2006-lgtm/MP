@@ -77,10 +77,10 @@ export function AppHeader() {
     <header className="sticky top-0 flex h-20 items-center gap-4 border-b bg-primary text-primary-foreground px-8 md:px-12 z-50">
         <Link
           href="/home"
-          className="flex items-center gap-2 text-lg font-semibold"
+          className="flex items-center gap-4 text-lg font-semibold"
         >
-          <Car className="h-10 w-10" />
-          <span className="font-bold text-xl">ParkEasy</span>
+          <Car className="h-12 w-12" />
+          <span className="font-bold text-2xl">ParkEasy</span>
         </Link>
         <nav className="hidden md:flex flex-1 items-center justify-center gap-8 text-lg lg:gap-10">
           {navItems.map(item => (
