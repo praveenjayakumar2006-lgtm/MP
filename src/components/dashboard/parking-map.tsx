@@ -155,7 +155,7 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
         'bg-red-100 border-red-400 text-red-800 cursor-not-allowed opacity-70': status === 'occupied' || (status === 'reserved' && !isUser),
         'bg-yellow-100 border-yellow-400 text-yellow-800 hover:bg-yellow-200 cursor-pointer': status === 'reserved' && isUser,
         'h-24 w-16': slot.type === 'car',
-        'h-20 w-16': slot.type === 'bike',
+        'h-20 w-14': slot.type === 'bike',
       }
     );
   };
@@ -171,7 +171,7 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
   const bikeSlots = slots.filter((slot) => slot.type === 'bike');
 
   if (!isClient) {
-    return <Skeleton className="h-[450px] w-full max-w-2xl" />;
+    return <Skeleton className="h-[450px] w-full max-w-4xl" />;
   }
 
   return (
@@ -215,7 +215,7 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
                 <p className="font-semibold text-muted-foreground text-sm">Bike Parking</p>
                 <div className="flex flex-col gap-2">
                     <div className="flex flex-row gap-4">
-                        {bikeSlots.slice(0, 5).map((slot) => {
+                        {bikeSlots.slice(0, 6).map((slot) => {
                         const { status, isUser } = getSlotStatus(slot.id);
                         const hasIcon = status === 'occupied' || status === 'reserved';
 
@@ -240,7 +240,7 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
                         })}
                     </div>
                     <div className="flex flex-row gap-4">
-                        {bikeSlots.slice(5, 10).map((slot) => {
+                        {bikeSlots.slice(6, 12).map((slot) => {
                         const { status, isUser } = getSlotStatus(slot.id);
                         const hasIcon = status === 'occupied' || status === 'reserved';
                         
