@@ -74,15 +74,18 @@ export function AppHeader() {
   };
 
   return (
-    <header className="sticky top-0 flex h-20 items-center gap-4 border-b bg-primary text-primary-foreground px-8 md:px-12 z-50">
-        <Link
-          href="/home"
-          className="flex items-center gap-4 text-lg font-semibold"
-        >
-          <Car className="h-12 w-12" />
-          <span className="font-bold text-2xl">ParkEasy</span>
-        </Link>
-        <nav className="hidden md:flex flex-1 items-center justify-center gap-8 text-lg lg:gap-10">
+    <header className="sticky top-0 flex h-20 items-center justify-between border-b bg-primary text-primary-foreground px-8 md:px-12 z-50">
+        <div className="flex items-center gap-4 text-lg font-semibold">
+            <Link
+            href="/home"
+            className="flex items-center gap-4"
+            >
+            <Car className="h-12 w-12" />
+            <span className="font-bold text-2xl">ParkEasy</span>
+            </Link>
+        </div>
+        
+        <nav className="hidden md:flex items-center justify-center gap-8 text-lg lg:gap-10 absolute left-1/2 -translate-x-1/2">
           {navItems.map(item => (
             <NavLink
               key={item.href}
@@ -109,7 +112,7 @@ export function AppHeader() {
                 </DropdownMenuContent>
             </DropdownMenu>
         </nav>
-        <div className="flex items-center gap-4 ml-auto">
+        <div className="flex items-center gap-4">
             {isClient && !isMobile && user && (
               <Button onClick={handleLogout} variant="ghost" size="icon" className="hover:bg-white/10 [&_svg]:size-8">
                   <LogOut className="text-primary-foreground/80 hover:text-primary-foreground" />
