@@ -6,6 +6,8 @@ import { Car, Menu, ChevronDown, LogOut } from 'lucide-react';
 import {
   Sheet,
   SheetContent,
+  SheetHeader,
+  SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
@@ -127,6 +129,9 @@ export function AppHeader() {
                   </Button>
               </SheetTrigger>
               <SheetContent side="left">
+                <SheetHeader>
+                    <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+                </SheetHeader>
                   <nav className="grid gap-6 text-xl font-medium">
                   <Link
                       href="/home"
