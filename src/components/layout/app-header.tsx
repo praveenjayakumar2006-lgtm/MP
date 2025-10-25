@@ -31,6 +31,9 @@ const navItems = [
   { href: '/home', label: 'Home' },
   { href: '/booking', label: 'Booking' },
   { href: '/violations', label: 'Report a Violation' },
+  { href: '/reservations', label: 'My Bookings' },
+  { href: '/feedback', label: 'Feedback' },
+  { href: '/help', label: 'Help' },
 ];
 
 const otherItems = [
@@ -90,6 +93,12 @@ export function AppHeader() {
     );
   };
 
+  const mainNavItems = [
+    { href: '/home', label: 'Home' },
+    { href: '/booking', label: 'Booking' },
+    { href: '/violations', label: 'Report a Violation' },
+  ];
+
   return (
     <header className="sticky top-0 flex h-20 items-center justify-between border-b bg-primary text-primary-foreground px-8 md:px-12 z-50">
         <div className="flex items-center gap-4 text-lg font-semibold">
@@ -111,31 +120,24 @@ export function AppHeader() {
             >
               {item.label}
             </NavLink>))}
-            <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className={cn(
-                    "flex items-center gap-1 text-lg font-medium transition-colors hover:text-primary-foreground hover:bg-white/10 p-2 rounded-md",
-                    isOtherItemActive ? "text-primary-foreground font-semibold" : "text-primary-foreground/80"
-                )}>
-                    Others <ChevronDown className="h-4 w-4" />
-                </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start">
-                {otherItems.map(item => (
-                    <DropdownMenuItem key={item.href} asChild>
-                        <Link href={item.href}>{item.label}</Link>
-                    </DropdownMenuItem>
-                ))}
-                {user && (
-                  <>
-                    <DropdownMenuItem onClick={handleSignOut} className="text-red-500 focus:text-red-500 focus:bg-red-50">
-                        <LogOut className="mr-2 h-4 w-4" />
-                        <span>Sign Out</span>
-                    </DropdownMenuItem>
-                  </>
-                )}
-                </DropdownMenuContent>
-            </DropdownMenu>
+            {user && (
+              <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className={cn(
+                      "flex items-center gap-1 text-lg font-medium transition-colors hover:text-primary-foreground hover:bg-white/10 p-2 rounded-md",
+                      "text-primary-foreground/80"
+                  )}>
+                      <LogOut className="h-5 w-5" />
+                  </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={handleSignOut} className="text-red-500 focus:text-red-500 focus:bg-red-50">
+                          <LogOut className="mr-2 h-4 w-4" />
+                          <span>Sign Out</span>
+                      </DropdownMenuItem>
+                  </DropdownMenuContent>
+              </DropdownMenu>
+            )}
         </nav>
         <div className="flex items-center gap-4">
             {isClient && isMobile && (
@@ -160,7 +162,7 @@ export function AppHeader() {
                       <span className="text-foreground">ParkEasy</span>
                   </Link>
                   <Separator className="my-2" />
-                  {navItems.map(item => (
+                  {mainNavItems.map(item => (
                       <Link
                       key={item.href}
                       href={item.href}
