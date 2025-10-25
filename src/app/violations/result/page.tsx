@@ -32,15 +32,15 @@ function ViolationResultContent() {
 
   return (
     <div className="flex flex-1 items-center justify-center">
-      <Card className="max-w-md w-full text-center p-6">
+      <Card className="max-w-sm w-full text-center p-4">
         <CardHeader>
           <div className="flex justify-center">
-            <CheckCircle2 className="h-16 w-16 text-green-500" />
+            <CheckCircle2 className="h-12 w-12 text-green-500" />
           </div>
-          <CardTitle className="mt-4 text-2xl">Report Submitted!</CardTitle>
+          <CardTitle className="mt-4 text-xl">Report Submitted!</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-muted-foreground mb-6">
+          <p className="text-muted-foreground text-sm mb-6">
             Your violation report has been submitted successfully. We appreciate you taking the time to help us improve safety.
           </p>
           {formattedLicensePlate && (
@@ -50,9 +50,9 @@ function ViolationResultContent() {
           )}
           <div className="flex justify-center gap-4">
             <Link href="/home">
-              <Button>Return to Home</Button>
+              <Button size="sm">Return to Home</Button>
             </Link>
-            <Button variant="outline" onClick={() => router.push('/violations')}>Report Another Violation</Button>
+            <Button variant="outline" size="sm" onClick={() => router.push('/violations')}>Report Another Violation</Button>
           </div>
         </CardContent>
       </Card>
@@ -64,18 +64,18 @@ function ViolationResultContent() {
 export default function ViolationResultPage() {
     return (
         <Suspense fallback={<div className="flex flex-1 items-center justify-center">
-             <Card className="max-w-md w-full p-6">
+             <Card className="max-w-sm w-full p-4">
                  <CardHeader className="items-center">
-                    <Skeleton className="h-16 w-16 rounded-full" />
-                    <Skeleton className="h-8 w-48 mt-4" />
+                    <Skeleton className="h-12 w-12 rounded-full" />
+                    <Skeleton className="h-7 w-40 mt-4" />
                 </CardHeader>
                 <CardContent className="items-center flex flex-col gap-4">
-                    <Skeleton className="h-6 w-full" />
-                     <Skeleton className="h-6 w-full" />
-                    <Skeleton className="h-10 w-3/4" />
+                    <Skeleton className="h-5 w-full" />
+                     <Skeleton className="h-5 w-full" />
+                    <Skeleton className="h-8 w-3/4" />
                      <div className="flex justify-center gap-4 w-full">
-                        <Skeleton className="h-10 w-1/2" />
-                        <Skeleton className="h-10 w-1/2" />
+                        <Skeleton className="h-9 w-1/2" />
+                        <Skeleton className="h-9 w-1/2" />
                     </div>
                 </CardContent>
             </Card>
