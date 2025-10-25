@@ -138,7 +138,7 @@ export function AppHeader() {
                       className="flex items-center gap-2 text-lg font-semibold"
                   >
                       <Car className="h-6 w-6 text-primary" />
-                      <span className="sr-only">ParkEasy</span>
+                      <span>ParkEasy</span>
                   </Link>
                   {navItems.map(item => (
                       <NavLink
