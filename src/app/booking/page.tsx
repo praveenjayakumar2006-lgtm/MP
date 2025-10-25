@@ -70,6 +70,12 @@ export default function BookingPage() {
   
   const form = useForm<BookingFormValues>({
     resolver: zodResolver(bookingSchema),
+    defaultValues: {
+        vehiclePlate: '',
+        date: undefined,
+        startTime: '',
+        duration: '',
+    },
   });
 
   const selectedDate = form.watch('date');
