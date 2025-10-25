@@ -170,10 +170,10 @@ export function AppHeader() {
                   ))}
                   </div>
                   {user ? (
-                    <Button onClick={() => { handleLogout(); handleLinkClick(); }} variant="outline" className="w-full mt-4">Sign Out</Button>
+                    <Button onClick={() => { handleLogout(); handleLinkClick(); }} variant="outline" className="w-full mt-2">Sign Out</Button>
                   ) : (
                     <Link href="/login" onClick={handleLinkClick}>
-                        <Button variant="outline" className="w-full mt-4">Sign In</Button>
+                        <Button variant="outline" className="w-full mt-2">Sign In</Button>
                     </Link>
                   )}
                   </nav>
