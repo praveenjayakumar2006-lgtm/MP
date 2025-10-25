@@ -49,9 +49,9 @@ function ViolationResultContent() {
           )}
           <div className="flex justify-center gap-4">
             <Link href="/home">
-              <Button size="sm" className="h-8 px-2 text-xs">Return to Home</Button>
+              <Button size="sm">Return to Home</Button>
             </Link>
-            <Button variant="outline" size="sm" onClick={() => router.push('/violations')} className="h-8 px-2 text-xs">Report Another Violation</Button>
+            <Button variant="outline" size="sm" onClick={() => router.push('/violations')}>Report Another Violation</Button>
           </div>
         </CardContent>
       </Card>
