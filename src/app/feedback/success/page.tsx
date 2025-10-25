@@ -7,23 +7,23 @@ import Link from 'next/link';
 export default function FeedbackSuccessPage() {
   return (
     <div className="flex flex-1 items-center justify-center">
-      <Card className="max-w-md w-full text-center p-6">
+      <Card className="max-w-sm w-full text-center p-4">
         <CardHeader>
           <div className="flex justify-center">
-            <CheckCircle2 className="h-16 w-16 text-green-500" />
+            <CheckCircle2 className="h-12 w-12 text-green-500" />
           </div>
-          <CardTitle className="mt-4 text-2xl">Thank You!</CardTitle>
+          <CardTitle className="mt-4 text-xl">Thank You!</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-muted-foreground mb-6">
+          <p className="text-muted-foreground text-sm mb-6">
             Your feedback has been submitted successfully. We appreciate you taking the time to help us improve.
           </p>
           <div className="flex justify-center gap-4">
             <Link href="/home">
-              <Button>Return to Home</Button>
+              <Button size="sm">Return to Home</Button>
             </Link>
             <Link href="/reservations">
-              <Button variant="outline">View My Bookings</Button>
+              <Button variant="outline" size="sm">View My Bookings</Button>
             </Link>
           </div>
         </CardContent>
