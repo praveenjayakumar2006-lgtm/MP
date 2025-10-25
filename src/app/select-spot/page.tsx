@@ -10,11 +10,12 @@ import { Calendar, Clock, Hourglass, Info } from 'lucide-react';
 
 function SelectSpotContent() {
     const searchParams = useSearchParams();
+    const vehiclePlate = searchParams.get('vehiclePlate');
     const date = searchParams.get('date');
     const startTime = searchParams.get('startTime');
     const duration = searchParams.get('duration');
 
-    const bookingDetails = date && startTime && duration ? { date, startTime, duration } : undefined;
+    const bookingDetails = vehiclePlate && date && startTime && duration ? { vehiclePlate, date, startTime, duration } : undefined;
 
     const formattedDate = date ? format(parseISO(date), 'PPP') : 'N/A';
     

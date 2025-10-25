@@ -27,6 +27,7 @@ import { Button } from '../ui/button';
 import { Skeleton } from '../ui/skeleton';
 
 type BookingDetails = {
+  vehiclePlate: string;
   date: string;
   startTime: string;
   duration: string;
@@ -107,7 +108,7 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
       id: Date.now().toString(),
       slotId: selectedSlot.id,
       userId: 'user-123',
-      vehiclePlate: `USER-${Math.floor(Math.random() * 900) + 100}`,
+      vehiclePlate: bookingDetails.vehiclePlate,
       startTime: startDate,
       endTime: addHours(startDate, parseInt(bookingDetails.duration, 10)),
       status: 'Upcoming',
