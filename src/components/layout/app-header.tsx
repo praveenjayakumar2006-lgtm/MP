@@ -135,9 +135,9 @@ export function AppHeader() {
                   <nav className="grid gap-6 text-xl font-medium">
                   <Link
                       href="/home"
-                      className="flex items-center gap-2 text-lg font-semibold"
+                      className="flex items-center gap-4 text-2xl font-semibold"
                   >
-                      <Car className="h-6 w-6 text-primary" />
+                      <Car className="h-10 w-10 text-primary" />
                       <span>ParkEasy</span>
                   </Link>
                   {navItems.map(item => (
