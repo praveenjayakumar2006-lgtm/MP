@@ -58,7 +58,7 @@ export default function FeedbackPage() {
 
   return (
     <div className="mx-auto w-full max-w-2xl">
-      <div className="mb-8">
+      <div className="mb-8 text-center">
         <h1 className="text-3xl font-semibold">Submit Feedback</h1>
         <p className="text-muted-foreground">We'd love to hear what you think.</p>
       </div>
