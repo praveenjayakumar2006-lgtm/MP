@@ -131,7 +131,7 @@ export default function BookingPage() {
                                                 form.clearErrors('vehiclePlate');
                                             }
                                         }}
-                                        className="pl-10" />
+                                        className="pl-10 hover:bg-accent hover:text-accent-foreground" />
                                     </div>
                                   </FormControl>
                                   <FormMessage />
