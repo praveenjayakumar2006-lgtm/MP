@@ -78,17 +78,8 @@ export default function BookingPage() {
     },
   });
 
-  const vehiclePlate = form.watch('vehiclePlate');
   const selectedDate = form.watch('date');
   const selectedStartTime = form.watch('startTime');
-
-  useEffect(() => {
-    if (!vehiclePlate) {
-      form.resetField('date');
-      form.resetField('startTime');
-      form.resetField('duration');
-    }
-  }, [vehiclePlate, form]);
   
   function onSubmit(values: BookingFormValues) {
     const params = new URLSearchParams({
@@ -150,10 +141,8 @@ export default function BookingPage() {
                                           variant={'outline'}
                                           className={cn(
                                           'w-full justify-start text-left font-normal',
-                                          !field.value && 'text-muted-foreground',
-                                          'disabled:cursor-not-allowed disabled:opacity-50'
+                                          !field.value && 'text-muted-foreground'
                                           )}
-                                          disabled={!vehiclePlate}
                                       >
                                           <div className="flex items-center gap-2">
                                             <CalendarIcon className="h-4 w-4 opacity-50" />
