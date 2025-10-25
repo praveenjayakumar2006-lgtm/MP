@@ -2,7 +2,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Car, Menu, ChevronDown, Mail, Phone } from 'lucide-react';
+import { Car, Menu, ChevronDown, Mail, Phone, LogOut } from 'lucide-react';
 import {
   Sheet,
   SheetContent,
@@ -15,6 +15,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { usePathname, useRouter } from 'next/navigation';
@@ -23,6 +24,8 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { useEffect, useState } from 'react';
 import { useFirebase } from '@/firebase';
 import { Separator } from '@/components/ui/separator';
+import { signOut } from 'firebase/auth';
+import { useToast } from '@/hooks/use-toast';
 
 const navItems = [
   { href: '/home', label: 'Home' },
@@ -41,11 +44,33 @@ export function AppHeader() {
   const isMobile = useIsMobile();
   const [isClient, setIsClient] = useState(false);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
-  const { user } = useFirebase();
+  const { user, auth } = useFirebase();
+  const router = useRouter();
+  const { toast } = useToast();
 
   useEffect(() => {
     setIsClient(true);
   }, []);
+
+  const handleSignOut = async () => {
+    if (!auth) return;
+    try {
+      await signOut(auth);
+      toast({
+        title: 'Signed Out',
+        description: 'You have been successfully signed out.',
+        duration: 2000,
+      });
+      // The auth listener in the root layout will handle the redirect to /login
+    } catch (error) {
+      toast({
+        variant: 'destructive',
+        title: 'Sign Out Failed',
+        description: 'There was a problem signing you out. Please try again.',
+      });
+    }
+  };
+
 
   const isOtherItemActive = otherItems.some(item => pathname.startsWith(item.href));
 
@@ -101,6 +126,15 @@ export function AppHeader() {
                         <Link href={item.href}>{item.label}</Link>
                     </DropdownMenuItem>
                 ))}
+                {user && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleSignOut} className="text-red-500 focus:text-red-500 focus:bg-red-50">
+                        <LogOut className="mr-2 h-4 w-4" />
+                        <span>Sign Out</span>
+                    </DropdownMenuItem>
+                  </>
+                )}
                 </DropdownMenuContent>
             </DropdownMenu>
         </nav>
@@ -148,6 +182,21 @@ export function AppHeader() {
                       {item.label}
                       </Link>
                   ))}
+                  {user && (
+                    <>
+                    <Separator />
+                    <button
+                      onClick={() => {
+                        handleSignOut();
+                        handleLinkClick();
+                      }}
+                      className="flex items-center py-2 text-red-500 transition-colors hover:text-red-600"
+                    >
+                      <LogOut className="mr-2 h-5 w-5" />
+                      Sign Out
+                    </button>
+                    </>
+                  )}
                   </div>
                   {!user && (
                     <Link href="/login" onClick={handleLinkClick}>
