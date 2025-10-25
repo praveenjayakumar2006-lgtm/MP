@@ -20,9 +20,10 @@ function ViolationResultContent() {
   const formatLicensePlate = (plate: string | null) => {
     if (!plate) return null;
     const cleaned = plate.replace(/\s/g, '').toUpperCase();
-    const match = cleaned.match(/^([A-Z]{2})(\d{2})([A-Z]{1,2})(.*)$/);
+    const match = cleaned.match(/^([A-Z]{2})(\d{2})([A-Z]{1,2})(\d{1,4})$/);
     if (match) {
-        return `${match[1]} ${match[2]} ${match[3]} ${match[4]}`;
+        const [_, state, district, series, number] = match;
+        return `${state} ${district} ${series} ${number}`;
     }
     return plate;
   }
