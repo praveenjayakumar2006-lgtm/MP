@@ -35,7 +35,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Input } from '@/components/ui/input';
 
 const bookingSchema = z.object({
@@ -78,8 +78,17 @@ export default function BookingPage() {
     },
   });
 
+  const vehiclePlate = form.watch('vehiclePlate');
   const selectedDate = form.watch('date');
   const selectedStartTime = form.watch('startTime');
+
+  useEffect(() => {
+    if (!vehiclePlate) {
+      form.resetField('date');
+      form.resetField('startTime');
+      form.resetField('duration');
+    }
+  }, [vehiclePlate, form]);
   
   function onSubmit(values: BookingFormValues) {
     const params = new URLSearchParams({
@@ -143,6 +152,7 @@ export default function BookingPage() {
                                           'w-full justify-start text-left font-normal',
                                           !field.value && 'text-muted-foreground'
                                           )}
+                                          disabled={!vehiclePlate}
                                       >
                                           <div className="flex items-center gap-2">
                                             <CalendarIcon className="h-4 w-4 opacity-50" />
@@ -254,3 +264,5 @@ export default function BookingPage() {
       </section>
   )
 }
+
+    
