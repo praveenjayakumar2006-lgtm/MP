@@ -30,6 +30,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 type Status = 'Active' | 'Completed' | 'Upcoming';
 
@@ -40,6 +41,7 @@ export function ReservationsTable() {
   const [reservationToCancel, setReservationToCancel] = useState<Reservation | null>(null);
   const { toast } = useToast();
   const router = useRouter();
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     if (context?.reservations) {
@@ -142,6 +144,9 @@ export function ReservationsTable() {
     router.push(`/select-spot?${params.toString()}`);
   }
 
+  const getDateFormat = () => {
+    return isMobile ? 'MMM d, h:mm a' : 'MMM d, yyyy, h:mm a';
+  };
 
   const filteredReservations = displayReservations?.filter((res) => {
     if (filter === 'all') return true;
@@ -202,10 +207,10 @@ export function ReservationsTable() {
                       </TableCell>
                       <TableCell>{reservation.vehiclePlate}</TableCell>
                       <TableCell>
-                        {format(new Date(reservation.startTime), 'MMM d, yyyy, h:mm a')}
+                        {format(new Date(reservation.startTime), getDateFormat())}
                       </TableCell>
                       <TableCell>
-                        {format(new Date(reservation.endTime), 'MMM d, yyyy, h:mm a')}
+                        {format(new Date(reservation.endTime), getDateFormat())}
                       </TableCell>
                       <TableCell>
                         <Badge variant={getStatusVariant(reservation.status)}>
