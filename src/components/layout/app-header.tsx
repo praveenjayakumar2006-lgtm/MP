@@ -2,7 +2,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Car, Menu, ChevronDown, LogOut, Mail, Phone } from 'lucide-react';
+import { Car, Menu, ChevronDown, Mail, Phone } from 'lucide-react';
 import {
   Sheet,
   SheetContent,
@@ -22,8 +22,6 @@ import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useEffect, useState } from 'react';
 import { useFirebase } from '@/firebase';
-import { signOut } from 'firebase/auth';
-import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
 
 const navItems = [
@@ -43,24 +41,11 @@ export function AppHeader() {
   const isMobile = useIsMobile();
   const [isClient, setIsClient] = useState(false);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
-  const { auth, user } = useFirebase();
-  const router = useRouter();
-  const { toast } = useToast();
-
+  const { user } = useFirebase();
 
   useEffect(() => {
     setIsClient(true);
   }, []);
-
-  const handleLogout = async () => {
-    try {
-      await signOut(auth);
-      toast({ title: 'Logged out successfully.', duration: 2000 });
-      router.push('/login');
-    } catch (error) {
-      toast({ variant: 'destructive', title: 'Failed to log out.' });
-    }
-  };
 
   const isOtherItemActive = otherItems.some(item => pathname.startsWith(item.href));
 
@@ -120,11 +105,6 @@ export function AppHeader() {
             </DropdownMenu>
         </nav>
         <div className="flex items-center gap-4">
-            {isClient && !isMobile && user && (
-              <Button onClick={handleLogout} variant="ghost" size="icon" className="hover:bg-white/10 [&_svg]:size-8">
-                  <LogOut className="text-primary-foreground/80 hover:text-primary-foreground" />
-              </Button>
-            )}
             {isClient && isMobile && (
             <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
               <SheetTrigger asChild>
@@ -169,9 +149,7 @@ export function AppHeader() {
                       </Link>
                   ))}
                   </div>
-                  {user ? (
-                    <Button onClick={() => { handleLogout(); handleLinkClick(); }} variant="outline" className="w-full">Sign Out</Button>
-                  ) : (
+                  {!user && (
                     <Link href="/login" onClick={handleLinkClick}>
                         <Button variant="outline" className="w-full mt-4">Sign In</Button>
                     </Link>
