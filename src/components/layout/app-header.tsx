@@ -138,26 +138,26 @@ export function AppHeader() {
                       className="flex items-center gap-4 text-2xl font-semibold"
                   >
                       <Car className="h-10 w-10 text-primary" />
-                      <span>ParkEasy</span>
+                      <span className="text-foreground">ParkEasy</span>
                   </Link>
                   {navItems.map(item => (
-                      <NavLink
+                      <Link
                       key={item.href}
                       href={item.href}
-                      className="transition-colors hover:text-foreground text-foreground"
+                      className="transition-colors hover:text-primary text-foreground"
                       >
                       {item.label}
-                      </NavLink>
+                      </Link>
                   ))}
                   <div className="border-t pt-4">
                   {otherItems.map(item => (
-                      <NavLink
+                      <Link
                       key={item.href}
                       href={item.href}
-                      className="block py-2 transition-colors hover:text-foreground text-muted-foreground"
+                      className="block py-2 transition-colors hover:text-primary text-foreground"
                       >
                       {item.label}
-                      </NavLink>
+                      </Link>
                   ))}
                   </div>
                   {user ? (
