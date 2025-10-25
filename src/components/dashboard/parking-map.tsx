@@ -189,9 +189,9 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
   return (
     <>
       <Card>
-        <CardContent className="p-4">
-          <div className="relative flex flex-col items-center border-2 border-gray-400 bg-gray-200 p-2 rounded-lg gap-4">
-            <div className="flex flex-row items-end gap-4">
+        <CardContent className="p-4 overflow-x-auto">
+          <div className="relative inline-flex flex-col items-center border-2 border-gray-400 bg-gray-200 p-2 rounded-lg gap-4">
+            <div className="flex flex-col md:flex-row items-center md:items-end gap-4">
               <div className="flex flex-col items-center gap-2">
                   <p className="font-semibold text-muted-foreground text-sm">Car Parking</p>
                   <div className="flex flex-row gap-4">
@@ -222,7 +222,8 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
               </div>
 
 
-              <Separator orientation="vertical" className="mx-2 bg-gray-400 w-1 h-44" />
+              <Separator orientation="vertical" className="hidden md:block mx-2 bg-gray-400 w-1 h-44" />
+              <Separator orientation="horizontal" className="block md:hidden my-2 bg-gray-400 h-1 w-full" />
 
               <div className="flex flex-col items-center gap-2">
                   <p className="font-semibold text-muted-foreground text-sm">Bike Parking</p>
@@ -360,7 +361,3 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
     </>
   );
 }
-
-    
-
-    
