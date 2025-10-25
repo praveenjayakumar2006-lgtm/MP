@@ -80,7 +80,7 @@ export default function LoginPage() {
       <CardHeader>
         <CardTitle className="text-2xl">Login</CardTitle>
         <CardDescription>
-          Enter your information to sign in to your account
+          Enter your information to Login to your account
         </CardDescription>
       </CardHeader>
       <CardContent>
