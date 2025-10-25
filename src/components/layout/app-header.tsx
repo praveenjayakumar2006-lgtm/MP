@@ -206,7 +206,7 @@ export function AppHeader() {
                             <p className="text-xs text-muted-foreground">
                                 For general inquiries and support.
                             </p>
-                            <a href="mailto:support@parkeasy.com" className="mt-1 inline-block text-xs font-medium text-primary hover:underline">
+                            <a href="mailto:support@parkeasy.com" className="mt-1 inline-block text-sm font-medium text-primary hover:underline">
                                 support@parkeasy.com
                             </a>
                           </div>
@@ -218,7 +218,7 @@ export function AppHeader() {
                             <p className="text-xs text-muted-foreground">
                                 Available 24/7 to assist you.
                             </p>
-                            <a href="tel:+18001234567" className="mt-1 inline-block text-xs font-medium text-primary hover:underline">
+                            <a href="tel:+18001234567" className="mt-1 inline-block text-sm font-medium text-primary hover:underline">
                                 1-800-123-4567
                             </a>
                           </div>
