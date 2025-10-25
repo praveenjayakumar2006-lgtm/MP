@@ -29,7 +29,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { format, isToday } from 'date-fns';
-import { Calendar as CalendarIcon, Clock } from 'lucide-react';
+import { Calendar as CalendarIcon, Clock, Hourglass } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -191,7 +191,8 @@ export default function BookingPage() {
                               <FormLabel>Duration (Hours)</FormLabel>
                               <Select onValueChange={field.onChange} value={field.value} disabled={!selectedStartTime}>
                                   <FormControl>
-                                  <SelectTrigger>
+                                  <SelectTrigger className="justify-start gap-2">
+                                    <Hourglass className="h-4 w-4" />
                                       <SelectValue placeholder="Select hours" />
                                   </SelectTrigger>
                                   </FormControl>
