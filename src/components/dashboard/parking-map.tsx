@@ -161,7 +161,7 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
   const getSlotClasses = (slot: ParkingSlot) => {
     const { status, isUser } = getSlotStatus(slot.id);
     return cn(
-      'relative flex flex-col items-center justify-center rounded-md border-2 transition-colors',
+      'relative flex flex-col items-center rounded-md border-2 transition-colors pt-1',
       {
         'bg-green-100 border-green-400 text-green-800 hover:bg-green-200 cursor-pointer': status === 'available',
         'bg-red-100 border-red-400 text-red-800 cursor-not-allowed opacity-70': status === 'occupied' || (status === 'reserved' && !isUser),
@@ -212,7 +212,7 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
                           {status === 'reserved' && isUser && (
                               <Badge variant="default" className="absolute -top-2 -right-2 text-xs px-1 py-0">You</Badge>
                           )}
-                          <span className="absolute bottom-1 right-2 text-[10px] font-bold">
+                          <span className="absolute bottom-1 right-1 text-[10px] font-bold">
                           {slot.id}
                           </span>
                       </div>
@@ -222,7 +222,7 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
               </div>
 
 
-              <Separator orientation="vertical" className="hidden md:block mx-2 bg-gray-400 w-1 h-44" />
+              <Separator orientation="vertical" className="hidden md:block mx-2 bg-gray-400" />
               <Separator orientation="horizontal" className="block md:hidden my-2 bg-gray-400 h-1 w-full" />
 
               <div className="flex flex-col items-center gap-2">
