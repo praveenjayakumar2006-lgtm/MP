@@ -114,11 +114,11 @@ export default function BookingPage() {
                                       <Button
                                           variant={'outline'}
                                           className={cn(
-                                          'w-full justify-start text-left font-normal',
+                                          'w-full justify-start text-left font-normal gap-2',
                                           !field.value && 'text-muted-foreground'
                                           )}
                                       >
-                                          <CalendarIcon className="mr-2 h-4 w-4 opacity-50" />
+                                          <CalendarIcon className="h-4 w-4 opacity-50" />
                                           {field.value ? (
                                           format(field.value, 'PPP')
                                           ) : (
@@ -162,8 +162,8 @@ export default function BookingPage() {
                                 disabled={!selectedDate}
                               >
                                   <FormControl>
-                                  <SelectTrigger className="justify-start">
-                                      <Clock className="mr-2 h-4 w-4" />
+                                  <SelectTrigger className="justify-start gap-2">
+                                      <Clock className="h-4 w-4" />
                                       <SelectValue placeholder="Select a time" />
                                   </SelectTrigger>
                                   </FormControl>
