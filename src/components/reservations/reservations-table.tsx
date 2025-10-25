@@ -137,6 +137,7 @@ export function ReservationsTable() {
     const durationInHours = Math.round(durationInMs / (1000 * 60 * 60));
 
     const params = new URLSearchParams({
+      vehiclePlate: reservation.vehiclePlate,
       date: startTime.toISOString(),
       startTime: `${startTime.getHours().toString().padStart(2, '0')}:${startTime.getMinutes().toString().padStart(2, '0')}`,
       duration: String(durationInHours),
@@ -147,6 +148,18 @@ export function ReservationsTable() {
   const getDateFormat = () => {
     return isMobile ? 'MMM d, h:mm a' : 'MMM d, yyyy, h:mm a';
   };
+
+  const formatLicensePlate = (plate: string | null) => {
+    if (!plate) return null;
+    const cleaned = plate.replace(/\s/g, '').toUpperCase();
+    // Indian license plate format
+    const match = cleaned.match(/^([A-Z]{2})(\d{2})([A-Z]{1,2})(\d{1,4})$/);
+    if (match) {
+        const [_, state, district, series, number] = match;
+        return `${state} ${district} ${series} ${number}`;
+    }
+    return plate;
+  }
 
   const filteredReservations = displayReservations?.filter((res) => {
     if (filter === 'all') return true;
@@ -205,7 +218,7 @@ export function ReservationsTable() {
                       <TableCell className="font-medium">
                         {reservation.slotId}
                       </TableCell>
-                      <TableCell>{reservation.vehiclePlate}</TableCell>
+                      <TableCell>{formatLicensePlate(reservation.vehiclePlate)}</TableCell>
                       <TableCell>
                         {format(new Date(reservation.startTime), getDateFormat())}
                       </TableCell>
