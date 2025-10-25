@@ -20,7 +20,7 @@ export default function FeedbackSuccessPage() {
           </p>
           <div className="flex justify-center gap-4">
             <Link href="/home">
-              <Button size="sm">Return to Home</Button>
+              <Button size="sm">Home</Button>
             </Link>
             <Link href="/reservations">
               <Button variant="outline" size="sm">View My Bookings</Button>

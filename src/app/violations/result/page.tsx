@@ -31,7 +31,7 @@ function ViolationResultContent() {
 
   return (
     <div className="flex flex-1 items-center justify-center">
-      <Card className="max-w-sm w-full text-center">
+      <Card className="max-w-sm w-full text-center p-0">
         <CardHeader className="p-4">
           <div className="flex justify-center">
             <CheckCircle2 className="h-12 w-12 text-green-500" />
@@ -49,7 +49,7 @@ function ViolationResultContent() {
           )}
           <div className="flex justify-center gap-4">
             <Link href="/home">
-              <Button size="sm">Return to Home</Button>
+              <Button size="sm">Home</Button>
             </Link>
             <Button variant="outline" size="sm" onClick={() => router.push('/violations')}>Report Another Violation</Button>
           </div>
