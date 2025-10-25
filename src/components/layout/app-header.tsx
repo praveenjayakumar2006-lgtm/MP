@@ -98,7 +98,7 @@ export function AppHeader() {
             className="flex items-center gap-4"
             >
             <Car className="h-12 w-12" />
-            <span className="font-bold text-2xl">ParkEasy</span>
+            <span className="font-bold text-3xl">ParkEasy</span>
             </Link>
         </div>
         
@@ -154,7 +154,7 @@ export function AppHeader() {
                   <Link
                       href="/home"
                       onClick={handleLinkClick}
-                      className="flex items-center gap-4 text-2xl font-semibold"
+                      className="flex items-center gap-4 text-3xl font-semibold"
                   >
                       <Car className="h-10 w-10 text-primary" />
                       <span className="text-foreground">ParkEasy</span>
