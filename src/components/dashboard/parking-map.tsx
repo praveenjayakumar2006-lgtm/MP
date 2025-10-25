@@ -174,7 +174,7 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
 
   const VehicleIcon = ({ type }: { type: 'car' | 'bike' }) => {
     if (type === 'car') {
-      return <Car className="h-1/2 w-1/2" />;
+      return <Car className="h-2/3 w-2/3" />;
     }
     return <Bike className="h-2/3 w-2/3" />;
   };
