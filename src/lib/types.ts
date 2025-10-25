@@ -9,6 +9,7 @@ export type ParkingSlot = {
   status?: ParkingSlotStatus;
   reservedBy?: 'user' | 'other';
   reservationId?: string;
+  forceIcon?: boolean;
 };
 
 export type Reservation = {
