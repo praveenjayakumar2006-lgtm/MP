@@ -309,9 +309,9 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
       >
         <AlertDialogContent>
           {showSuccess ? (
-             <div className="flex flex-col items-center justify-center p-8 gap-4">
+             <div className="flex flex-col items-center justify-center p-4 gap-2">
               <motion.div initial={{ scale: 0 }} animate={{ scale: 1, rotate: 360 }} transition={{ duration: 0.5, type: 'spring' }}>
-                  <CheckCircle2 className="h-24 w-24 text-green-500" />
+                  <CheckCircle2 className="h-16 w-16 text-green-500" />
               </motion.div>
               <AlertDialogTitle>Reservation Successful!</AlertDialogTitle>
               <AlertDialogDescription>
