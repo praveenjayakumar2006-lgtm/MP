@@ -122,7 +122,6 @@ export default function BookingPage() {
                               </FormItem>
                               )}
                           />
-                          <div />
                           <FormField
                               control={form.control}
                               name="date"
