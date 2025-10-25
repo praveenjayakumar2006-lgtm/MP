@@ -181,28 +181,21 @@ export function AppHeader() {
                       {item.label}
                       </Link>
                   ))}
-                  {user && (
-                    <>
-                    <button
-                      onClick={() => {
-                        handleSignOut();
-                        handleLinkClick();
-                      }}
-                      className="flex items-center py-2 text-red-500 transition-colors hover:text-red-600"
-                    >
-                      <LogOut className="mr-2 h-5 w-5" />
-                      Sign Out
-                    </button>
-                    </>
-                  )}
                   </div>
-                  {!user && (
-                    <Link href="/login" onClick={handleLinkClick}>
-                        <Button variant="outline" className="w-full mt-4">Sign In</Button>
-                    </Link>
-                  )}
                   </nav>
                   <div className="absolute bottom-6 left-6 right-6">
+                    {user && (
+                        <button
+                        onClick={() => {
+                            handleSignOut();
+                            handleLinkClick();
+                        }}
+                        className="flex items-center py-2 text-red-500 transition-colors hover:text-red-600 w-full"
+                        >
+                        <LogOut className="mr-2 h-5 w-5" />
+                        Sign Out
+                        </button>
+                    )}
                     <Separator className="my-4" />
                     <div className="space-y-4">
                       <h3 className="text-lg font-semibold text-foreground">Contact Us</h3>
