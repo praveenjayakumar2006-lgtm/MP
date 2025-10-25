@@ -90,7 +90,7 @@ export default function BookingPage() {
   const currentMinute = now.getMinutes();
 
   return (
-    <section id="booking" className="py-12 md:py-24 lg:py-32 flex flex-col items-center justify-center flex-1 bg-background">
+    <section id="booking" className="flex flex-col items-center justify-center flex-1 bg-background">
         <div className="container px-4 md:px-6">
            <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
             <div className="space-y-2">
