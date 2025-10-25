@@ -10,7 +10,6 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
-  CardDescription,
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
@@ -137,9 +136,6 @@ export function ViolationChecker() {
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle>Violation Details</CardTitle>
-          <CardDescription>
-            Submit the slot number, violation type, and an image for analysis.
-          </CardDescription>
         </CardHeader>
         <Form {...violationForm}>
           <form onSubmit={violationForm.handleSubmit(onViolationSubmit)}>
