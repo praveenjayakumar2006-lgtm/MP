@@ -15,8 +15,7 @@ function ViolationResultContent() {
   const searchParams = useSearchParams();
   const licensePlate = searchParams.get('licensePlate');
 
-  // Simple formatter for Indian license plates, can be adjusted.
-  // e.g. HR26DQ05551 -> HR 26 DQ 05551
+  // Formats license plates like 'HR26DQ05551' to 'HR 26 DQ 05551'
   const formatLicensePlate = (plate: string | null) => {
     if (!plate) return null;
     const cleaned = plate.replace(/\s/g, '').toUpperCase();
