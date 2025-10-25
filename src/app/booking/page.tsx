@@ -151,7 +151,7 @@ export default function BookingPage() {
                                           variant={'outline'}
                                           disabled={!vehiclePlateValue}
                                           className={cn(
-                                          'w-full justify-start text-left font-normal',
+                                          'w-full justify-start text-left font-normal hover:bg-accent',
                                           !field.value && 'text-muted-foreground',
                                           'disabled:cursor-not-allowed disabled:opacity-50'
                                           )}
