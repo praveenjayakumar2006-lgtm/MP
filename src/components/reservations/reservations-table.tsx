@@ -95,6 +95,15 @@ export function ReservationsTable() {
       });
       return;
     }
+     if (reservation.status === 'Active') {
+      toast({
+        variant: 'destructive',
+        title: 'Cannot Cancel',
+        description: 'Active reservations cannot be cancelled.',
+        duration: 3000,
+      });
+      return;
+    }
     setReservationToCancel(reservation);
   };
   
@@ -174,7 +183,6 @@ export function ReservationsTable() {
         <TableCell><Skeleton className="h-6 w-40" /></TableCell>
         <TableCell><Skeleton className="h-6 w-40" /></TableCell>
         <TableCell><Skeleton className="h-6 w-20" /></TableCell>
-        <TableCell><Skeleton className="h-8 w-24 float-right" /></TableCell>
       </TableRow>
     ))
   );
@@ -201,7 +209,6 @@ export function ReservationsTable() {
                     <TableHead>Start Time</TableHead>
                     <TableHead>End Time</TableHead>
                     <TableHead>Status</TableHead>
-                    <TableHead className="text-right">Action</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -226,19 +233,21 @@ export function ReservationsTable() {
                         {format(new Date(reservation.endTime), getDateFormat())}
                       </TableCell>
                       <TableCell>
-                        <Badge variant={getStatusVariant(reservation.status)}>
-                          {reservation.status}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          onClick={(e) => handleCancelReservation(e, reservation)}
-                          disabled={reservation.status === 'Completed' || reservation.status === 'Active'}
-                        >
-                          Cancel
-                        </Button>
+                        <div className="flex flex-col items-start gap-2">
+                           <Badge variant={getStatusVariant(reservation.status)}>
+                            {reservation.status}
+                          </Badge>
+                           {reservation.status === 'Upcoming' && (
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              onClick={(e) => handleCancelReservation(e, reservation)}
+                              className="h-auto px-2 py-1 text-xs"
+                            >
+                              Cancel
+                            </Button>
+                          )}
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}
