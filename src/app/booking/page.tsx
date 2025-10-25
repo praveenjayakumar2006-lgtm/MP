@@ -165,7 +165,7 @@ export default function BookingPage() {
                                       <Button
                                           variant={'outline'}
                                           className={cn(
-                                          'w-full justify-start text-left font-normal disabled:cursor-not-allowed',
+                                          'w-full justify-start text-left font-normal disabled:cursor-not-allowed hover:bg-background',
                                           !field.value && 'text-muted-foreground',
                                           !vehiclePlate && 'disabled:opacity-100'
                                           )}
