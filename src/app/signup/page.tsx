@@ -1,3 +1,4 @@
+
 'use client';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -100,7 +101,7 @@ export default function SignupPage() {
       <CardHeader>
         <CardTitle className="text-2xl">Sign Up</CardTitle>
         <CardDescription>
-          Enter your information to Sign Up to your account
+          Enter your information to Sign Up your account
         </CardDescription>
       </CardHeader>
       <CardContent>
