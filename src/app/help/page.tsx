@@ -1,3 +1,4 @@
+
 'use client';
 
 import {
@@ -36,10 +37,10 @@ export default function HelpPage() {
   return (
     <div className="w-full flex-1 flex flex-col items-center">
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
+        <h1 className="text-3xl font-semibold">
           Help & Support
         </h1>
-        <p className="mt-2 text-lg text-muted-foreground">
+        <p className="text-muted-foreground">
           Have questions? We're here to help.
         </p>
       </div>
