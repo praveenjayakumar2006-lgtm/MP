@@ -31,14 +31,14 @@ function ViolationResultContent() {
 
   return (
     <div className="flex flex-1 items-center justify-center">
-      <Card className="max-w-sm w-full text-center p-2">
-        <CardHeader>
+      <Card className="max-w-sm w-full text-center">
+        <CardHeader className="p-4">
           <div className="flex justify-center">
             <CheckCircle2 className="h-12 w-12 text-green-500" />
           </div>
           <CardTitle className="mt-4 text-xl">Report Submitted!</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-4 pt-0">
           <p className="text-muted-foreground text-sm mb-6">
             Your violation report has been submitted successfully. We appreciate you taking the time to help us improve safety.
           </p>
