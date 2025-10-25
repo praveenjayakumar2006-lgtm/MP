@@ -121,7 +121,11 @@ export default function BookingPage() {
                                   <FormControl>
                                     <div className="relative">
                                       <Ticket className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                                      <Input placeholder="Enter vehicle plate" {...field} className="pl-10" />
+                                      <Input 
+                                        placeholder="Enter vehicle plate" 
+                                        {...field}
+                                        onChange={(e) => field.onChange(e.target.value.toUpperCase())}
+                                        className="pl-10" />
                                     </div>
                                   </FormControl>
                                   <FormMessage />
