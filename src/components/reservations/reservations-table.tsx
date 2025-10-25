@@ -221,7 +221,7 @@ export function ReservationsTable() {
       <Card>
         <CardContent className="p-0">
           <Tabs value={filter} onValueChange={(value) => setFilter(value as any)} className="w-full">
-            <div className="flex items-center p-4">
+            <div className="flex items-center justify-center p-4">
               <TabsList>
                 <TabsTrigger value="all">All</TabsTrigger>
                 <TabsTrigger value="Active">Active</TabsTrigger>
