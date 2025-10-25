@@ -42,6 +42,7 @@ export function AppHeader() {
   const pathname = usePathname();
   const isMobile = useIsMobile();
   const [isClient, setIsClient] = useState(false);
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
   const { auth, user } = useFirebase();
   const router = useRouter();
   const { toast } = useToast();
@@ -62,6 +63,10 @@ export function AppHeader() {
   };
 
   const isOtherItemActive = otherItems.some(item => pathname.startsWith(item.href));
+
+  const handleLinkClick = () => {
+    setIsSheetOpen(false);
+  };
 
   const NavLink = ({ href, children, className }: { href: string, children: React.ReactNode, className?: string }) => {
     const isActive = href === '/booking' ? pathname.startsWith('/booking') || pathname.startsWith('/select-spot') : pathname.startsWith(href);
@@ -121,7 +126,7 @@ export function AppHeader() {
               </Button>
             )}
             {isClient && isMobile && (
-            <Sheet>
+            <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
               <SheetTrigger asChild>
                   <Button variant="outline" size="icon" className="shrink-0 md:hidden bg-transparent border-primary-foreground/80 text-primary-foreground hover:bg-white/10 hover:text-primary-foreground">
                   <Menu className="h-5 w-5" />
@@ -135,6 +140,7 @@ export function AppHeader() {
                   <nav className="grid gap-6 text-xl font-medium">
                   <Link
                       href="/home"
+                      onClick={handleLinkClick}
                       className="flex items-center gap-4 text-2xl font-semibold"
                   >
                       <Car className="h-10 w-10 text-primary" />
@@ -144,6 +150,7 @@ export function AppHeader() {
                       <Link
                       key={item.href}
                       href={item.href}
+                      onClick={handleLinkClick}
                       className="transition-colors hover:text-primary text-foreground"
                       >
                       {item.label}
@@ -154,6 +161,7 @@ export function AppHeader() {
                       <Link
                       key={item.href}
                       href={item.href}
+                      onClick={handleLinkClick}
                       className="block py-2 transition-colors hover:text-primary text-foreground"
                       >
                       {item.label}
@@ -161,9 +169,9 @@ export function AppHeader() {
                   ))}
                   </div>
                   {user ? (
-                    <Button onClick={handleLogout} variant="outline" className="w-full mt-4">Sign Out</Button>
+                    <Button onClick={() => { handleLogout(); handleLinkClick(); }} variant="outline" className="w-full mt-4">Sign Out</Button>
                   ) : (
-                    <Link href="/login">
+                    <Link href="/login" onClick={handleLinkClick}>
                         <Button variant="outline" className="w-full mt-4">Sign In</Button>
                     </Link>
                   )}
