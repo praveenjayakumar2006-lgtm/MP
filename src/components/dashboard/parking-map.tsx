@@ -166,8 +166,8 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
         'bg-green-100 border-green-400 text-green-800 hover:bg-green-200 cursor-pointer': status === 'available',
         'bg-red-100 border-red-400 text-red-800 cursor-not-allowed opacity-70': status === 'occupied' || (status === 'reserved' && !isUser),
         'bg-yellow-100 border-yellow-400 text-yellow-800 hover:bg-yellow-200 cursor-pointer': status === 'reserved' && isUser,
-        'h-24 w-16': slot.type === 'car',
-        'h-20 w-14': slot.type === 'bike',
+        'h-20 w-14': slot.type === 'car',
+        'h-16 w-12': slot.type === 'bike',
       }
     );
   };
