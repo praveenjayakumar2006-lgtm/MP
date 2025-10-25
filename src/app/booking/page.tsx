@@ -36,6 +36,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { useState } from 'react';
 
 const bookingSchema = z.object({
   date: z.date({
@@ -64,6 +65,7 @@ const timeSlots = Array.from({ length: 24 * 2 }, (_, i) => {
 
 export default function BookingPage() {
   const router = useRouter();
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   
   const form = useForm<BookingFormValues>({
     resolver: zodResolver(bookingSchema),
@@ -108,7 +110,7 @@ export default function BookingPage() {
                               render={({ field }) => (
                               <FormItem>
                                   <FormLabel>Date</FormLabel>
-                                  <Popover>
+                                  <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
                                   <PopoverTrigger asChild>
                                       <FormControl>
                                       <Button
@@ -137,6 +139,7 @@ export default function BookingPage() {
                                         field.onChange(date);
                                         form.resetField('startTime');
                                         form.resetField('duration');
+                                        setIsCalendarOpen(false);
                                       }}
                                       disabled={(date) =>
                                           date < new Date(new Date().setHours(0, 0, 0, 0))
