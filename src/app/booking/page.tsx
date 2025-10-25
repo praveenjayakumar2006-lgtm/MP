@@ -92,7 +92,7 @@ export default function BookingPage() {
   return (
     <section id="booking" className="flex flex-col items-center justify-center flex-1 bg-background">
         <div className="container px-4 md:px-6">
-           <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
+           <div className="flex flex-col items-center justify-center space-y-4 text-center mb-8">
             <div className="space-y-2">
               <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">Book Your Spot</h2>
               <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
