@@ -25,17 +25,6 @@ const mockReservations: Reservation[] = [
         updatedAt: new Date(),
     },
     {
-        id: '2',
-        slotId: 'C5',
-        userId: 'user-123',
-        vehiclePlate: 'USER-456',
-        startTime: new Date(new Date().getTime() + 2 * 60 * 60 * 1000), // 2 hours from now
-        endTime: new Date(new Date().getTime() + 4 * 60 * 60 * 1000), // 4 hours from now
-        status: 'Upcoming',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-    },
-    {
         id: '4',
         slotId: 'B1',
         userId: 'user-123',
