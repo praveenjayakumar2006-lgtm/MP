@@ -128,7 +128,7 @@ export function AppHeader() {
                   <span className="sr-only">Toggle navigation menu</span>
                   </Button>
               </SheetTrigger>
-              <SheetContent side="left">
+              <SheetContent side="right">
                 <SheetHeader>
                     <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
                 </SheetHeader>
