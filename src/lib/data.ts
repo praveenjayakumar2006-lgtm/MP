@@ -7,7 +7,7 @@ export const parkingSlots: ParkingSlot[] = [
   { id: 'C2', type: 'car', status: 'available' },
   { id: 'C3', type: 'car', status: 'occupied' },
   { id: 'C4', type: 'car', status: 'occupied' },
-  { id: 'C5', type: 'car', status: 'available' },
+  { id: 'C5', type: 'car', status: 'occupied' },
   // Bike slots
   { id: 'B1', type: 'bike', status: 'occupied' },
   { id: 'B2', type: 'bike', status: 'occupied' },
