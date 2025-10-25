@@ -120,26 +120,21 @@ export function AppHeader() {
             >
               {item.label}
             </NavLink>))}
-            {user && (
-              <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className={cn(
-                      "flex items-center gap-1 text-lg font-medium transition-colors hover:text-primary-foreground hover:bg-white/10 p-2 rounded-md",
-                      "text-primary-foreground/80"
-                  )}>
-                      <LogOut className="h-5 w-5" />
-                  </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={handleSignOut} className="text-red-500 focus:text-red-500 focus:bg-red-50">
-                          <LogOut className="mr-2 h-4 w-4" />
-                          <span>Sign Out</span>
-                      </DropdownMenuItem>
-                  </DropdownMenuContent>
-              </DropdownMenu>
-            )}
         </nav>
         <div className="flex items-center gap-4">
+          <div className="hidden md:flex">
+             {user && (
+                <Button
+                  onClick={handleSignOut}
+                  variant="ghost"
+                  className="text-lg font-medium text-primary-foreground/80 transition-colors hover:text-primary-foreground hover:bg-white/10"
+                >
+                  <LogOut className="mr-2 h-5 w-5" />
+                  Sign Out
+                </Button>
+              )}
+          </div>
+           
             {isClient && isMobile && (
             <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
               <SheetTrigger asChild>
@@ -187,16 +182,18 @@ export function AppHeader() {
                   </nav>
                   <div className="absolute bottom-6 left-6 right-6">
                     {user && (
-                        <button
+                        <Button
+                        variant="destructive"
+                        size="lg"
+                        className="w-full text-lg"
                         onClick={() => {
                             handleSignOut();
                             handleLinkClick();
                         }}
-                        className="flex items-center py-2 text-red-500 transition-colors hover:text-red-600 w-full"
                         >
                         <LogOut className="mr-2 h-5 w-5" />
                         Sign Out
-                        </button>
+                        </Button>
                     )}
                     <Separator className="my-4" />
                     <div className="space-y-4">
