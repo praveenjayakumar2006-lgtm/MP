@@ -114,16 +114,18 @@ export default function BookingPage() {
                                       <Button
                                           variant={'outline'}
                                           className={cn(
-                                          'w-full justify-start text-left font-normal gap-2',
+                                          'w-full justify-start text-left font-normal',
                                           !field.value && 'text-muted-foreground'
                                           )}
                                       >
-                                          <CalendarIcon className="h-4 w-4 opacity-50" />
-                                          {field.value ? (
-                                          format(field.value, 'PPP')
-                                          ) : (
-                                          <span>Pick a date</span>
-                                          )}
+                                          <div className="flex items-center gap-2">
+                                            <CalendarIcon className="h-4 w-4 opacity-50" />
+                                            {field.value ? (
+                                            format(field.value, 'PPP')
+                                            ) : (
+                                            <span>Pick a date</span>
+                                            )}
+                                          </div>
                                       </Button>
                                       </FormControl>
                                   </PopoverTrigger>
@@ -162,9 +164,11 @@ export default function BookingPage() {
                                 disabled={!selectedDate}
                               >
                                   <FormControl>
-                                  <SelectTrigger className="justify-start gap-2">
+                                  <SelectTrigger>
+                                    <div className="flex items-center gap-2">
                                       <Clock className="h-4 w-4" />
                                       <SelectValue placeholder="Select a time" />
+                                    </div>
                                   </SelectTrigger>
                                   </FormControl>
                                   <SelectContent>
@@ -191,9 +195,11 @@ export default function BookingPage() {
                               <FormLabel>Duration (Hours)</FormLabel>
                               <Select onValueChange={field.onChange} value={field.value} disabled={!selectedStartTime}>
                                   <FormControl>
-                                  <SelectTrigger className="justify-start gap-2">
-                                    <Hourglass className="h-4 w-4" />
-                                      <SelectValue placeholder="Select hours" />
+                                  <SelectTrigger>
+                                     <div className="flex items-center gap-2">
+                                        <Hourglass className="h-4 w-4" />
+                                        <SelectValue placeholder="Select hours" />
+                                     </div>
                                   </SelectTrigger>
                                   </FormControl>
                                   <SelectContent>
