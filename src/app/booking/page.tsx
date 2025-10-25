@@ -204,7 +204,7 @@ export default function BookingPage() {
                                 disabled={!selectedDate}
                               >
                                   <FormControl>
-                                  <SelectTrigger className="hover:bg-accent hover:text-accent-foreground disabled:cursor-not-allowed disabled:opacity-50">
+                                  <SelectTrigger className={cn("hover:bg-accent hover:text-accent-foreground disabled:cursor-not-allowed disabled:opacity-50", !field.value && "text-muted-foreground")}>
                                     <div className="flex items-center gap-2">
                                       <Clock className="h-4 w-4" />
                                       <SelectValue placeholder="Select a time" />
@@ -235,7 +235,7 @@ export default function BookingPage() {
                               <FormLabel>Duration (Hours)</FormLabel>
                               <Select onValueChange={field.onChange} value={field.value} disabled={!selectedStartTime}>
                                   <FormControl>
-                                  <SelectTrigger className="hover:bg-accent hover:text-accent-foreground disabled:cursor-not-allowed disabled:opacity-50">
+                                  <SelectTrigger className={cn("hover:bg-accent hover:text-accent-foreground disabled:cursor-not-allowed disabled:opacity-50", !field.value && "text-muted-foreground")}>
                                      <div className="flex items-center gap-2">
                                         <Hourglass className="h-4 w-4" />
                                         <SelectValue placeholder="Select hours" />
