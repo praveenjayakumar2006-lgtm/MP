@@ -2,7 +2,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Car, Menu, ChevronDown, LogOut } from 'lucide-react';
+import { Car, Menu, ChevronDown, LogOut, Mail, Phone } from 'lucide-react';
 import {
   Sheet,
   SheetContent,
@@ -19,12 +19,12 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import Image from 'next/image';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useEffect, useState } from 'react';
 import { useFirebase } from '@/firebase';
 import { signOut } from 'firebase/auth';
 import { useToast } from '@/hooks/use-toast';
+import { Separator } from '@/components/ui/separator';
 
 const navItems = [
   { href: '/home', label: 'Home' },
@@ -146,6 +146,7 @@ export function AppHeader() {
                       <Car className="h-10 w-10 text-primary" />
                       <span className="text-foreground">ParkEasy</span>
                   </Link>
+                  <Separator className="my-2" />
                   {navItems.map(item => (
                       <Link
                       key={item.href}
@@ -176,6 +177,36 @@ export function AppHeader() {
                     </Link>
                   )}
                   </nav>
+                  <div className="absolute bottom-6 left-6 right-6">
+                    <Separator className="my-4" />
+                    <div className="space-y-4">
+                      <h3 className="text-lg font-semibold text-foreground">Contact Us</h3>
+                      <div className="flex items-start gap-3">
+                          <Mail className="h-5 w-5 mt-1 text-muted-foreground" />
+                          <div>
+                            <h4 className="font-semibold text-sm">Email Support</h4>
+                            <p className="text-xs text-muted-foreground">
+                                For general inquiries and support.
+                            </p>
+                            <a href="mailto:support@parkeasy.com" className="mt-1 inline-block text-xs font-medium text-primary hover:underline">
+                                support@parkeasy.com
+                            </a>
+                          </div>
+                      </div>
+                      <div className="flex items-start gap-3">
+                           <Phone className="h-5 w-5 mt-1 text-muted-foreground" />
+                          <div>
+                            <h4 className="font-semibold text-sm">Phone Support</h4>
+                            <p className="text-xs text-muted-foreground">
+                                Available 24/7 to assist you.
+                            </p>
+                            <a href="tel:+18001234567" className="mt-1 inline-block text-xs font-medium text-primary hover:underline">
+                                1-800-123-4567
+                            </a>
+                          </div>
+                      </div>
+                    </div>
+                  </div>
               </SheetContent>
             </Sheet>
              )}
