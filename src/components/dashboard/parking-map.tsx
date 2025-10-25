@@ -210,7 +210,7 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
                       >
                           {hasIcon && <VehicleIcon type={slot.type} />}
                           {status === 'reserved' && isUser && (
-                              <Badge variant="default" className="absolute -top-3 -right-3 text-[10px] px-1.5 py-0.5">You</Badge>
+                              <Badge variant="default" className="absolute -top-3 -right-3 text-[10px] px-1.5 py-0">You</Badge>
                           )}
                           <span className="absolute bottom-1 right-1 text-[10px] font-bold">
                           {slot.id}
@@ -244,7 +244,7 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
                               >
                               {hasIcon && <VehicleIcon type={slot.type} />}
                               {status === 'reserved' && isUser && (
-                                  <Badge variant="default" className="absolute -top-3 -right-3 text-[10px] px-1.5 py-0.5">You</Badge>
+                                  <Badge variant="default" className="absolute -top-3 -right-3 text-[10px] px-1.5 py-0">You</Badge>
                               )}
                               <span className="absolute bottom-1 right-1 text-[10px] font-bold">
                                   {slot.id}
@@ -269,7 +269,7 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
                               >
                               {hasIcon && <VehicleIcon type={slot.type} />}
                               {status === 'reserved' && isUser && (
-                                  <Badge variant="default" className="absolute -top-3 -right-3 text-[10px] px-1.5 py-0.5">You</Badge>
+                                  <Badge variant="default" className="absolute -top-3 -right-3 text-[10px] px-1.5 py-0">You</Badge>
                               )}
                               <span className="absolute bottom-1 right-1 text-[10px] font-bold">
                                   {slot.id}
@@ -311,7 +311,7 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
           {showSuccess ? (
              <div className="flex flex-col items-center justify-center p-4 gap-2">
               <motion.div initial={{ scale: 0 }} animate={{ scale: 1, rotate: 360 }} transition={{ duration: 0.5, type: 'spring' }}>
-                  <CheckCircle2 className="h-16 w-16 text-green-500" />
+                  <CheckCircle2 className="h-12 w-12 text-green-500" />
               </motion.div>
               <AlertDialogTitle>Reservation Successful!</AlertDialogTitle>
               <AlertDialogDescription>
