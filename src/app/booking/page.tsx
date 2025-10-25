@@ -151,7 +151,7 @@ export default function BookingPage() {
                                           className={cn(
                                           'w-full justify-start text-left font-normal',
                                           !field.value && 'text-muted-foreground',
-                                          'disabled:opacity-100 disabled:cursor-not-allowed'
+                                          'disabled:cursor-not-allowed'
                                           )}
                                           disabled={!vehiclePlate}
                                       >
@@ -163,6 +163,7 @@ export default function BookingPage() {
                                             <span>Pick a date</span>
                                             )}
                                           </div>
+
                                       </Button>
                                       </FormControl>
                                   </PopoverTrigger>
@@ -202,7 +203,7 @@ export default function BookingPage() {
                                 disabled={!selectedDate}
                               >
                                   <FormControl>
-                                  <SelectTrigger className="disabled:opacity-100 disabled:cursor-not-allowed">
+                                  <SelectTrigger className="disabled:cursor-not-allowed">
                                     <div className="flex items-center gap-2">
                                       <Clock className="h-4 w-4" />
                                       <SelectValue placeholder="Select a time" />
@@ -233,7 +234,7 @@ export default function BookingPage() {
                               <FormLabel>Duration (Hours)</FormLabel>
                               <Select onValueChange={field.onChange} value={field.value} disabled={!selectedStartTime}>
                                   <FormControl>
-                                  <SelectTrigger className="disabled:opacity-100 disabled:cursor-not-allowed">
+                                  <SelectTrigger className="disabled:cursor-not-allowed">
                                      <div className="flex items-center gap-2">
                                         <Hourglass className="h-4 w-4" />
                                         <SelectValue placeholder="Select hours" />
