@@ -212,7 +212,7 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
                           {status === 'reserved' && isUser && (
                               <Badge variant="default" className="absolute -top-2 -right-2 text-xs px-1 py-0">You</Badge>
                           )}
-                          <span className="absolute bottom-1 right-2 text-xs font-bold">
+                          <span className="absolute bottom-1 right-2 text-[10px] font-bold">
                           {slot.id}
                           </span>
                       </div>
@@ -246,7 +246,7 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
                               {status === 'reserved' && isUser && (
                                   <Badge variant="default" className="absolute -top-2 -right-2 text-xs px-1 py-0">You</Badge>
                               )}
-                              <span className="absolute bottom-1 right-1 text-xs font-bold">
+                              <span className="absolute bottom-1 right-1 text-[10px] font-bold">
                                   {slot.id}
                               </span>
                               </div>
@@ -271,7 +271,7 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
                               {status === 'reserved' && isUser && (
                                   <Badge variant="default" className="absolute -top-2 -right-2 text-xs px-1 py-0">You</Badge>
                               )}
-                              <span className="absolute bottom-1 right-1 text-xs font-bold">
+                              <span className="absolute bottom-1 right-1 text-[10px] font-bold">
                                   {slot.id}
                               </span>
                               </div>
