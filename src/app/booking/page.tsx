@@ -96,7 +96,7 @@ export default function BookingPage() {
   const currentMinute = now.getMinutes();
 
   return (
-    <section id="booking" className="flex flex-col items-center justify-center flex-1 bg-background">
+    <section id="booking" className="flex flex-col items-center justify-center flex-1 bg-background py-12">
         <div className="container px-4 md:px-6">
            <div className="flex flex-col items-center justify-center space-y-4 text-center mb-8">
             <div className="space-y-2">
@@ -111,7 +111,7 @@ export default function BookingPage() {
                 <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)}>
                     <CardContent className="pt-6">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                            <FormField
                               control={form.control}
                               name="vehiclePlate"
@@ -192,7 +192,7 @@ export default function BookingPage() {
                                 disabled={!selectedDate}
                               >
                                   <FormControl>
-                                  <SelectTrigger>
+                                  <SelectTrigger className="hover:bg-accent hover:text-accent-foreground">
                                     <div className="flex items-center gap-2">
                                       <Clock className="h-4 w-4" />
                                       <SelectValue placeholder="Select a time" />
@@ -223,7 +223,7 @@ export default function BookingPage() {
                               <FormLabel>Duration (Hours)</FormLabel>
                               <Select onValueChange={field.onChange} value={field.value} disabled={!selectedStartTime}>
                                   <FormControl>
-                                  <SelectTrigger>
+                                  <SelectTrigger className="hover:bg-accent hover:text-accent-foreground">
                                      <div className="flex items-center gap-2">
                                         <Hourglass className="h-4 w-4" />
                                         <SelectValue placeholder="Select hours" />
