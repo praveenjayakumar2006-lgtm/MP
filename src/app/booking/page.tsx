@@ -29,16 +29,17 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { format, isToday } from 'date-fns';
-import { Calendar as CalendarIcon, Clock, Hourglass } from 'lucide-react';
+import { Calendar as CalendarIcon, Clock, Hourglass, Ticket } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
 import { useState } from 'react';
+import { Input } from '@/components/ui/input';
 
 const bookingSchema = z.object({
+  vehiclePlate: z.string().min(1, 'Vehicle plate is required.'),
   date: z.date({
     required_error: 'A date is required.',
   }),
@@ -76,6 +77,7 @@ export default function BookingPage() {
   
   function onSubmit(values: BookingFormValues) {
     const params = new URLSearchParams({
+      vehiclePlate: values.vehiclePlate,
       date: values.date.toISOString(),
       startTime: values.startTime,
       duration: values.duration,
@@ -103,7 +105,24 @@ export default function BookingPage() {
                 <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)}>
                     <CardContent className="pt-6">
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                           <FormField
+                              control={form.control}
+                              name="vehiclePlate"
+                              render={({ field }) => (
+                              <FormItem>
+                                  <FormLabel>Number Plate</FormLabel>
+                                  <FormControl>
+                                    <div className="relative">
+                                      <Ticket className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                                      <Input placeholder="Enter vehicle plate" {...field} className="pl-10" />
+                                    </div>
+                                  </FormControl>
+                                  <FormMessage />
+                              </FormItem>
+                              )}
+                          />
+                          <div />
                           <FormField
                               control={form.control}
                               name="date"
