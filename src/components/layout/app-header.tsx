@@ -128,7 +128,6 @@ export function AppHeader() {
                 ))}
                 {user && (
                   <>
-                    <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={handleSignOut} className="text-red-500 focus:text-red-500 focus:bg-red-50">
                         <LogOut className="mr-2 h-4 w-4" />
                         <span>Sign Out</span>
@@ -184,7 +183,6 @@ export function AppHeader() {
                   ))}
                   {user && (
                     <>
-                    <Separator />
                     <button
                       onClick={() => {
                         handleSignOut();
