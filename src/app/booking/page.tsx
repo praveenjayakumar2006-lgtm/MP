@@ -80,6 +80,31 @@ export default function BookingPage() {
 
   const selectedDate = form.watch('date');
   const selectedStartTime = form.watch('startTime');
+  const vehiclePlate = form.watch('vehiclePlate');
+
+  useEffect(() => {
+    if (!vehiclePlate) {
+      form.resetField('date');
+      form.resetField('startTime');
+      form.resetField('duration');
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [vehiclePlate]);
+
+  useEffect(() => {
+    if(!selectedDate) {
+        form.resetField('startTime');
+        form.resetField('duration');
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedDate]);
+
+  useEffect(() => {
+    if(!selectedStartTime) {
+        form.resetField('duration');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedStartTime]);
   
   function onSubmit(values: BookingFormValues) {
     const params = new URLSearchParams({
@@ -140,9 +165,11 @@ export default function BookingPage() {
                                       <Button
                                           variant={'outline'}
                                           className={cn(
-                                          'w-full justify-start text-left font-normal',
-                                          !field.value && 'text-muted-foreground'
+                                          'w-full justify-start text-left font-normal disabled:cursor-not-allowed',
+                                          !field.value && 'text-muted-foreground',
+                                          !vehiclePlate && 'disabled:opacity-100'
                                           )}
+                                          disabled={!vehiclePlate}
                                       >
                                           <div className="flex items-center gap-2">
                                             <CalendarIcon className="h-4 w-4 opacity-50" />
