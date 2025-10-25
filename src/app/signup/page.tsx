@@ -100,7 +100,7 @@ export default function SignupPage() {
       <CardHeader>
         <CardTitle className="text-2xl">Sign Up</CardTitle>
         <CardDescription>
-          Enter your information to create an account
+          Enter your information to sign in to your account
         </CardDescription>
       </CardHeader>
       <CardContent>
