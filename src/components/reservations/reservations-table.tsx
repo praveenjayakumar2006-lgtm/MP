@@ -31,8 +31,37 @@ import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { Activity, CalendarClock, CheckCircle2 } from 'lucide-react';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 type Status = 'Active' | 'Completed' | 'Upcoming';
+
+const StatusIcon = ({ status }: { status: Status }) => {
+  const iconMap: Record<Status, React.ReactElement> = {
+    Active: <Activity className="h-5 w-5 text-blue-500" />,
+    Completed: <CheckCircle2 className="h-5 w-5 text-green-500" />,
+    Upcoming: <CalendarClock className="h-5 w-5 text-yellow-500" />,
+  };
+
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <span>{iconMap[status]}</span>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>{status}</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+};
+
 
 export function ReservationsTable() {
   const context = useContext(ReservationsContext);
@@ -234,9 +263,7 @@ export function ReservationsTable() {
                       </TableCell>
                       <TableCell>
                         <div className="flex flex-col items-start gap-2">
-                           <Badge variant={getStatusVariant(reservation.status)}>
-                            {reservation.status}
-                          </Badge>
+                           <StatusIcon status={reservation.status} />
                            {reservation.status === 'Upcoming' && (
                             <Button
                               variant="destructive"
