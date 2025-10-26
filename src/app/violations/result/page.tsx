@@ -4,7 +4,7 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Check, CheckCircle2 } from 'lucide-react';
+import { Check, CheckCircle2, X } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
@@ -47,10 +47,16 @@ function ViolationResultContent() {
                 <p className="text-sm text-foreground">
                     Detected License Plate: <span className="font-semibold bg-primary/10 text-primary px-2 py-1 rounded-md">{formattedLicensePlate}</span>
                 </p>
-                <Button variant="secondary" size="sm">
-                    <Check className="mr-2 h-4 w-4" />
-                    Confirm this number plate
-                </Button>
+                <div className="flex items-center gap-4">
+                  <Button variant="outline" className="border-green-500 text-green-600 hover:bg-green-50 hover:text-green-700">
+                      <Check className="mr-2 h-4 w-4" />
+                      Confirm
+                  </Button>
+                   <Button variant="destructive" className="bg-red-500/10 text-red-600 hover:bg-red-500/20 border border-red-500/20">
+                      <X className="mr-2 h-4 w-4" />
+                      Reject
+                  </Button>
+                </div>
             </div>
           )}
           <div className="flex justify-center gap-4">
