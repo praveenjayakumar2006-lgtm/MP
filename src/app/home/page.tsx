@@ -27,18 +27,18 @@ export default function HomePage() {
               </Link>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-8">
-              <div className="flex flex-col items-center gap-2">
+            <div className="flex flex-row items-start justify-center gap-12 pt-8">
+              <div className="flex flex-col items-center gap-2 max-w-[200px]">
                 <Clock className="h-10 w-10 text-primary" />
                 <h3 className="font-semibold">Real-time Availability</h3>
                 <p className="text-sm text-muted-foreground">Check available spots instantly.</p>
               </div>
-              <div className="flex flex-col items-center gap-2">
+              <div className="flex flex-col items-center gap-2 max-w-[200px]">
                 <ShieldCheck className="h-10 w-10 text-primary" />
                 <h3 className="font-semibold">Secure Booking</h3>
                 <p className="text-sm text-muted-foreground">Reserve your spot with confidence.</p>
               </div>
-              <div className="flex flex-col items-center gap-2">
+              <div className="flex flex-col items-center gap-2 max-w-[200px]">
                 <AlertTriangle className="h-10 w-10 text-primary" />
                 <h3 className="font-semibold">Violation Reporting</h3>
                 <p className="text-sm text-muted-foreground">Easily report parking violations.</p>
