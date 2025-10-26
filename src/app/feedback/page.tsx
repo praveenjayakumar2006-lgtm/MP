@@ -89,7 +89,7 @@ export default function FeedbackPage() {
                       <FormControl>
                         <Input
                           type="email"
-                          placeholder="you@example.com"
+                          placeholder="you@gmail.com"
                           {...field}
                         />
                       </FormControl>
