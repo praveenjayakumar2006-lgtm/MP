@@ -28,7 +28,7 @@ export default function HomePage() {
               </Link>
             </div>
 
-            <div className="flex flex-col items-center gap-8 w-full max-w-2xl mx-auto pt-8">
+            <div className="flex flex-col items-center gap-4 w-full max-w-2xl mx-auto pt-4">
                 <Separator />
                 <div className="flex flex-col items-center">
                     <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl text-center mb-6">Our Services</h2>
