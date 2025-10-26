@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, Suspense } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -25,7 +25,7 @@ import {
 } from '@/components/ui/select';
 import { Loader2 } from 'lucide-react';
 import { analyzeVehicleImage, analyzeViolationText } from '@/app/violations/actions';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
@@ -65,17 +65,21 @@ function fileToDataUrl(file: File): Promise<string> {
   });
 }
 
-export function ViolationChecker() {
+function ViolationCheckerComponent() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const defaultSlotNumber = searchParams.get('slotNumber') || '';
+  const defaultViolationType = searchParams.get('violationType');
 
   const violationForm = useForm<ViolationFormValues>({
     resolver: zodResolver(violationSchema),
     defaultValues: {
-      slotNumber: '',
-      violationType: undefined,
+      slotNumber: defaultSlotNumber,
+      violationType: defaultViolationType === 'overstaying' || defaultViolationType === 'unauthorized_parking' ? defaultViolationType : undefined,
       imageSource: 'upload',
       image: null,
     },
@@ -133,7 +137,11 @@ export function ViolationChecker() {
       ]);
       
       if (vehicleResult.licensePlate === 'NO_LICENSE_PLATE_DETECTED') {
-        router.push('/violations/capture-failed');
+        const params = new URLSearchParams({
+            slotNumber: values.slotNumber,
+            violationType: values.violationType,
+        });
+        router.push(`/violations/capture-failed?${params.toString()}`);
         return;
       }
 
@@ -178,7 +186,7 @@ export function ViolationChecker() {
                         {...field} 
                         onChange={(e) => {
                             field.onChange(e);
-                            if (violationForm.formState.errors.slotNumber) {
+                            if (e.target.value && violationForm.formState.errors.slotNumber) {
                                 violationForm.clearErrors('slotNumber');
                             }
                         }}
@@ -197,7 +205,7 @@ export function ViolationChecker() {
                     <Select 
                         onValueChange={(value) => {
                             field.onChange(value);
-                            if (violationForm.formState.errors.violationType) {
+                            if (value && violationForm.formState.errors.violationType) {
                                 violationForm.clearErrors('violationType');
                             }
                         }}
@@ -280,4 +288,12 @@ export function ViolationChecker() {
       </Card>
     </div>
   );
+}
+
+export function ViolationChecker() {
+    return (
+        <Suspense fallback={<div>Loading form...</div>}>
+            <ViolationCheckerComponent />
+        </Suspense>
+    )
 }

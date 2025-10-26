@@ -112,7 +112,11 @@ function CameraPageContent() {
         ]);
 
         if (vehicleResult.licensePlate === 'NO_LICENSE_PLATE_DETECTED') {
-            router.push('/violations/capture-failed');
+            const params = new URLSearchParams({
+                slotNumber: slotNumber,
+                violationType: violationType,
+            });
+            router.push(`/violations/capture-failed?${params.toString()}`);
             return;
         }
 
