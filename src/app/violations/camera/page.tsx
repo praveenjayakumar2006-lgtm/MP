@@ -45,7 +45,13 @@ function CameraPageContent() {
 
   useEffect(() => {
     async function setupCamera() {
-      if (capturedImage) return;
+      if (capturedImage) {
+        if (streamRef.current) {
+          streamRef.current.getTracks().forEach(track => track.stop());
+          streamRef.current = null;
+        }
+        return;
+      };
 
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
@@ -117,7 +123,7 @@ function CameraPageContent() {
             const params = new URLSearchParams();
             if (slotNumber) params.set('slotNumber', slotNumber);
             if (violationType) params.set('violationType', violationType);
-            router.push(`/violations/capture-failed?${params.toString()}`);
+            router.replace(`/violations/capture-failed?${params.toString()}`);
             return;
         }
 
@@ -175,6 +181,12 @@ function CameraPageContent() {
                     animate={{ opacity: 1, scale: 1 }}
                     className="relative w-full h-full flex flex-col"
                 >
+                    <div className="absolute top-0 left-0 right-0 p-4 bg-gradient-to-b from-black/60 to-transparent flex justify-start items-center z-20">
+                        <Button onClick={() => router.replace('/violations')} variant="secondary" className="h-auto p-2 gap-2">
+                            <ArrowLeft />
+                            <span>Back</span>
+                        </Button>
+                    </div>
                     <img src={capturedImage} alt="Captured preview" className="w-full h-full object-contain" />
                     <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/80 to-transparent flex justify-around z-20">
                         <Button onClick={handleRetake} variant="outline" size="lg" className="bg-white/10 text-white hover:bg-white/20 border-white/20">Retake</Button>
@@ -188,6 +200,12 @@ function CameraPageContent() {
                     animate={{ opacity: 1 }}
                     className="relative w-full h-full flex flex-col items-center justify-center"
                 >
+                    <div className="absolute top-0 left-0 right-0 p-4 bg-gradient-to-b from-black/60 to-transparent flex justify-start items-center z-20">
+                        <Button onClick={() => router.replace('/violations')} variant="secondary" className="h-auto p-2 gap-2">
+                            <ArrowLeft />
+                            <span>Back</span>
+                        </Button>
+                    </div>
                     <video ref={videoRef} className="absolute top-0 left-0 w-full h-full object-cover" autoPlay muted playsInline />
                     
                     {hasCameraPermission === false && (
