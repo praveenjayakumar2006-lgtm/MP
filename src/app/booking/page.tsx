@@ -113,10 +113,7 @@ export default function BookingPage() {
             <Card className="max-w-3xl w-full">
                 <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)}>
-                    <CardHeader>
-                        <CardTitle>Booking Details</CardTitle>
-                    </CardHeader>
-                    <CardContent>
+                    <CardContent className="pt-6">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                            <FormField
                               control={form.control}
