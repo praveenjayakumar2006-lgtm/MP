@@ -49,6 +49,18 @@ function SelectSpotContent() {
         router.push(`/booking?${params.toString()}`);
     }
 
+    // Formats license plates like 'HR26DQ05551' to 'HR 26 DQ 05551'
+    const formatLicensePlate = (plate: string | null) => {
+        if (!plate) return null;
+        const cleaned = plate.replace(/\s/g, '').toUpperCase();
+        const match = cleaned.match(/^([A-Z]{2})(\d{1,2})([A-Z]{1,2})(\d{1,4})$/);
+        if (match) {
+            const [_, state, district, series, number] = match;
+            return `${state} ${district} ${series} ${number}`;
+        }
+        return plate;
+    }
+
     return (
         <div
             className="flex flex-col items-center justify-center flex-1 bg-muted p-4 md:p-6 w-full"
@@ -72,7 +84,7 @@ function SelectSpotContent() {
                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 text-sm justify-items-start">
                             <div className="flex items-center gap-2">
                                 <Ticket className="h-4 w-4 text-muted-foreground" />
-                                <p className="font-medium">{vehiclePlate}</p>
+                                <p className="font-medium">{formatLicensePlate(vehiclePlate)}</p>
                             </div>
                             <div className="flex items-center gap-2">
                                 <Calendar className="h-4 w-4 text-muted-foreground" />
