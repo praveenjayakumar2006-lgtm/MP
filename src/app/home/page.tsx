@@ -37,8 +37,8 @@ export default function HomePage() {
                       <Clock className="h-6 w-6 text-primary" />
                     </div>
                     <div>
-                      <h3 className="font-semibold">Real-time Availability</h3>
-                      <p className="text-sm text-muted-foreground">Check available spots instantly.</p>
+                      <h3 className="text-lg font-semibold">Real-time Availability</h3>
+                      <p className="text-base text-muted-foreground">Check available spots instantly.</p>
                     </div>
                   </div>
                    <div className="flex items-start gap-4 text-left">
@@ -46,8 +46,8 @@ export default function HomePage() {
                       <ShieldCheck className="h-6 w-6 text-primary" />
                     </div>
                     <div>
-                      <h3 className="font-semibold">Secure Booking</h3>
-                      <p className="text-sm text-muted-foreground">Reserve your spot with confidence.</p>
+                      <h3 className="text-lg font-semibold">Secure Booking</h3>
+                      <p className="text-base text-muted-foreground">Reserve your spot with confidence.</p>
                     </div>
                   </div>
                    <div className="flex items-start gap-4 text-left">
@@ -55,8 +55,8 @@ export default function HomePage() {
                       <AlertTriangle className="h-6 w-6 text-primary" />
                     </div>
                     <div>
-                      <h3 className="font-semibold">Violation Reporting</h3>
-                      <p className="text-sm text-muted-foreground">Easily report parking violations.</p>
+                      <h3 className="text-lg font-semibold">Violation Reporting</h3>
+                      <p className="text-base text-muted-foreground">Easily report parking violations.</p>
                     </div>
                   </div>
                 </div>
