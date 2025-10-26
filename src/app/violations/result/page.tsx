@@ -7,13 +7,15 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Check, CheckCircle2, X } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Suspense } from 'react';
+import { Suspense, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 
 function ViolationResultContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const licensePlate = searchParams.get('licensePlate');
+  const [isRejected, setIsRejected] = useState(false);
 
   // Formats license plates like 'HR26DQ05551' to 'HR 26 DQ 05551'
   const formatLicensePlate = (plate: string | null) => {
@@ -47,16 +49,28 @@ function ViolationResultContent() {
                 <p className="text-sm text-foreground">
                     Detected License Plate: <span className="font-semibold bg-primary/10 text-primary px-2 py-1 rounded-md">{formattedLicensePlate}</span>
                 </p>
-                <div className="flex items-center gap-4">
-                  <Button variant="outline" className="border-green-500 text-green-600 hover:bg-green-50 hover:text-green-700">
-                      <Check className="mr-2 h-4 w-4" />
-                      Confirm
-                  </Button>
-                   <Button variant="destructive" className="bg-red-500/10 text-red-600 hover:bg-red-500/20 border border-red-500/20">
-                      <X className="mr-2 h-4 w-4" />
-                      Reject
-                  </Button>
-                </div>
+                <AnimatePresence>
+                  {!isRejected && (
+                    <motion.div
+                      className="flex items-center gap-4"
+                      exit={{ opacity: 0, y: 10 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <Button variant="outline" className="border-green-500 text-green-600 hover:bg-green-50 hover:text-green-700">
+                          <Check className="mr-2 h-4 w-4" />
+                          Confirm
+                      </Button>
+                      <Button
+                          variant="destructive"
+                          className="bg-red-500/10 text-red-600 hover:bg-red-500/20 border border-red-500/20"
+                          onClick={() => setIsRejected(true)}
+                      >
+                          <X className="mr-2 h-4 w-4" />
+                          Reject
+                      </Button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
             </div>
           )}
           <div className="flex justify-center gap-4">
