@@ -33,7 +33,7 @@ export default function HomePage() {
                 <CardHeader>
                   <CardTitle className="text-2xl font-bold tracking-tighter sm:text-3xl">Our Services</CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="p-6">
                   <div className="flex flex-row items-start justify-center gap-12">
                     <div className="flex flex-col items-center gap-2 max-w-[200px]">
                       <Clock className="h-10 w-10 text-primary" />
