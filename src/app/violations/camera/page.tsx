@@ -7,7 +7,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { analyzeVehicleImage, analyzeViolationText } from '@/app/violations/actions';
-import { Loader2, Camera, VideoOff, CheckCircle2, X } from 'lucide-react';
+import { Loader2, Camera, VideoOff, CheckCircle2, X, ArrowLeft } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 function dataURLtoFile(dataurl: string, filename: string): File {
@@ -135,6 +135,17 @@ function CameraPageContent() {
 
   return (
     <div className="fixed inset-0 bg-black flex flex-col items-center justify-center text-white">
+        <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-black/60 to-transparent z-20 flex items-center p-4">
+            <Button onClick={() => router.back()} variant="ghost" className="text-white hover:bg-white/10 h-auto p-2 gap-2">
+                <ArrowLeft className="h-5 w-5" />
+                <span className="font-medium">Back</span>
+            </Button>
+            <div className="flex-1 text-center">
+                <p className="text-white/90">Center the vehicle's license plate</p>
+            </div>
+             <div className="w-20"></div> {/* Spacer to balance the back button */}
+        </div>
+
         <AnimatePresence>
             {isLoading ? (
                 <motion.div
@@ -166,7 +177,7 @@ function CameraPageContent() {
                     className="relative w-full h-full flex flex-col"
                 >
                     <img src={capturedImage} alt="Captured preview" className="w-full h-full object-contain" />
-                    <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/80 to-transparent flex justify-around">
+                    <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/80 to-transparent flex justify-around z-20">
                         <Button onClick={handleRetake} variant="outline" size="lg" className="bg-white/10 text-white hover:bg-white/20 border-white/20">Retake</Button>
                         <Button onClick={handleConfirm} size="lg">Confirm & Analyze</Button>
                     </div>
@@ -179,9 +190,7 @@ function CameraPageContent() {
                     className="relative w-full h-full flex flex-col items-center justify-center"
                 >
                     <video ref={videoRef} className="absolute top-0 left-0 w-full h-full object-cover" autoPlay muted playsInline />
-                     <div className="absolute top-4 left-0 right-0 text-center p-2 rounded-md bg-black/50 px-16">
-                        <p>Center the vehicle's license plate in the frame.</p>
-                     </div>
+                    
                     {hasCameraPermission === false && (
                         <div className="absolute z-10 p-4">
                             <Alert variant="destructive" className="bg-destructive/80 border-destructive-foreground text-destructive-foreground">
@@ -193,7 +202,7 @@ function CameraPageContent() {
                             </Alert>
                         </div>
                     )}
-                    <div className="absolute bottom-0 left-0 right-0 p-6 flex justify-center">
+                    <div className="absolute bottom-0 left-0 right-0 p-6 flex justify-center z-20">
                         <Button onClick={handleCapture} disabled={hasCameraPermission !== true} size="lg" className="rounded-full w-20 h-20 border-4 border-white bg-white/30 hover:bg-white/40">
                              <Camera className="h-8 w-8 text-white" />
                         </Button>
@@ -202,10 +211,6 @@ function CameraPageContent() {
             )}
         </AnimatePresence>
 
-        <Button onClick={() => router.back()} variant="ghost" className="absolute top-4 left-4 text-white hover:bg-white/10 p-2 h-auto">
-            <X className="h-6 w-6" />
-            <span className="sr-only">Back</span>
-        </Button>
         <canvas ref={canvasRef} style={{ display: 'none' }} />
     </div>
   );
