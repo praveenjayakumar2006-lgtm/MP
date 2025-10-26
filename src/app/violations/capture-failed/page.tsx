@@ -34,7 +34,7 @@ function CaptureFailedContent() {
                 The license plate was not detected properly. Please ensure the plate is clear, well-lit, and centered in the frame.
             </p>
             <div className="flex justify-center gap-4">
-                <Button size="sm" onClick={handleRetake}>Retake Photo</Button>
+                <Button size="sm" onClick={handleRetake}>Try Again</Button>
             </div>
             </CardContent>
         </Card>
