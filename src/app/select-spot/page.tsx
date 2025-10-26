@@ -51,22 +51,22 @@ function SelectSpotContent() {
                 </div>
 
                 {bookingDetails && (
-                     <div className="w-full mb-6 bg-background border rounded-lg p-3">
-                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 text-xs justify-items-center">
-                            <div className="flex items-center gap-1.5">
-                                <Ticket className="h-3.5 w-3.5 text-muted-foreground" />
+                     <div className="mb-6 bg-background border rounded-lg p-4">
+                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 text-sm justify-items-start">
+                            <div className="flex items-center gap-2">
+                                <Ticket className="h-4 w-4 text-muted-foreground" />
                                 <p className="font-medium">{vehiclePlate}</p>
                             </div>
-                            <div className="flex items-center gap-1.5">
-                                <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
+                            <div className="flex items-center gap-2">
+                                <Calendar className="h-4 w-4 text-muted-foreground" />
                                 <p className="font-medium">{formattedDate}</p>
                             </div>
-                            <div className="flex items-center gap-1.5">
-                                <Clock className="h-3.5 w-3.5 text-muted-foreground" />
+                            <div className="flex items-center gap-2">
+                                <Clock className="h-4 w-4 text-muted-foreground" />
                                 <p className="font-medium">{formattedTime(startTime)} - {getEndTime()}</p>
                             </div>
-                            <div className="flex items-center gap-1.5">
-                                <Hourglass className="h-3.5 w-3.5 text-muted-foreground" />
+                            <div className="flex items-center gap-2">
+                                <Hourglass className="h-4 w-4 text-muted-foreground" />
                                 <p className="font-medium">{duration} hour{Number(duration) > 1 ? 's' : ''}</p>
                             </div>
                         </div>
