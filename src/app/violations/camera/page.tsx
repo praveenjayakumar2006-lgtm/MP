@@ -148,6 +148,13 @@ function CameraPageContent() {
     }
   }
 
+  const handleBack = () => {
+    const params = new URLSearchParams();
+    if (slotNumber) params.set('slotNumber', slotNumber);
+    if (violationType) params.set('violationType', violationType);
+    router.replace(`/violations?${params.toString()}`);
+  }
+
 
   return (
     <div className="fixed inset-0 bg-black flex flex-col items-center justify-center text-white">
@@ -182,7 +189,7 @@ function CameraPageContent() {
                     className="relative w-full h-full flex flex-col"
                 >
                     <div className="absolute top-0 left-0 right-0 p-4 bg-gradient-to-b from-black/60 to-transparent flex justify-start items-center z-20">
-                        <Button onClick={() => router.replace('/violations')} variant="secondary" className="h-auto p-2 gap-2">
+                        <Button onClick={handleBack} variant="secondary" className="h-auto p-2 gap-2">
                             <ArrowLeft />
                             <span>Back</span>
                         </Button>
@@ -201,7 +208,7 @@ function CameraPageContent() {
                     className="relative w-full h-full flex flex-col items-center justify-center"
                 >
                     <div className="absolute top-0 left-0 right-0 p-4 bg-gradient-to-b from-black/60 to-transparent flex justify-start items-center z-20">
-                        <Button onClick={() => router.replace('/violations')} variant="secondary" className="h-auto p-2 gap-2">
+                        <Button onClick={handleBack} variant="secondary" className="h-auto p-2 gap-2">
                             <ArrowLeft />
                             <span>Back</span>
                         </Button>

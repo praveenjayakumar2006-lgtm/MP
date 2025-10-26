@@ -91,12 +91,12 @@ function ViolationCheckerComponent() {
         }
 
         const currentValues = violationForm.getValues();
+        const params = new URLSearchParams({
+            slotNumber: currentValues.slotNumber,
+            violationType: currentValues.violationType!,
+        });
 
         if (currentValues.imageSource === 'camera') {
-            const params = new URLSearchParams({
-                slotNumber: currentValues.slotNumber,
-                violationType: currentValues.violationType!,
-            });
             router.push(`/violations/camera?${params.toString()}`);
         } else if (currentValues.imageSource === 'upload') {
             fileInputRef.current?.click();
