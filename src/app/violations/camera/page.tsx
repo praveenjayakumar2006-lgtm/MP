@@ -45,6 +45,9 @@ function CameraPageContent() {
 
   useEffect(() => {
     async function setupCamera() {
+      // Only run setup if we don't have a captured image
+      if (capturedImage) return;
+
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
         streamRef.current = stream;
@@ -65,12 +68,13 @@ function CameraPageContent() {
 
     setupCamera();
 
+    // Cleanup function to stop the stream when the component unmounts or image is captured
     return () => {
       if (streamRef.current) {
         streamRef.current.getTracks().forEach(track => track.stop());
       }
     };
-  }, [toast]);
+  }, [capturedImage, toast]);
   
   const handleCapture = () => {
     if (videoRef.current && canvasRef.current) {
@@ -168,12 +172,12 @@ function CameraPageContent() {
                         <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring' }}>
                             <CheckCircle2 className="h-16 w-16 text-green-400" />
                         </motion.div>
-                        <p className="text-xl font-medium">Analysis Complete!</p>
+                        <p className="text-xl">Analysis Complete!</p>
                     </>
                 ) : (
                     <>
                         <Loader2 className="h-12 w-12 animate-spin text-primary" />
-                        <p className="text-xl font-medium">Analyzing Image...</p>
+                        <p className="text-xl">Analyzing Image...</p>
                     </>
                 )}
                 </motion.div>
@@ -229,10 +233,12 @@ export default function CameraPage() {
         <Suspense fallback={
             <div className="fixed inset-0 bg-black flex flex-col items-center justify-center text-white">
                 <Loader2 className="h-12 w-12 animate-spin text-primary" />
-                <p className="text-xl font-medium mt-4">Loading Camera...</p>
+                <p className="text-xl mt-4">Loading Camera...</p>
             </div>
         }>
             <CameraPageContent />
         </Suspense>
     )
 }
+
+    
