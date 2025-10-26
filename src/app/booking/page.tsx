@@ -81,8 +81,6 @@ export default function BookingPage() {
   });
 
   const selectedDate = form.watch('date');
-  const selectedStartTime = form.watch('startTime');
-  const vehiclePlateValue = form.watch('vehiclePlate');
   
   function onSubmit(values: BookingFormValues) {
     const params = new URLSearchParams({
@@ -151,11 +149,9 @@ export default function BookingPage() {
                                       <FormControl>
                                       <Button
                                           variant={'outline'}
-                                          disabled={!vehiclePlateValue}
                                           className={cn(
                                           'w-full justify-start text-left font-normal hover:bg-accent',
-                                          !field.value && 'text-muted-foreground',
-                                          'disabled:cursor-not-allowed disabled:opacity-50'
+                                          !field.value && 'text-muted-foreground'
                                           )}
                                       >
                                           <div className="flex items-center gap-2">
@@ -203,10 +199,9 @@ export default function BookingPage() {
                                     form.resetField('duration');
                                 }} 
                                 value={field.value}
-                                disabled={!selectedDate}
                               >
                                   <FormControl>
-                                  <SelectTrigger className={cn("hover:bg-accent hover:text-accent-foreground disabled:cursor-not-allowed disabled:opacity-50", !field.value && "text-muted-foreground")}>
+                                  <SelectTrigger className={cn("hover:bg-accent hover:text-accent-foreground", !field.value && "text-muted-foreground")}>
                                     <div className="flex items-center gap-2">
                                       <Clock className="h-4 w-4" />
                                       <SelectValue placeholder="Select a time" />
@@ -235,9 +230,9 @@ export default function BookingPage() {
                           render={({ field }) => (
                               <FormItem>
                               <FormLabel>Duration (Hours)</FormLabel>
-                              <Select onValueChange={field.onChange} value={field.value} disabled={!selectedStartTime}>
+                              <Select onValueChange={field.onChange} value={field.value}>
                                   <FormControl>
-                                  <SelectTrigger className={cn("hover:bg-accent hover:text-accent-foreground disabled:cursor-not-allowed disabled:opacity-50", !field.value && "text-muted-foreground")}>
+                                  <SelectTrigger className={cn("hover:bg-accent hover:text-accent-foreground", !field.value && "text-muted-foreground")}>
                                      <div className="flex items-center gap-2">
                                         <Hourglass className="h-4 w-4" />
                                         <SelectValue placeholder="Select hours" />
