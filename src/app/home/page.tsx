@@ -28,11 +28,12 @@ export default function HomePage() {
               </Link>
             </div>
 
-            <div className="flex flex-col items-center gap-4 w-full max-w-2xl mx-auto pt-4">
-                <Separator />
-                <div className="flex flex-col items-center">
+            <Separator className="my-2" />
+
+            <div className="flex flex-col items-center gap-4 w-full max-w-2xl mx-auto pt-12">
+                <div className="flex flex-col items-center text-center">
                     <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl text-center mb-6">Our Services</h2>
-                    <div className="flex flex-col items-center text-center gap-6">
+                    <div className="flex flex-col items-center text-left gap-6">
                         <div className="flex items-center gap-4 text-left">
                             <div className="bg-primary/10 p-3 rounded-full">
                             <Clock className="h-6 w-6 text-primary" />
