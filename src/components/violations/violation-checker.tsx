@@ -168,7 +168,16 @@ export function ViolationChecker() {
                   <FormItem>
                     <FormLabel>Slot Number <span className="text-destructive">*</span></FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g., C5" {...field} />
+                      <Input 
+                        placeholder="e.g., C5" 
+                        {...field} 
+                        onChange={(e) => {
+                            field.onChange(e);
+                            if (violationForm.formState.errors.slotNumber) {
+                                violationForm.clearErrors('slotNumber');
+                            }
+                        }}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -180,7 +189,15 @@ export function ViolationChecker() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Violation Type <span className="text-destructive">*</span></FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select 
+                        onValueChange={(value) => {
+                            field.onChange(value);
+                            if (violationForm.formState.errors.violationType) {
+                                violationForm.clearErrors('violationType');
+                            }
+                        }}
+                        defaultValue={field.value}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select a violation type" />
