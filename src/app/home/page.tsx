@@ -2,16 +2,16 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { Car } from 'lucide-react';
+import { Car, Clock, ShieldCheck, AlertTriangle } from 'lucide-react';
 import Link from 'next/link';
 
 export default function HomePage() {
 
   return (
     <div className="flex flex-col flex-1">
-      <section id="home" className="flex flex-1 flex-col items-center justify-center text-center bg-background">
+      <section id="home" className="flex flex-1 flex-col items-center justify-center text-center bg-background p-4">
         <div className="container px-4 md:px-6">
-          <div className="flex flex-col justify-center space-y-6">
+          <div className="flex flex-col justify-center space-y-8">
             <div className="space-y-4">
               <Car className="h-16 w-16 text-primary mx-auto" />
               <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none">
@@ -25,6 +25,24 @@ export default function HomePage() {
               <Link href="/booking">
                 <Button size="lg">Book a Slot</Button>
               </Link>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-8">
+              <div className="flex flex-col items-center gap-2">
+                <Clock className="h-10 w-10 text-primary" />
+                <h3 className="font-semibold">Real-time Availability</h3>
+                <p className="text-sm text-muted-foreground">Check available spots instantly.</p>
+              </div>
+              <div className="flex flex-col items-center gap-2">
+                <ShieldCheck className="h-10 w-10 text-primary" />
+                <h3 className="font-semibold">Secure Booking</h3>
+                <p className="text-sm text-muted-foreground">Reserve your spot with confidence.</p>
+              </div>
+              <div className="flex flex-col items-center gap-2">
+                <AlertTriangle className="h-10 w-10 text-primary" />
+                <h3 className="font-semibold">Violation Reporting</h3>
+                <p className="text-sm text-muted-foreground">Easily report parking violations.</p>
+              </div>
             </div>
           </div>
         </div>
