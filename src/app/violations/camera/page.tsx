@@ -149,7 +149,7 @@ function CameraPageContent() {
                 <span>Back</span>
             </Button>
             <div className="flex-1 text-center">
-                <p className="text-white/90">Center the vehicle's license plate</p>
+                
             </div>
              <div className="w-24"></div> {/* Spacer to balance the back button */}
         </div>
