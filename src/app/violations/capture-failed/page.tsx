@@ -23,7 +23,7 @@ export default function CaptureFailedPage() {
             The license plate was not detected properly. Please ensure the plate is clear, well-lit, and centered in the frame.
           </p>
           <div className="flex justify-center gap-4">
-            <Button size="sm" onClick={() => router.push('/violations')}>Try Again</Button>
+            <Button size="sm" onClick={() => router.push('/violations')}>Retake Photo</Button>
           </div>
         </CardContent>
       </Card>
