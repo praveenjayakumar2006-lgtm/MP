@@ -24,7 +24,7 @@ export default function HomePage() {
             </div>
             <div className="flex flex-col gap-2 min-[400px]:flex-row justify-center">
               <Link href="/booking">
-                <Button size="lg">Book a Slot</Button>
+                <Button size="lg" className="px-10 py-6 text-lg">Book a Slot</Button>
               </Link>
             </div>
             
@@ -33,31 +33,31 @@ export default function HomePage() {
                 <CardHeader>
                   <CardTitle className="text-3xl font-bold tracking-tighter sm:text-4xl text-center">Our Services</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-6">
+                <CardContent className="pt-0">
                   <div className="flex items-start gap-4 text-left">
                     <div className="bg-primary/10 p-3 rounded-full">
                       <Clock className="h-6 w-6 text-primary" />
                     </div>
                     <div>
-                      <h3 className="text-lg font-semibold">Real-time Availability</h3>
+                      <h3 className="text-xl font-semibold">Real-time Availability</h3>
                       <p className="text-base text-muted-foreground">Check available spots instantly.</p>
                     </div>
                   </div>
-                   <div className="flex items-start gap-4 text-left">
+                   <div className="flex items-start gap-4 text-left mt-6">
                     <div className="bg-primary/10 p-3 rounded-full">
                       <ShieldCheck className="h-6 w-6 text-primary" />
                     </div>
                     <div>
-                      <h3 className="text-lg font-semibold">Secure Booking</h3>
+                      <h3 className="text-xl font-semibold">Secure Booking</h3>
                       <p className="text-base text-muted-foreground">Reserve your spot with confidence.</p>
                     </div>
                   </div>
-                   <div className="flex items-start gap-4 text-left">
+                   <div className="flex items-start gap-4 text-left mt-6">
                     <div className="bg-primary/10 p-3 rounded-full">
                       <AlertTriangle className="h-6 w-6 text-primary" />
                     </div>
                     <div>
-                      <h3 className="text-lg font-semibold">Violation Reporting</h3>
+                      <h3 className="text-xl font-semibold">Violation Reporting</h3>
                       <p className="text-base text-muted-foreground">Easily report parking violations.</p>
                     </div>
                   </div>
