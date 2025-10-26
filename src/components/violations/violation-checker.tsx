@@ -28,6 +28,7 @@ import { analyzeVehicleImage, analyzeViolationText } from '@/app/violations/acti
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { motion } from 'framer-motion';
 
 const violationSchemaBase = z.object({
   slotNumber: z.string().min(1, 'Slot number is required.'),
@@ -137,10 +138,9 @@ function ViolationCheckerComponent() {
       ]);
       
       if (vehicleResult.licensePlate === 'NO_LICENSE_PLATE_DETECTED') {
-        const params = new URLSearchParams({
-            slotNumber: values.slotNumber,
-            violationType: values.violationType,
-        });
+        const params = new URLSearchParams();
+        if (values.slotNumber) params.set('slotNumber', values.slotNumber);
+        if (values.violationType) params.set('violationType', values.violationType);
         router.push(`/violations/capture-failed?${params.toString()}`);
         return;
       }
@@ -157,9 +157,33 @@ function ViolationCheckerComponent() {
         title: 'Analysis Failed',
         description: 'There was an error processing your request. Please try again.',
       });
-    } finally {
       setIsLoading(false);
     }
+  }
+  
+  if (isLoading) {
+    return (
+        <div className="grid md:grid-cols-2 gap-8 items-center max-w-4xl mx-auto flex-1">
+            <div className="text-center md:text-left">
+                <h1 className="text-3xl font-semibold">Report a Violation</h1>
+                <p className="text-base text-muted-foreground mt-2">
+                Report a parking violation using our AI system.
+                </p>
+            </div>
+            <Card className="w-full max-w-md relative min-h-[430px]">
+                <motion.div
+                    key="loader"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-4 bg-background/80 backdrop-blur-sm"
+                >
+                    <Loader2 className="h-12 w-12 animate-spin text-primary" />
+                    <p className="text-xl">Analyzing Image...</p>
+                </motion.div>
+            </Card>
+        </div>
+    )
   }
 
   return (
