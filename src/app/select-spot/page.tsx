@@ -51,23 +51,20 @@ function SelectSpotContent() {
                 </div>
 
                 {bookingDetails && (
-                    <div className="w-full mb-6 bg-background border rounded-lg p-3">
-                         <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-xs">
+                     <div className="w-full mb-6 bg-background border rounded-lg p-3">
+                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 text-xs justify-items-center">
                             <div className="flex items-center gap-1.5">
                                 <Ticket className="h-3.5 w-3.5 text-muted-foreground" />
                                 <p className="font-medium">{vehiclePlate}</p>
                             </div>
-                             <Separator orientation="vertical" className="h-4" />
                             <div className="flex items-center gap-1.5">
                                 <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
                                 <p className="font-medium">{formattedDate}</p>
                             </div>
-                             <Separator orientation="vertical" className="h-4" />
                             <div className="flex items-center gap-1.5">
                                 <Clock className="h-3.5 w-3.5 text-muted-foreground" />
                                 <p className="font-medium">{formattedTime(startTime)} - {getEndTime()}</p>
                             </div>
-                             <Separator orientation="vertical" className="h-4" />
                             <div className="flex items-center gap-1.5">
                                 <Hourglass className="h-3.5 w-3.5 text-muted-foreground" />
                                 <p className="font-medium">{duration} hour{Number(duration) > 1 ? 's' : ''}</p>
