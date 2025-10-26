@@ -8,8 +8,6 @@ import * as z from 'zod';
 import {
   Card,
   CardContent,
-  CardHeader,
-  CardTitle,
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
@@ -30,7 +28,6 @@ import {
 } from '@/components/ui/select';
 import { Loader2, Camera } from 'lucide-react';
 import { analyzeVehicleImage, analyzeViolationText } from '@/app/violations/actions';
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
@@ -184,7 +181,7 @@ export function ViolationChecker() {
       <div className="text-center md:text-left">
         <h1 className="text-3xl font-semibold">Report a Violation</h1>
         <p className="text-base text-muted-foreground mt-2">
-          Fill in the details to check for a parking violation using our AI-powered system.
+          Report a parking violation using our AI system.
         </p>
       </div>
       <Card className="w-full max-w-md">
