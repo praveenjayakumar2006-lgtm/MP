@@ -27,18 +27,18 @@ export default function HomePage() {
               </Link>
             </div>
             
-            <div className="pt-8">
+            <div className="pt-8 w-full max-w-2xl mx-auto">
                 <div className="mb-6 text-center">
                   <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">Our Services</h2>
                 </div>
-                <div className="max-w-2xl mx-auto space-y-6">
+                <div className="space-y-6 mt-8">
                   <div className="flex items-start gap-4 text-left">
                     <div className="bg-primary/10 p-3 rounded-full">
                       <Clock className="h-6 w-6 text-primary" />
                     </div>
                     <div>
                       <h3 className="font-semibold">Real-time Availability</h3>
-                      <p className="text-sm text-muted-foreground">Check available spots instantly before you even leave home.</p>
+                      <p className="text-sm text-muted-foreground">Check available spots instantly.</p>
                     </div>
                   </div>
                    <div className="flex items-start gap-4 text-left">
@@ -47,7 +47,7 @@ export default function HomePage() {
                     </div>
                     <div>
                       <h3 className="font-semibold">Secure Booking</h3>
-                      <p className="text-sm text-muted-foreground">Reserve your spot with confidence using our secure payment system.</p>
+                      <p className="text-sm text-muted-foreground">Reserve your spot with confidence.</p>
                     </div>
                   </div>
                    <div className="flex items-start gap-4 text-left">
@@ -56,7 +56,7 @@ export default function HomePage() {
                     </div>
                     <div>
                       <h3 className="font-semibold">Violation Reporting</h3>
-                      <p className="text-sm text-muted-foreground">Easily report parking violations to help maintain order.</p>
+                      <p className="text-sm text-muted-foreground">Easily report parking violations.</p>
                     </div>
                   </div>
                 </div>
