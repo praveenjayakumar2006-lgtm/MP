@@ -4,7 +4,7 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { CheckCircle2 } from 'lucide-react';
+import { Check, CheckCircle2 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
@@ -43,9 +43,15 @@ function ViolationResultContent() {
             Your violation report has been submitted successfully. We appreciate you taking the time to help us improve safety.
           </p>
           {formattedLicensePlate && (
-            <p className="text-sm text-foreground mb-6">
-              Detected License Plate: <span className="font-semibold bg-primary/10 text-primary px-2 py-1 rounded-md">{formattedLicensePlate}</span>
-            </p>
+             <div className="mb-6 flex flex-col items-center gap-4">
+                <p className="text-sm text-foreground">
+                    Detected License Plate: <span className="font-semibold bg-primary/10 text-primary px-2 py-1 rounded-md">{formattedLicensePlate}</span>
+                </p>
+                <Button variant="secondary" size="sm">
+                    <Check className="mr-2 h-4 w-4" />
+                    Confirm this number plate
+                </Button>
+            </div>
           )}
           <div className="flex justify-center gap-4">
             <Link href="/home">
