@@ -104,7 +104,7 @@ export default function BookingPage() {
            <div className="flex flex-col items-center justify-center space-y-4 text-center mb-8">
             <div className="space-y-2">
               <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">Book Your Spot</h2>
-              <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+              <p className="max-w-[900px] text-muted-foreground md:text-base/relaxed lg:text-sm/relaxed xl:text-base/relaxed">
                 Enter your vehicle and desired time to reserve a spot.
               </p>
             </div>
