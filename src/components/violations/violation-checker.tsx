@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, Suspense } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -81,10 +81,18 @@ export function ViolationChecker() {
   const imageSource = violationForm.watch('imageSource');
 
   useEffect(() => {
-    if (defaultImageSource === 'upload' && fileInputRef.current) {
-      fileInputRef.current.click();
+    // This effect ensures that if the user comes back to this page with query params,
+    // the form is correctly populated.
+    const slot = searchParams.get('slotNumber');
+    const type = searchParams.get('violationType');
+    if (slot) {
+      violationForm.setValue('slotNumber', slot);
     }
-  }, [defaultImageSource]);
+    if (type === 'overstaying' || type === 'unauthorized_parking') {
+      violationForm.setValue('violationType', type);
+    }
+  }, [searchParams, violationForm]);
+
 
   const handleProceedClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -123,8 +131,8 @@ export function ViolationChecker() {
   }
 
   return (
-    <div className="grid md:grid-cols-2 gap-8 items-center max-w-4xl mx-auto flex-1">
-      <div className="text-center md:text-left">
+    <div className="w-full flex flex-col items-center justify-center max-w-4xl mx-auto flex-1">
+      <div className="text-center mb-8">
         <h1 className="text-3xl font-semibold">Report a Violation</h1>
         <p className="text-base text-muted-foreground mt-2">
           Report a parking violation using our AI system.
