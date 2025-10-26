@@ -16,6 +16,7 @@ function ViolationResultContent() {
   const searchParams = useSearchParams();
   const licensePlate = searchParams.get('licensePlate');
   const [isRejected, setIsRejected] = useState(false);
+  const [isConfirmed, setIsConfirmed] = useState(false);
 
   // Formats license plates like 'HR26DQ05551' to 'HR 26 DQ 05551'
   const formatLicensePlate = (plate: string | null) => {
@@ -50,13 +51,17 @@ function ViolationResultContent() {
                     Detected License Plate: <span className="font-semibold bg-primary/10 text-primary px-2 py-1 rounded-md">{formattedLicensePlate}</span>
                 </p>
                 <AnimatePresence>
-                  {!isRejected && (
+                  {!(isRejected || isConfirmed) && (
                     <motion.div
                       className="flex items-center gap-4"
                       exit={{ opacity: 0, y: 10 }}
                       transition={{ duration: 0.3 }}
                     >
-                      <Button variant="outline" className="border-green-500 text-green-600 hover:bg-green-50 hover:text-green-700">
+                      <Button 
+                        variant="outline"
+                        className="border-green-500 text-green-600 hover:bg-green-50 hover:text-green-700"
+                        onClick={() => setIsConfirmed(true)}
+                      >
                           <Check className="mr-2 h-4 w-4" />
                           Confirm
                       </Button>
