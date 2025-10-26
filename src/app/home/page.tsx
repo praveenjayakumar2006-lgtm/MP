@@ -34,29 +34,29 @@ export default function HomePage() {
                   <CardTitle className="text-3xl font-bold tracking-tighter sm:text-4xl text-center">Our Services</CardTitle>
                 </CardHeader>
                 <CardContent className="pt-0 flex flex-col items-center text-center">
-                  <div className="flex items-start gap-4 text-left mt-6">
+                  <div className="flex items-center gap-4 text-left mt-6">
                     <div className="bg-primary/10 p-3 rounded-full">
                       <Clock className="h-6 w-6 text-primary" />
                     </div>
-                    <div>
+                    <div className="w-64">
                       <h3 className="text-xl font-semibold">Real-time Availability</h3>
                       <p className="text-base text-muted-foreground">Check available spots instantly.</p>
                     </div>
                   </div>
-                   <div className="flex items-start gap-4 text-left mt-6">
+                   <div className="flex items-center gap-4 text-left mt-6">
                     <div className="bg-primary/10 p-3 rounded-full">
                       <ShieldCheck className="h-6 w-6 text-primary" />
                     </div>
-                    <div>
+                    <div className="w-64">
                       <h3 className="text-xl font-semibold">Secure Booking</h3>
                       <p className="text-base text-muted-foreground">Reserve your spot with confidence.</p>
                     </div>
                   </div>
-                   <div className="flex items-start gap-4 text-left mt-6">
+                   <div className="flex items-center gap-4 text-left mt-6">
                     <div className="bg-primary/10 p-3 rounded-full">
                       <AlertTriangle className="h-6 w-6 text-primary" />
                     </div>
-                    <div>
+                    <div className="w-64">
                       <h3 className="text-xl font-semibold">Violation Reporting</h3>
                       <p className="text-base text-muted-foreground">Easily report parking violations.</p>
                     </div>
