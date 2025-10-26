@@ -37,7 +37,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Input } from '@/components/ui/input';
 
 const bookingSchema = z.object({
@@ -47,10 +47,10 @@ const bookingSchema = z.object({
   }),
   startTime: z.string({
     required_error: 'A start time is required.',
-  }),
+  }).min(1, 'A start time is required.'),
   duration: z.string({
     required_error: 'A duration is required.',
-  }),
+  }).min(1, 'A duration is required.'),
 });
 
 type BookingFormValues = z.infer<typeof bookingSchema>;
@@ -102,7 +102,7 @@ export default function BookingPage() {
            <div className="flex flex-col items-center justify-center space-y-4 text-center mb-8">
             <div className="space-y-2">
               <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">Book Your Spot</h2>
-              <p className="max-w-[900px] text-muted-foreground md:text-base/relaxed lg:text-sm/relaxed xl:text-base/relaxed">
+              <p className="max-w-[900px] text-muted-foreground md:text-sm/relaxed lg:text-xs/relaxed xl:text-sm/relaxed">
                 Enter your vehicle and desired time to reserve a spot.
               </p>
             </div>
@@ -191,10 +191,7 @@ export default function BookingPage() {
                           render={({ field }) => (
                               <FormItem>
                               <FormLabel>Start Time</FormLabel>
-                              <Select 
-                                onValueChange={field.onChange} 
-                                value={field.value}
-                              >
+                              <Select onValueChange={field.onChange} value={field.value}>
                                   <FormControl>
                                   <SelectTrigger className={cn("hover:bg-accent hover:text-accent-foreground", !field.value && "text-muted-foreground")}>
                                     <div className="flex items-center gap-2">
