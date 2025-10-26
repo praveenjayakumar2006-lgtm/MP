@@ -24,11 +24,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Loader2 } from 'lucide-react';
-import { analyzeVehicleImage, analyzeViolationText } from '@/app/violations/actions';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useToast } from '@/hooks/use-toast';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { motion } from 'framer-motion';
 
 const violationSchemaBase = z.object({
   slotNumber: z.string().min(1, 'Slot number is required.'),
@@ -67,10 +64,8 @@ function fileToDataUrl(file: File): Promise<string> {
 }
 
 function ViolationCheckerComponent() {
-  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const defaultSlotNumber = searchParams.get('slotNumber') || '';
@@ -109,81 +104,19 @@ function ViolationCheckerComponent() {
     });
   };
 
-  async function onViolationSubmit(values: ViolationFormValues) {
-    if (values.imageSource === 'camera') return;
-    
-    setIsLoading(true);
-    
-    const file = values.image;
-    if (!file) {
-      setIsLoading(false);
-      return;
-    }
+  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (file) {
+      const imageDataUrl = await fileToDataUrl(file);
+      sessionStorage.setItem('violationImage', imageDataUrl);
 
-    try {
-      const details = `An image has been uploaded for a vehicle in slot ${values.slotNumber} regarding a potential ${values.violationType.replace(
-        '_',
-        ' '
-      )} violation.`;
-
-      const imageDataUri = await fileToDataUrl(file);
-      const [violationResult, vehicleResult] = await Promise.all([
-        analyzeViolationText({
-          slotNumber: values.slotNumber,
-          violationType: values.violationType,
-          details: details,
-          timestamp: new Date().toISOString(),
-        }),
-        analyzeVehicleImage({ imageDataUri }),
-      ]);
-      
-      if (vehicleResult.licensePlate === 'NO_LICENSE_PLATE_DETECTED') {
-        const params = new URLSearchParams();
-        if (values.slotNumber) params.set('slotNumber', values.slotNumber);
-        if (values.violationType) params.set('violationType', values.violationType);
-        router.push(`/violations/capture-failed?${params.toString()}`);
-        return;
-      }
-
-      const queryParams = new URLSearchParams({
-        licensePlate: vehicleResult.licensePlate,
+      const currentValues = violationForm.getValues();
+      const params = new URLSearchParams({
+          slotNumber: currentValues.slotNumber,
+          violationType: currentValues.violationType!,
       });
-
-      router.push(`/violations/result?${queryParams.toString()}`);
-    } catch (error) {
-      console.error('Error analyzing violation:', error);
-      toast({
-        variant: 'destructive',
-        title: 'Analysis Failed',
-        description: 'There was an error processing your request. Please try again.',
-      });
-      setIsLoading(false);
+      router.push(`/violations/uploading?${params.toString()}`);
     }
-  }
-  
-  if (isLoading) {
-    return (
-        <div className="grid md:grid-cols-2 gap-8 items-center max-w-4xl mx-auto flex-1">
-            <div className="text-center md:text-left">
-                <h1 className="text-3xl font-semibold">Report a Violation</h1>
-                <p className="text-base text-muted-foreground mt-2">
-                Report a parking violation using our AI system.
-                </p>
-            </div>
-            <Card className="w-full max-w-md relative min-h-[430px]">
-                <motion.div
-                    key="loader"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-4 bg-background/80 backdrop-blur-sm"
-                >
-                    <Loader2 className="h-12 w-12 animate-spin text-primary" />
-                    <p className="text-xl">Analyzing Image...</p>
-                </motion.div>
-            </Card>
-        </div>
-    )
   }
 
   return (
@@ -196,7 +129,7 @@ function ViolationCheckerComponent() {
       </div>
       <Card className="w-full max-w-md">
         <Form {...violationForm}>
-          <form onSubmit={violationForm.handleSubmit(onViolationSubmit)}>
+          <form>
             <CardContent className="space-y-4 pt-6">
               <FormField
                 control={violationForm.control}
@@ -280,26 +213,16 @@ function ViolationCheckerComponent() {
                 ref={fileInputRef}
                 className="hidden"
                 accept="image/*"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) {
-                    violationForm.setValue('image', file, { shouldValidate: true });
-                    // Automatically submit the form once a file is chosen
-                    violationForm.handleSubmit(onViolationSubmit)();
-                  }
-                }}
+                onChange={handleFileChange}
               />
               
               <div className="pt-2">
                 <Button 
                   onClick={handleProceedClick} 
-                  disabled={isLoading} 
                   className="w-full"
                   type="button" 
                 >
-                  {isLoading ? (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  ) : imageSource === 'camera' ? (
+                  {imageSource === 'camera' ? (
                     'Proceed to Camera'
                   ) : (
                     'Proceed to Gallery'
