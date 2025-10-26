@@ -13,12 +13,18 @@ function CaptureFailedContent() {
     const searchParams = useSearchParams();
     const slotNumber = searchParams.get('slotNumber');
     const violationType = searchParams.get('violationType');
+    const imageSource = searchParams.get('imageSource');
 
-    const handleRetake = () => {
+    const handleTryAgain = () => {
         const params = new URLSearchParams();
         if (slotNumber) params.set('slotNumber', slotNumber);
         if (violationType) params.set('violationType', violationType);
-        router.push(`/violations/camera?${params.toString()}`);
+
+        if (imageSource === 'camera') {
+            router.push(`/violations/camera?${params.toString()}`);
+        } else {
+             router.push(`/violations?${params.toString()}&imageSource=upload`);
+        }
     }
 
     return (
@@ -41,8 +47,8 @@ function CaptureFailedContent() {
                 <Button size="sm" onClick={() => router.push('/violations')} className="w-full" variant="secondary">
                     Report Another
                 </Button>
-                <Button size="sm" onClick={handleRetake} className="w-full">
-                    Try Again
+                <Button size="sm" onClick={handleTryAgain} className="w-full">
+                  {imageSource === 'upload' ? 'Select Another Photo' : 'Try Again'}
                 </Button>
             </div>
             </CardContent>

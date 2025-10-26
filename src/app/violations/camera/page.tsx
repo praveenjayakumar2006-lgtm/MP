@@ -122,6 +122,7 @@ function CameraPageContent() {
             const params = new URLSearchParams();
             if (slotNumber) params.set('slotNumber', slotNumber);
             if (violationType) params.set('violationType', violationType);
+            params.set('imageSource', 'camera');
             router.replace(`/violations/capture-failed?${params.toString()}`);
             return;
         }
@@ -212,7 +213,7 @@ function CameraPageContent() {
                             <span>Back</span>
                         </Button>
                     </div>
-                    <video ref={videoRef} className="absolute top-0 left-0 w-full h-full object-cover" autoPlay muted playsInline />
+                     <video ref={videoRef} className="absolute top-0 left-0 w-full h-full object-cover" autoPlay muted playsInline />
                     
                     {hasCameraPermission === false && (
                         <div className="absolute z-10 p-4">

@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -35,10 +35,7 @@ const violationSchemaBase = z.object({
 
 const violationSchemaUpload = violationSchemaBase.extend({
   imageSource: z.literal('upload'),
-  image: z.any().refine(
-    (file) => file instanceof File,
-    'An image is required.'
-  ),
+  image: z.any().optional(),
 });
 
 const violationSchemaCamera = violationSchemaBase.extend({
@@ -69,18 +66,25 @@ export function ViolationChecker() {
 
   const defaultSlotNumber = searchParams.get('slotNumber') || '';
   const defaultViolationType = searchParams.get('violationType');
+  const defaultImageSource = searchParams.get('imageSource');
 
   const violationForm = useForm<ViolationFormValues>({
     resolver: zodResolver(violationSchema),
     defaultValues: {
       slotNumber: defaultSlotNumber,
       violationType: defaultViolationType === 'overstaying' || defaultViolationType === 'unauthorized_parking' ? defaultViolationType : undefined,
-      imageSource: 'upload',
+      imageSource: defaultImageSource === 'camera' ? 'camera' : 'upload',
       image: null,
     },
   });
-
+  
   const imageSource = violationForm.watch('imageSource');
+
+  useEffect(() => {
+    if (defaultImageSource === 'upload' && fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  }, [defaultImageSource]);
 
   const handleProceedClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();

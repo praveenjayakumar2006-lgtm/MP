@@ -52,7 +52,8 @@ function UploadingPageContent() {
           const params = new URLSearchParams();
           if (slotNumber) params.set('slotNumber', slotNumber);
           if (violationType) params.set('violationType', violationType);
-          router.push(`/violations/capture-failed?${params.toString()}`);
+          params.set('imageSource', 'upload');
+          router.replace(`/violations/capture-failed?${params.toString()}`);
           return;
         }
 
