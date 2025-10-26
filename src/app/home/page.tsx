@@ -31,35 +31,33 @@ export default function HomePage() {
             <Separator className="my-2" />
 
             <div className="flex flex-col items-center gap-4 w-full max-w-2xl mx-auto pt-12">
-                <div className="flex flex-col items-center text-center">
-                    <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl text-center mb-6">Our Services</h2>
-                    <div className="flex flex-col items-center text-left gap-6">
-                        <div className="flex items-center gap-4 text-left">
-                            <div className="bg-primary/10 p-3 rounded-full">
-                            <Clock className="h-6 w-6 text-primary" />
-                            </div>
-                            <div className="w-64">
-                            <h3 className="text-xl font-semibold">Real-time Availability</h3>
-                            <p className="text-base text-muted-foreground">Check available spots instantly.</p>
-                            </div>
+                <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl text-center">Our Services</h2>
+                <div className="flex flex-col items-center text-center gap-6 mt-8">
+                    <div className="flex items-center gap-4 text-left w-72">
+                        <div className="bg-primary/10 p-3 rounded-full">
+                        <Clock className="h-6 w-6 text-primary" />
                         </div>
-                        <div className="flex items-center gap-4 text-left">
-                            <div className="bg-primary/10 p-3 rounded-full">
-                            <ShieldCheck className="h-6 w-6 text-primary" />
-                            </div>
-                            <div className="w-64">
-                            <h3 className="text-xl font-semibold">Secure Booking</h3>
-                            <p className="text-base text-muted-foreground">Reserve your spot with confidence.</p>
-                            </div>
+                        <div>
+                        <h3 className="text-xl font-semibold">Real-time Availability</h3>
+                        <p className="text-base text-muted-foreground">Check available spots instantly.</p>
                         </div>
-                        <div className="flex items-center gap-4 text-left">
-                            <div className="bg-primary/10 p-3 rounded-full">
-                            <AlertTriangle className="h-6 w-6 text-primary" />
-                            </div>
-                            <div className="w-64">
-                            <h3 className="text-xl font-semibold">Violation Reporting</h3>
-                            <p className="text-base text-muted-foreground">Easily report parking violations.</p>
-                            </div>
+                    </div>
+                    <div className="flex items-center gap-4 text-left w-72">
+                        <div className="bg-primary/10 p-3 rounded-full">
+                        <ShieldCheck className="h-6 w-6 text-primary" />
+                        </div>
+                        <div>
+                        <h3 className="text-xl font-semibold">Secure Booking</h3>
+                        <p className="text-base text-muted-foreground">Reserve your spot with confidence.</p>
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-4 text-left w-72">
+                        <div className="bg-primary/10 p-3 rounded-full">
+                        <AlertTriangle className="h-6 w-6 text-primary" />
+                        </div>
+                        <div>
+                        <h3 className="text-xl font-semibold">Violation Reporting</h3>
+                        <p className="text-base text-muted-foreground">Easily report parking violations.</p>
                         </div>
                     </div>
                 </div>
