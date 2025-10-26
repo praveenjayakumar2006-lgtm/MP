@@ -74,7 +74,6 @@ function fileToDataUrl(file: File): Promise<string> {
 
 export function ViolationChecker() {
   const [isLoading, setIsLoading] = useState(false);
-  const [preview, setPreview] = useState<string | null>(null);
   const [imageSource, setImageSource] = useState<'upload' | 'camera'>('upload');
   const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -91,19 +90,7 @@ export function ViolationChecker() {
     },
   });
 
-  const { register, watch, setValue, trigger } = violationForm;
-
-  const imageFile = watch('image');
-  
-  useEffect(() => {
-    if (imageFile instanceof File) {
-      const url = URL.createObjectURL(imageFile);
-      setPreview(url);
-      return () => URL.revokeObjectURL(url);
-    }
-    setPreview(null);
-  }, [imageFile]);
-
+  const { setValue, trigger } = violationForm;
 
   useEffect(() => {
     async function setupCamera() {
@@ -147,7 +134,6 @@ export function ViolationChecker() {
         const capturedFile = dataURLtoFile(dataUrl, `capture-${Date.now()}.jpg`);
         setValue('image', capturedFile);
         trigger('image'); // Manually trigger validation
-        setPreview(dataUrl);
       }
     }
   };
@@ -250,7 +236,6 @@ export function ViolationChecker() {
                   onValueChange={(value: 'upload' | 'camera') => {
                     setImageSource(value);
                     setValue('image', null);
-                    setPreview(null);
                   }}
                   className="flex space-x-4"
                 >
@@ -306,17 +291,6 @@ export function ViolationChecker() {
                 )}
               />
 
-              {preview && (
-                <div className="mt-4 relative aspect-video w-full">
-                  <p className="text-sm font-medium mb-2">Image Preview:</p>
-                  <Image
-                    src={preview}
-                    alt="Image preview"
-                    fill
-                    className="rounded-md object-cover"
-                  />
-                </div>
-              )}
                <canvas ref={canvasRef} style={{ display: 'none' }} />
 
               <div className="pt-2">
