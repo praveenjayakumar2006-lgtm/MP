@@ -56,12 +56,11 @@ function CameraPageContent() {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
         streamRef.current = stream;
-        setHasCameraPermission(true);
         if (videoRef.current) {
-          videoRef.current.srcObject = stream;
+            videoRef.current.srcObject = stream;
         }
+        setHasCameraPermission(true);
       } catch (error) {
-        console.error('Error accessing camera:', error);
         setHasCameraPermission(false);
         toast({
           variant: 'destructive',
