@@ -35,7 +35,9 @@ import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 
 const violationSchema = z.object({
   slotNumber: z.string().min(1, 'Slot number is required.'),
-  violationType: z.enum(['overstaying', 'unauthorized_parking']),
+  violationType: z.enum(['overstaying', 'unauthorized_parking'], {
+    required_error: "You need to select a violation type.",
+  }),
   image: z.any().refine(
     (file) => file,
     'An image is required.'
@@ -82,7 +84,7 @@ export function ViolationChecker() {
     resolver: zodResolver(violationSchema),
     defaultValues: {
       slotNumber: '',
-      violationType: 'overstaying',
+      violationType: undefined,
       image: null,
     },
   });
