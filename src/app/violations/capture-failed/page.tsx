@@ -4,6 +4,7 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { AlertTriangle } from 'lucide-react';
+import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
 
@@ -34,6 +35,9 @@ function CaptureFailedContent() {
                 The license plate was not detected properly. Please ensure the plate is clear, well-lit, and centered in the frame.
             </p>
             <div className="flex justify-center gap-4">
+                <Link href="/home">
+                    <Button variant="outline" size="sm">Home</Button>
+                </Link>
                 <Button size="sm" onClick={handleRetake}>Try Again</Button>
             </div>
             </CardContent>
