@@ -84,7 +84,7 @@ function UploadingPageContent() {
   return (
     <div className="fixed inset-0 bg-black text-white flex flex-col items-center justify-center">
         <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-black/60 to-transparent z-20 flex items-center p-4">
-            <Button onClick={() => router.back()} variant="secondary" className="bg-gray-700/70 border-none text-white hover:bg-gray-600/70 h-auto p-2 gap-2">
+            <Button onClick={() => router.push('/violations')} variant="secondary" className="bg-gray-700/70 border-none text-white hover:bg-gray-600/70 h-auto p-2 gap-2">
                 <ArrowLeft className="h-5 w-5" />
                 <span>Back</span>
             </Button>
@@ -129,3 +129,5 @@ export default function UploadingPage() {
         </Suspense>
     )
 }
+
+    
