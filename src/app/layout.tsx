@@ -21,25 +21,25 @@ function AppContent({ children }: { children: React.ReactNode }) {
   const { user, isUserLoading } = useUser();
 
   const isAuthPage = useMemo(() => ['/login', '/signup'].includes(pathname), [pathname]);
-  const showHeader = useMemo(() => !isAuthPage, [isAuthPage]);
+  const isHeaderlessPage = useMemo(() => ['/login', '/signup', '/violations/camera'].includes(pathname), [pathname]);
 
   useEffect(() => {
     if (!isUserLoading) {
       if (user && isAuthPage) {
         router.replace('/home');
-      } else if (!user && !isAuthPage) {
+      } else if (!user && !isHeaderlessPage) {
         router.replace('/login');
       }
     }
-  }, [user, isUserLoading, isAuthPage, router]);
+  }, [user, isUserLoading, isAuthPage, isHeaderlessPage, router]);
 
-  if (isUserLoading || (!user && !isAuthPage) || (user && isAuthPage)) {
+  if (isUserLoading || (!user && !isHeaderlessPage) || (user && isAuthPage)) {
     return <Loading />;
   }
 
   return (
     <>
-      {showHeader && <AppHeader />}
+      {!isHeaderlessPage && <AppHeader />}
       <main className="flex flex-1 flex-col">
         <PageTransition>{children}</PageTransition>
       </main>
