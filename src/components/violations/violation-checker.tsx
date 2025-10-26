@@ -79,6 +79,7 @@ export function ViolationChecker() {
   });
   
   const imageSource = violationForm.watch('imageSource');
+  const { setValue } = violationForm;
 
   useEffect(() => {
     // This effect ensures that if the user comes back to this page with query params,
@@ -86,12 +87,12 @@ export function ViolationChecker() {
     const slot = searchParams.get('slotNumber');
     const type = searchParams.get('violationType');
     if (slot) {
-      violationForm.setValue('slotNumber', slot);
+      setValue('slotNumber', slot);
     }
     if (type === 'overstaying' || type === 'unauthorized_parking') {
-      violationForm.setValue('violationType', type);
+      setValue('violationType', type);
     }
-  }, [searchParams, violationForm]);
+  }, [searchParams, setValue]);
 
 
   const handleProceedClick = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -131,14 +132,14 @@ export function ViolationChecker() {
   }
 
   return (
-    <div className="w-full flex flex-col items-center justify-center max-w-4xl mx-auto flex-1">
+    <div className="w-full flex flex-col items-center justify-center max-w-md mx-auto flex-1">
       <div className="text-center mb-8">
         <h1 className="text-3xl font-semibold">Report a Violation</h1>
         <p className="text-base text-muted-foreground mt-2">
           Report a parking violation using our AI system.
         </p>
       </div>
-      <Card className="w-full max-w-md">
+      <Card className="w-full">
         <Form {...violationForm}>
           <form>
             <CardContent className="space-y-4 pt-6">
