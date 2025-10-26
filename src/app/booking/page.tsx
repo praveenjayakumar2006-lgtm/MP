@@ -105,7 +105,7 @@ export default function BookingPage() {
             <div className="space-y-2">
               <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">Book Your Spot</h2>
               <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                Select your desired date, time, and duration to see available slots.
+                Enter your vehicle and desired time to reserve a spot.
               </p>
             </div>
           </div>
