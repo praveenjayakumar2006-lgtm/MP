@@ -29,11 +29,9 @@ export default function HomePage() {
             </div>
             
             <div className="pt-8 w-full max-w-2xl mx-auto">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-3xl font-bold tracking-tighter sm:text-4xl text-center">Our Services</CardTitle>
-                </CardHeader>
-                <CardContent className="pt-0 flex flex-col items-center text-center">
+              <div className="flex flex-col items-center">
+                <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl text-center mb-6">Our Services</h2>
+                <div className="flex flex-col items-center text-center">
                   <div className="flex items-center gap-4 text-left mt-6">
                     <div className="bg-primary/10 p-3 rounded-full">
                       <Clock className="h-6 w-6 text-primary" />
@@ -61,8 +59,8 @@ export default function HomePage() {
                       <p className="text-base text-muted-foreground">Easily report parking violations.</p>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             </div>
           </div>
         </div>
