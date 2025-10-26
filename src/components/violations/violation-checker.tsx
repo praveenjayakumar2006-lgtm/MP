@@ -188,12 +188,9 @@ export function ViolationChecker() {
         </p>
       </div>
       <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>Violation Details</CardTitle>
-        </CardHeader>
         <Form {...violationForm}>
           <form onSubmit={violationForm.handleSubmit(onViolationSubmit)}>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-4 pt-6">
               <FormField
                 control={violationForm.control}
                 name="slotNumber"
