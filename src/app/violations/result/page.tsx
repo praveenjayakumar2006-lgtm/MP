@@ -17,7 +17,7 @@ function ViolationResultContent() {
 
   // Formats license plates like 'HR26DQ05551' to 'HR 26 DQ 05551'
   const formatLicensePlate = (plate: string | null) => {
-    if (!plate) return null;
+    if (!plate || plate === 'NO_LICENSE_PLATE_DETECTED') return null;
     const cleaned = plate.replace(/\s/g, '').toUpperCase();
     const match = cleaned.match(/^([A-Z]{2})(\d{2})([A-Z]{1,2})(\d{1,4})$/);
     if (match) {

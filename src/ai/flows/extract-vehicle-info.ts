@@ -20,7 +20,7 @@ const ExtractVehicleInfoInputSchema = z.object({
 export type ExtractVehicleInfoInput = z.infer<typeof ExtractVehicleInfoInputSchema>;
 
 const ExtractVehicleInfoOutputSchema = z.object({
-  licensePlate: z.string().describe('The license plate number of the vehicle.'),
+  licensePlate: z.string().describe("The license plate number of the vehicle. If not found, return 'NO_LICENSE_PLATE_DETECTED'."),
   owner: z.object({
     name: z.string().describe("The fictional owner's full name."),
     address: z.string().describe("The fictional owner's address."),
@@ -38,8 +38,8 @@ const extractVehicleInfoPrompt = ai.definePrompt({
   input: {schema: ExtractVehicleInfoInputSchema},
   output: {schema: ExtractVehicleInfoOutputSchema},
   prompt: `You are an expert vehicle recognition system. Your task is to analyze the provided image of a vehicle and extract the following information using OCR and image analysis:
-1. Generate plausible but CLEARLY FICTIONAL information for the vehicle's owner, including a name, address, and phone number. This is for demonstration purposes only.
-2. The license plate number.
+1. The license plate number. If you cannot find a license plate in the image, you MUST return 'NO_LICENSE_PLATE_DETECTED' for the licensePlate field.
+2. Generate plausible but CLEARLY FICTIONAL information for the vehicle's owner, including a name, address, and phone number. This is for demonstration purposes only.
 
 Analyze the image provided and return the information in the specified JSON format.
 

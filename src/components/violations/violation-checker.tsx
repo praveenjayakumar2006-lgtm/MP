@@ -132,13 +132,8 @@ export function ViolationChecker() {
         analyzeVehicleImage({ imageDataUri }),
       ]);
       
-      if (!vehicleResult.licensePlate) {
-        toast({
-            variant: 'destructive',
-            title: 'Number Plate Not Detected',
-            description: 'Please retake the photo, ensuring the plate is clear.',
-        });
-        setIsLoading(false);
+      if (vehicleResult.licensePlate === 'NO_LICENSE_PLATE_DETECTED') {
+        router.push('/violations/capture-failed');
         return;
       }
 

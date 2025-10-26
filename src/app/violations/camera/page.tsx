@@ -111,6 +111,11 @@ function CameraPageContent() {
             analyzeVehicleImage({ imageDataUri: capturedImage })
         ]);
 
+        if (vehicleResult.licensePlate === 'NO_LICENSE_PLATE_DETECTED') {
+            router.push('/violations/capture-failed');
+            return;
+        }
+
         setShowConfirmation(true);
         
         const queryParams = new URLSearchParams({
