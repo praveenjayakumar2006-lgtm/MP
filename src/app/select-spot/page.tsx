@@ -56,34 +56,22 @@ function SelectSpotContent() {
                             <h4 className="text-lg font-semibold">Your Booking Details</h4>
                         </CardHeader>
                         <CardContent className="p-4 pt-0">
-                             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                             <div className="flex flex-wrap items-center justify-start gap-x-6 gap-y-3 text-sm">
                                 <div className="flex items-center gap-2">
-                                    <Ticket className="h-5 w-5 text-muted-foreground" />
-                                    <div>
-                                        <p className="font-semibold">Number Plate</p>
-                                        <p className="text-muted-foreground">{vehiclePlate}</p>
-                                    </div>
+                                    <Ticket className="h-4 w-4 text-muted-foreground" />
+                                    <p className="font-medium">{vehiclePlate}</p>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <Calendar className="h-5 w-5 text-muted-foreground" />
-                                    <div>
-                                        <p className="font-semibold">Date</p>
-                                        <p className="text-muted-foreground">{formattedDate}</p>
-                                    </div>
+                                    <Calendar className="h-4 w-4 text-muted-foreground" />
+                                    <p className="font-medium">{formattedDate}</p>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <Clock className="h-5 w-5 text-muted-foreground" />
-                                    <div>
-                                        <p className="font-semibold">Time</p>
-                                        <p className="text-muted-foreground">{formattedTime(startTime)} - {getEndTime()}</p>
-                                    </div>
+                                    <Clock className="h-4 w-4 text-muted-foreground" />
+                                    <p className="font-medium">{formattedTime(startTime)} - {getEndTime()}</p>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <Hourglass className="h-5 w-5 text-muted-foreground" />
-                                    <div>
-                                        <p className="font-semibold">Duration</p>
-                                        <p className="text-muted-foreground">{duration} hour{Number(duration) > 1 ? 's' : ''}</p>
-                                    </div>
+                                    <Hourglass className="h-4 w-4 text-muted-foreground" />
+                                    <p className="font-medium">{duration} hour{Number(duration) > 1 ? 's' : ''}</p>
                                 </div>
                             </div>
                         </CardContent>
