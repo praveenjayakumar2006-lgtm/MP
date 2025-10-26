@@ -41,7 +41,10 @@ import { useState, Suspense } from 'react';
 import { Input } from '@/components/ui/input';
 
 const bookingSchema = z.object({
-  vehiclePlate: z.string().min(1, 'Vehicle plate is required.'),
+  vehiclePlate: z
+    .string()
+    .min(1, 'Vehicle plate is required.')
+    .regex(/^[A-Z]{2}[0-9]{1,2}[A-Z]{1,2}[0-9]{1,4}$/, 'Invalid number plate format.'),
   date: z.date({
     required_error: 'A date is required.',
   }),
@@ -129,7 +132,7 @@ function BookingForm() {
                                         placeholder="Enter vehicle plate" 
                                         {...field}
                                         onChange={(e) => {
-                                            field.onChange(e.target.value.toUpperCase());
+                                            field.onChange(e.target.value.toUpperCase().replace(/\s/g, ''));
                                             if (e.target.value) {
                                                 form.clearErrors('vehiclePlate');
                                             }
