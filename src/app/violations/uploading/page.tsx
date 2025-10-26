@@ -62,7 +62,7 @@ function UploadingPageContent() {
         });
 
         setTimeout(() => {
-          router.push(`/violations/result?${queryParams.toString()}`);
+          router.replace(`/violations/result?${queryParams.toString()}`);
         }, 1500);
 
       } catch (error) {
@@ -123,5 +123,3 @@ export default function UploadingPage() {
         </Suspense>
     )
 }
-
-    
