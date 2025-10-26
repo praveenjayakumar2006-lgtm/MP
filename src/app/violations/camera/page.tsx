@@ -112,10 +112,9 @@ function CameraPageContent() {
         ]);
 
         if (vehicleResult.licensePlate === 'NO_LICENSE_PLATE_DETECTED') {
-            const params = new URLSearchParams({
-                slotNumber: slotNumber,
-                violationType: violationType,
-            });
+            const params = new URLSearchParams();
+            if (slotNumber) params.set('slotNumber', slotNumber);
+            if (violationType) params.set('violationType', violationType);
             router.push(`/violations/capture-failed?${params.toString()}`);
             return;
         }
@@ -147,12 +146,12 @@ function CameraPageContent() {
         <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-black/60 to-transparent z-20 flex items-center p-4">
             <Button onClick={() => router.back()} variant="secondary" className="bg-gray-700/70 border-none text-white hover:bg-gray-600/70 h-auto p-2 gap-2">
                 <ArrowLeft className="h-5 w-5" />
-                <span className="font-medium">Back</span>
+                <span>Back</span>
             </Button>
             <div className="flex-1 text-center">
                 <p className="text-white/90">Center the vehicle's license plate</p>
             </div>
-             <div className="w-20"></div> {/* Spacer to balance the back button */}
+             <div className="w-24"></div> {/* Spacer to balance the back button */}
         </div>
 
         <AnimatePresence>
