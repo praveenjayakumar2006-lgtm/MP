@@ -51,7 +51,7 @@ function ViolationResultContent() {
             <Link href="/home">
               <Button size="sm">Home</Button>
             </Link>
-            <Button variant="outline" size="sm" onClick={() => router.push('/violations')}>Report Another Violation</Button>
+            <Button variant="outline" size="sm" onClick={() => router.replace('/violations')}>Report Another Violation</Button>
           </div>
         </CardContent>
       </Card>
