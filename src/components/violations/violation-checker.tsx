@@ -1,14 +1,11 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import {
-  Card,
-  CardContent,
-} from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
   Form,
@@ -35,14 +32,14 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 const violationSchemaBase = z.object({
   slotNumber: z.string().min(1, 'Slot number is required.'),
   violationType: z.enum(['overstaying', 'unauthorized_parking'], {
-    required_error: "You need to select a violation type.",
+    required_error: 'You need to select a violation type.',
   }),
 });
 
 const violationSchemaUpload = violationSchemaBase.extend({
   imageSource: z.literal('upload'),
   image: z.any().refine(
-    (file) => file,
+    (file) => file instanceof File,
     'An image is required.'
   ),
 });
@@ -52,10 +49,12 @@ const violationSchemaCamera = violationSchemaBase.extend({
   image: z.any().optional(),
 });
 
-const violationSchema = z.discriminatedUnion("imageSource", [violationSchemaUpload, violationSchemaCamera]);
+const violationSchema = z.discriminatedUnion('imageSource', [
+  violationSchemaUpload,
+  violationSchemaCamera,
+]);
 
 type ViolationFormValues = z.infer<typeof violationSchema>;
-
 
 function fileToDataUrl(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -70,6 +69,7 @@ export function ViolationChecker() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const violationForm = useForm<ViolationFormValues>({
     resolver: zodResolver(violationSchema),
@@ -83,47 +83,63 @@ export function ViolationChecker() {
 
   const imageSource = violationForm.watch('imageSource');
 
+  const handleProceedClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    violationForm.trigger(['slotNumber', 'violationType']).then((isValid) => {
+        if (!isValid) {
+            return;
+        }
+
+        const currentValues = violationForm.getValues();
+
+        if (currentValues.imageSource === 'camera') {
+            const params = new URLSearchParams({
+                slotNumber: currentValues.slotNumber,
+                violationType: currentValues.violationType!,
+            });
+            router.push(`/violations/camera?${params.toString()}`);
+        } else if (currentValues.imageSource === 'upload') {
+            fileInputRef.current?.click();
+        }
+    });
+  };
+
   async function onViolationSubmit(values: ViolationFormValues) {
-    if (values.imageSource === 'camera') {
-        const params = new URLSearchParams({
-            slotNumber: values.slotNumber,
-            violationType: values.violationType,
-        });
-        router.push(`/violations/camera?${params.toString()}`);
-        return;
-    }
+    if (values.imageSource === 'camera') return;
     
     setIsLoading(true);
     
     const file = values.image;
     if (!file) {
-        setIsLoading(false);
-        return;
-    };
+      setIsLoading(false);
+      return;
+    }
 
     try {
-      const details = `An image has been uploaded for a vehicle in slot ${values.slotNumber} regarding a potential ${values.violationType.replace('_', ' ')} violation.`;
+      const details = `An image has been uploaded for a vehicle in slot ${values.slotNumber} regarding a potential ${values.violationType.replace(
+        '_',
+        ' '
+      )} violation.`;
 
       const imageDataUri = await fileToDataUrl(file);
       const [violationResult, vehicleResult] = await Promise.all([
         analyzeViolationText({
-            slotNumber: values.slotNumber,
-            violationType: values.violationType,
-            details: details,
-            timestamp: new Date().toISOString(),
+          slotNumber: values.slotNumber,
+          violationType: values.violationType,
+          details: details,
+          timestamp: new Date().toISOString(),
         }),
-        analyzeVehicleImage({ imageDataUri })
+        analyzeVehicleImage({ imageDataUri }),
       ]);
-      
+
       const queryParams = new URLSearchParams({
         licensePlate: vehicleResult.licensePlate,
       });
 
       router.push(`/violations/result?${queryParams.toString()}`);
-
     } catch (error) {
       console.error('Error analyzing violation:', error);
-       toast({
+      toast({
         variant: 'destructive',
         title: 'Analysis Failed',
         description: 'There was an error processing your request. Please try again.',
@@ -179,64 +195,60 @@ export function ViolationChecker() {
                   </FormItem>
                 )}
               />
-              
+
               <FormField
                 control={violationForm.control}
                 name="imageSource"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Evidence <span className="text-destructive">*</span></FormLabel>
-                     <RadioGroup
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                        className="flex space-x-4 pt-2"
-                      >
-                        <FormItem className="flex items-center space-x-2">
-                          <RadioGroupItem value="upload" id="upload" />
-                          <FormLabel htmlFor="upload" className="font-normal cursor-pointer">Upload Image</FormLabel>
-                        </FormItem>
-                        <FormItem className="flex items-center space-x-2">
-                          <RadioGroupItem value="camera" id="camera" />
-                          <FormLabel htmlFor="camera" className="font-normal cursor-pointer">Take Photo</FormLabel>
-                        </FormItem>
-                      </RadioGroup>
+                    <RadioGroup
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      className="flex space-x-4 pt-2"
+                    >
+                      <FormItem className="flex items-center space-x-2">
+                        <RadioGroupItem value="upload" id="upload" />
+                        <FormLabel htmlFor="upload" className="font-normal cursor-pointer">Upload Image</FormLabel>
+                      </FormItem>
+                      <FormItem className="flex items-center space-x-2">
+                        <RadioGroupItem value="camera" id="camera" />
+                        <FormLabel htmlFor="camera" className="font-normal cursor-pointer">Take Photo</FormLabel>
+                      </FormItem>
+                    </RadioGroup>
                     <FormMessage />
                   </FormItem>
                 )}
               />
 
-              {imageSource === 'upload' && (
-                <FormField
-                    control={violationForm.control}
-                    name="image"
-                    render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>Image <span className="text-destructive">*</span></FormLabel>
-                        <FormControl>
-                            <Input
-                            type="file"
-                            accept="image/*"
-                            onChange={(e) => {
-                                if (e.target.files && e.target.files.length > 0) {
-                                field.onChange(e.target.files[0]);
-                                }
-                            }}
-                            />
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                    )}
-                />
-              )}
-
+              <input
+                type="file"
+                ref={fileInputRef}
+                className="hidden"
+                accept="image/*"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    violationForm.setValue('image', file, { shouldValidate: true });
+                    // Automatically submit the form once a file is chosen
+                    violationForm.handleSubmit(onViolationSubmit)();
+                  }
+                }}
+              />
+              
               <div className="pt-2">
-                <Button type="submit" disabled={isLoading} className="w-full">
+                <Button 
+                  onClick={handleProceedClick} 
+                  disabled={isLoading} 
+                  className="w-full"
+                  type="button" 
+                >
                   {isLoading ? (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   ) : imageSource === 'camera' ? (
                     'Proceed to Camera'
                   ) : (
-                    'Analyze Violation'
+                    'Proceed to Gallery'
                   )}
                 </Button>
               </div>
