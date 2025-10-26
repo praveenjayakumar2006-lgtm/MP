@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useRef, Suspense } from 'react';
+import { useState, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -23,7 +23,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Loader2 } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
@@ -63,7 +62,7 @@ function fileToDataUrl(file: File): Promise<string> {
   });
 }
 
-function ViolationCheckerComponent() {
+export function ViolationChecker() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -235,12 +234,4 @@ function ViolationCheckerComponent() {
       </Card>
     </div>
   );
-}
-
-export function ViolationChecker() {
-    return (
-        <Suspense fallback={<div>Loading form...</div>}>
-            <ViolationCheckerComponent />
-        </Suspense>
-    )
 }
