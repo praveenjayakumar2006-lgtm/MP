@@ -31,7 +31,7 @@ export default function HomePage() {
                 <div className="mb-6 text-center">
                   <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">Our Services</h2>
                 </div>
-                <div className="space-y-6 mt-8">
+                <div className="space-y-6 mt-12">
                   <div className="flex items-start gap-4 text-left">
                     <div className="bg-primary/10 p-3 rounded-full">
                       <Clock className="h-6 w-6 text-primary" />
