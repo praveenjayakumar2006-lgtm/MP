@@ -40,13 +40,22 @@ function SelectSpotContent() {
         return format(endDate, 'h:mm a');
     }
 
+    const handleBack = () => {
+        const params = new URLSearchParams();
+        if (vehiclePlate) params.set('vehiclePlate', vehiclePlate);
+        if (date) params.set('date', date);
+        if (startTime) params.set('startTime', startTime);
+        if (duration) params.set('duration', duration);
+        router.push(`/booking?${params.toString()}`);
+    }
+
     return (
         <div
             className="flex flex-col items-center justify-center flex-1 bg-muted p-4 md:p-6 w-full"
         >
             <div className="w-full max-w-4xl flex flex-col items-center">
                  <div className="w-full flex justify-start mb-4">
-                    <Button variant="outline" onClick={() => router.back()}>
+                    <Button variant="outline" onClick={handleBack}>
                         <ArrowLeft className="mr-2 h-4 w-4" />
                         Back
                     </Button>
@@ -100,3 +109,5 @@ export default function SelectSpotPage() {
         </Suspense>
     )
 }
+
+    

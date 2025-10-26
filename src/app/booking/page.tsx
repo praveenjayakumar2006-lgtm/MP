@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import {
   Card,
   CardContent,
@@ -30,14 +30,14 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { format, isToday } from 'date-fns';
+import { format, isToday, parseISO } from 'date-fns';
 import { Calendar as CalendarIcon, Clock, Hourglass, Ticket } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { Input } from '@/components/ui/input';
 
 const bookingSchema = z.object({
@@ -66,18 +66,21 @@ const timeSlots = Array.from({ length: 24 * 2 }, (_, i) => {
     };
 });
 
-export default function BookingPage() {
+function BookingForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+
+  const defaultValues: Partial<BookingFormValues> = {
+    vehiclePlate: searchParams.get('vehiclePlate') || '',
+    date: searchParams.get('date') ? parseISO(searchParams.get('date')!) : undefined,
+    startTime: searchParams.get('startTime') || '',
+    duration: searchParams.get('duration') || '',
+  }
   
   const form = useForm<BookingFormValues>({
     resolver: zodResolver(bookingSchema),
-    defaultValues: {
-        vehiclePlate: '',
-        date: undefined,
-        startTime: '',
-        duration: '',
-    },
+    defaultValues,
   });
 
   const selectedDate = form.watch('date');
@@ -256,3 +259,13 @@ export default function BookingPage() {
       </section>
   )
 }
+
+export default function BookingPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <BookingForm />
+    </Suspense>
+  )
+}
+
+    
