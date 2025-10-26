@@ -21,7 +21,7 @@ function AppContent({ children }: { children: React.ReactNode }) {
   const { user, isUserLoading } = useUser();
 
   const isAuthPage = useMemo(() => ['/login', '/signup'].includes(pathname), [pathname]);
-  const isHeaderlessPage = useMemo(() => ['/login', '/signup', '/violations/camera'].includes(pathname), [pathname]);
+  const isHeaderlessPage = useMemo(() => ['/login', '/signup', '/violations/camera', '/violations/uploading'].includes(pathname), [pathname]);
 
   useEffect(() => {
     if (!isUserLoading) {
