@@ -7,7 +7,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { analyzeVehicleImage, analyzeViolationText } from '@/app/violations/actions';
-import { Loader2, Camera, VideoOff, CheckCircle2 } from 'lucide-react';
+import { Loader2, Camera, VideoOff, CheckCircle2, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 function dataURLtoFile(dataurl: string, filename: string): File {
@@ -179,8 +179,8 @@ function CameraPageContent() {
                     className="relative w-full h-full flex flex-col items-center justify-center"
                 >
                     <video ref={videoRef} className="absolute top-0 left-0 w-full h-full object-cover" autoPlay muted playsInline />
-                     <div className="absolute top-4 left-4 right-4 text-center p-2 rounded-md bg-black/50">
-                        <p>Center the vehicle&apos;s license plate in the frame.</p>
+                     <div className="absolute top-4 left-0 right-0 text-center p-2 rounded-md bg-black/50 px-16">
+                        <p>Center the vehicle's license plate in the frame.</p>
                      </div>
                     {hasCameraPermission === false && (
                         <div className="absolute z-10 p-4">
@@ -202,8 +202,9 @@ function CameraPageContent() {
             )}
         </AnimatePresence>
 
-        <Button onClick={() => router.back()} variant="ghost" className="absolute top-4 left-4 text-white hover:bg-white/10">
-            Back
+        <Button onClick={() => router.back()} variant="ghost" className="absolute top-4 left-4 text-white hover:bg-white/10 p-2 h-auto">
+            <X className="h-6 w-6" />
+            <span className="sr-only">Back</span>
         </Button>
         <canvas ref={canvasRef} style={{ display: 'none' }} />
     </div>
