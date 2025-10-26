@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -26,40 +26,35 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Loader2, Camera } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { analyzeVehicleImage, analyzeViolationText } from '@/app/violations/actions';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 
-const violationSchema = z.object({
+const violationSchemaBase = z.object({
   slotNumber: z.string().min(1, 'Slot number is required.'),
   violationType: z.enum(['overstaying', 'unauthorized_parking'], {
     required_error: "You need to select a violation type.",
   }),
+});
+
+const violationSchemaUpload = violationSchemaBase.extend({
+  imageSource: z.literal('upload'),
   image: z.any().refine(
     (file) => file,
     'An image is required.'
   ),
 });
-type ViolationFormValues = z.infer<typeof violationSchema>;
 
-function dataURLtoFile(dataurl: string, filename: string): File {
-    const arr = dataurl.split(',');
-    const mimeMatch = arr[0].match(/:(.*?);/);
-    if (!mimeMatch) {
-      throw new Error('Could not find MIME type in data URL');
-    }
-    const mime = mimeMatch[1];
-    const bstr = atob(arr[1]);
-    let n = bstr.length;
-    const u8arr = new Uint8Array(n);
-    while (n--) {
-      u8arr[n] = bstr.charCodeAt(n);
-    }
-    return new File([u8arr], filename, { type: mime });
-}
+const violationSchemaCamera = violationSchemaBase.extend({
+  imageSource: z.literal('camera'),
+  image: z.any().optional(),
+});
+
+const violationSchema = z.discriminatedUnion("imageSource", [violationSchemaUpload, violationSchemaCamera]);
+
+type ViolationFormValues = z.infer<typeof violationSchema>;
 
 
 function fileToDataUrl(file: File): Promise<string> {
@@ -73,10 +68,6 @@ function fileToDataUrl(file: File): Promise<string> {
 
 export function ViolationChecker() {
   const [isLoading, setIsLoading] = useState(false);
-  const [imageSource, setImageSource] = useState<'upload' | 'camera'>('upload');
-  const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
   const router = useRouter();
   const { toast } = useToast();
 
@@ -85,59 +76,23 @@ export function ViolationChecker() {
     defaultValues: {
       slotNumber: '',
       violationType: undefined,
+      imageSource: 'upload',
       image: null,
     },
   });
 
-  const { setValue, trigger } = violationForm;
-
-  useEffect(() => {
-    async function setupCamera() {
-      if (imageSource === 'camera') {
-        try {
-          const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-          setHasCameraPermission(true);
-          if (videoRef.current) {
-            videoRef.current.srcObject = stream;
-          }
-        } catch (error) {
-          console.error('Error accessing camera:', error);
-          setHasCameraPermission(false);
-          toast({
-            variant: 'destructive',
-            title: 'Camera Access Denied',
-            description: 'Please enable camera permissions in your browser settings.',
-          });
-        }
-      } else {
-        if (videoRef.current && videoRef.current.srcObject) {
-          const stream = videoRef.current.srcObject as MediaStream;
-          stream.getTracks().forEach(track => track.stop());
-        }
-      }
-    }
-    setupCamera();
-  }, [imageSource, toast]);
-
-
-  const handleCapture = () => {
-    if (videoRef.current && canvasRef.current) {
-      const video = videoRef.current;
-      const canvas = canvasRef.current;
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      const context = canvas.getContext('2d');
-      if (context) {
-        context.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
-        const dataUrl = canvas.toDataURL('image/jpeg');
-        const capturedFile = dataURLtoFile(dataUrl, `capture-${Date.now()}.jpg`);
-        setValue('image', capturedFile);
-        trigger('image'); // Manually trigger validation
-      }
-    }
-  };
+  const imageSource = violationForm.watch('imageSource');
 
   async function onViolationSubmit(values: ViolationFormValues) {
+    if (values.imageSource === 'camera') {
+        const params = new URLSearchParams({
+            slotNumber: values.slotNumber,
+            violationType: values.violationType,
+        });
+        router.push(`/violations/camera?${params.toString()}`);
+        return;
+    }
+    
     setIsLoading(true);
     
     const file = values.image;
@@ -225,73 +180,64 @@ export function ViolationChecker() {
                 )}
               />
               
-              <FormItem>
-                <FormLabel>Image Source <span className="text-destructive">*</span></FormLabel>
-                <RadioGroup
-                  defaultValue="upload"
-                  onValueChange={(value: 'upload' | 'camera') => {
-                    setImageSource(value);
-                    setValue('image', null);
-                  }}
-                  className="flex space-x-4"
-                >
-                  <FormItem className="flex items-center space-x-2">
-                    <RadioGroupItem value="upload" id="upload" />
-                    <FormLabel htmlFor="upload" className="font-normal">Upload Image</FormLabel>
-                  </FormItem>
-                  <FormItem className="flex items-center space-x-2">
-                    <RadioGroupItem value="camera" id="camera" />
-                    <FormLabel htmlFor="camera" className="font-normal">Take Photo</FormLabel>
-                  </FormItem>
-                </RadioGroup>
-              </FormItem>
-
               <FormField
                 control={violationForm.control}
-                name="image"
+                name="imageSource"
                 render={({ field }) => (
                   <FormItem>
-                    <FormControl>
-                      {imageSource === 'upload' ? (
-                        <Input
-                          type="file"
-                          accept="image/*"
-                          onChange={(e) => {
-                            if (e.target.files && e.target.files.length > 0) {
-                              field.onChange(e.target.files[0]);
-                            }
-                          }}
-                        />
-                      ) : (
-                        <div className="space-y-4">
-                           <div className="w-full aspect-video bg-muted rounded-md overflow-hidden flex items-center justify-center">
-                              <video ref={videoRef} className="w-full h-full object-cover" autoPlay muted playsInline />
-                           </div>
-                           {hasCameraPermission === false && (
-                              <Alert variant="destructive">
-                                <AlertTitle>Camera Access Required</AlertTitle>
-                                <AlertDescription>
-                                  Please allow camera access in your browser to use this feature.
-                                </AlertDescription>
-                              </Alert>
-                           )}
-                           <Button type="button" onClick={handleCapture} disabled={!hasCameraPermission} className="w-full">
-                            <Camera className="mr-2 h-4 w-4" />
-                            Capture Image
-                          </Button>
-                        </div>
-                      )}
-                    </FormControl>
+                    <FormLabel>Evidence <span className="text-destructive">*</span></FormLabel>
+                     <RadioGroup
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                        className="flex space-x-4 pt-2"
+                      >
+                        <FormItem className="flex items-center space-x-2">
+                          <RadioGroupItem value="upload" id="upload" />
+                          <FormLabel htmlFor="upload" className="font-normal cursor-pointer">Upload Image</FormLabel>
+                        </FormItem>
+                        <FormItem className="flex items-center space-x-2">
+                          <RadioGroupItem value="camera" id="camera" />
+                          <FormLabel htmlFor="camera" className="font-normal cursor-pointer">Take Photo</FormLabel>
+                        </FormItem>
+                      </RadioGroup>
                     <FormMessage />
                   </FormItem>
                 )}
               />
 
-               <canvas ref={canvasRef} style={{ display: 'none' }} />
+              {imageSource === 'upload' && (
+                <FormField
+                    control={violationForm.control}
+                    name="image"
+                    render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Image <span className="text-destructive">*</span></FormLabel>
+                        <FormControl>
+                            <Input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => {
+                                if (e.target.files && e.target.files.length > 0) {
+                                field.onChange(e.target.files[0]);
+                                }
+                            }}
+                            />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                    )}
+                />
+              )}
 
               <div className="pt-2">
                 <Button type="submit" disabled={isLoading} className="w-full">
-                  {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : 'Analyze Violation'}
+                  {isLoading ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : imageSource === 'camera' ? (
+                    'Proceed to Camera'
+                  ) : (
+                    'Analyze Violation'
+                  )}
                 </Button>
               </div>
             </CardContent>
