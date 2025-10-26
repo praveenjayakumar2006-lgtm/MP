@@ -172,8 +172,6 @@ export default function BookingPage() {
                                       selected={field.value}
                                       onSelect={(date) => {
                                         field.onChange(date);
-                                        form.resetField('startTime');
-                                        form.resetField('duration');
                                         setIsCalendarOpen(false);
                                       }}
                                       disabled={(date) =>
@@ -194,10 +192,7 @@ export default function BookingPage() {
                               <FormItem>
                               <FormLabel>Start Time</FormLabel>
                               <Select 
-                                onValueChange={(value) => {
-                                    field.onChange(value);
-                                    form.resetField('duration');
-                                }} 
+                                onValueChange={field.onChange} 
                                 value={field.value}
                               >
                                   <FormControl>
