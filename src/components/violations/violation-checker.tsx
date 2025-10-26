@@ -131,6 +131,16 @@ export function ViolationChecker() {
         }),
         analyzeVehicleImage({ imageDataUri }),
       ]);
+      
+      if (!vehicleResult.licensePlate) {
+        toast({
+            variant: 'destructive',
+            title: 'Number Plate Not Detected',
+            description: 'Please retake the photo, ensuring the plate is clear.',
+        });
+        setIsLoading(false);
+        return;
+      }
 
       const queryParams = new URLSearchParams({
         licensePlate: vehicleResult.licensePlate,
