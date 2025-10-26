@@ -27,7 +27,13 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
 const violationSchemaBase = z.object({
-  slotNumber: z.string().min(1, 'Slot number is required.'),
+  slotNumber: z
+    .string()
+    .min(1, 'Slot number is required.')
+    .regex(
+      /^[A-Z]([1-9][0-9]?|100)$/,
+      'Slot must be a letter followed by a number from 1-100 (e.g., C5).'
+    ),
   violationType: z.enum(['overstaying', 'unauthorized_parking'], {
     required_error: 'You need to select a violation type.',
   }),
@@ -154,6 +160,10 @@ export function ViolationChecker() {
                         placeholder="e.g., C5" 
                         {...field} 
                         onChange={(e) => {
+                            const value = e.target.value;
+                            if (value.length > 0) {
+                                e.target.value = value.charAt(0).toUpperCase() + value.slice(1);
+                            }
                             field.onChange(e);
                             if (e.target.value && violationForm.formState.errors.slotNumber) {
                                 violationForm.clearErrors('slotNumber');
