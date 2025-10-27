@@ -1,55 +1,48 @@
 /**
- * @fileoverview Firestore Security Rules for ParkSmart Reserve.
- *
- * Core Philosophy:
- * This ruleset prioritizes user data ownership and restricts unauthorized access to sensitive information.
- *
- * Data Structure:
- * - Users: Stored under `/users/{userId}`, where `{userId}` matches the Firebase Auth UID.
- * - Parking Slots: Stored under `/parkingSlots/{parkingSlotId}`.
- * - Reservations: Stored under `/reservations/{reservationId}`.
- * - Violations: Stored under `/violations/{violationId}`.
- * - Feedback: Stored under `/feedback/{feedbackId}`.
- *
- * Key Security Decisions:
- * - User data is strictly controlled: only the authenticated user can read/write their own profile.
- * - Reservations can only be deleted by owner.
- * - No listing of users is allowed for privacy.
+ * @description This ruleset implements a hybrid security model, balancing open access for public data with restricted access based on ownership and user roles.
+ * @dataStructure
+ *  - /users/{userId}: Stores individual user profiles, accessible only to the owning user.
+ *  - /parkingSlots/{parkingSlotId}: Contains public parking slot information, readable by all.
+ *  - /reservations/{reservationId}: Stores reservation data, readable and writable only by the owning user.
+ *  - /violations/{violationId}: Stores violation data, writeable by the service account via `allow create: if false;` and only readable by authenticated users.
+ *  - /feedback/{feedbackId}: Stores user feedback, writeable by authenticated users.
+ * @keySecurityDecisions
+ *  - Users can only access their own data under /users/{userId}.
+ *  - Listing of users is forbidden.
+ *  - Public read access is granted for /parkingSlots/{parkingSlotId}.
+ *  - Write access to violations is denied to client app, allowing it only from backend.
+ *  - Relational integrity is enforced on reservation creation by matching the userId to the authenticated user's UID.
+ *  - All updates and deletes are checked for resource existence to prevent accidental operations on non-existent data.
+ * @denormalizationForAuthorization N/A.  No denormalization of data is necessary for these rules.
+ * @structuralSegregation N/A. No structural segregation of data is being used.
  */
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
     /**
-     * @description Secures user profiles. Only the authenticated user can read/write their own profile.
+     * @description Controls access to user profile data.
      * @path /users/{userId}
-     * @allow (get, update, delete) if request.auth.uid == userId
-     * @allow (create) if request.auth.uid == request.resource.data.id
-     * @deny (get) if request.auth == null
-     * @deny (list) Always deny listing all users.
-     * @deny (create, update, delete) if request.auth.uid != userId
-     * @principle Enforces strict user ownership.
+     * @allow (create) - If the user's UID matches the userId.
+     * @allow (get, list, update, delete) - If the user's UID matches the userId.
+     * @deny (create) - If the user's UID does not match the userId.
+     * @deny (get, list, update, delete) - If the user's UID does not match the userId.
+     * @principle Enforces user-ownership for accessing user data.
      */
     match /users/{userId} {
-      function isOwner(userId) {
-        return request.auth.uid == userId;
-      }
-      function isExistingOwner(userId) {
-        return isOwner(userId) && resource != null;
-      }
-      allow get: if isOwner(userId);
+      allow get: if isSignedIn() && isOwner(userId);
       allow list: if false;
-      allow create: if isOwner(userId) && request.resource.data.id == userId;
-      allow update: if isExistingOwner(userId) && request.resource.data.id == resource.data.id;
-      allow delete: if isExistingOwner(userId);
+      allow create: if isSignedIn() && isOwner(userId) && request.resource.data.id == userId;
+      allow update: if isSignedIn() && isExistingOwner(userId) && request.resource.data.id == resource.data.id;
+      allow delete: if isSignedIn() && isExistingOwner(userId);
     }
 
     /**
-     * @description Secures parking slot data. Read-only access for all, no writes permitted.
+     * @description Controls access to parking slot information.
      * @path /parkingSlots/{parkingSlotId}
-     * @allow (get, list) if true
-     * @deny (create, update, delete) Always deny writes to parking slots.
-     * @principle Public read, no write access.
+     * @allow (get, list) - Public read access.
+     * @deny (create, update, delete) - No client-side writes allowed.
+     * @principle Allows public access to parking slot information, but restricts modification.
      */
     match /parkingSlots/{parkingSlotId} {
       allow get, list: if true;
@@ -57,49 +50,58 @@ service cloud.firestore {
     }
 
     /**
-     * @description Secures reservation data. Reservations can only be deleted by owner.
+     * @description Controls access to reservation data.
      * @path /reservations/{reservationId}
-     * @allow (get, list) if true
-     * @allow create: if request.auth.uid == request.resource.data.userId;
-     * @deny update: if true;
-     * @allow delete: if resource.data.userId == request.auth.uid;
-     * @principle Enforces user ownership for writes.
+     * @allow (create) - If the user's UID matches the reservation's userId.
+     * @allow (get, list, update, delete) - If the user's UID matches the reservation's userId.
+     * @deny (create) - If the user's UID does not match the reservation's userId.
+     * @deny (get, list, update, delete) - If the user's UID does not match the reservation's userId.
+     * @principle Enforces user-ownership for accessing reservation data and validates relational integrity.
      */
     match /reservations/{reservationId} {
-       function isOwner(userId) {
-        return request.auth.uid == userId;
-      }
-      function isExistingOwner(userId) {
-        return isOwner(userId) && resource != null;
-      }
-      allow get, list: if true;
-      allow create: if request.auth.uid == request.resource.data.userId;
-      allow update: if false;
-      allow delete: if isExistingOwner(resource.data.userId);
+      allow get: if isSignedIn() && isOwner(resource.data.userId);
+      allow list: if isSignedIn() && isOwner(resource.data.userId);
+      allow create: if isSignedIn() && request.auth.uid == request.resource.data.userId;
+      allow update: if isSignedIn() && isExistingOwner(resource.data.userId);
+      allow delete: if isSignedIn() && isExistingOwner(resource.data.userId);
     }
 
     /**
-     * @description Secures violation data. Read-only access for all, no writes permitted.
+     * @description Controls access to violation data.
      * @path /violations/{violationId}
-     * @allow (get, list) if true
-     * @deny (create, update, delete) Always deny writes to violations.
-     * @principle Public read, no write access.
+     * @allow (get, list) - Only authenticated users can read.
+     * @deny (create, update, delete) - No client-side writes allowed (only backend).
+     * @principle Restricts write access to violation data to the backend.
      */
     match /violations/{violationId} {
-      allow get, list: if true;
+      allow get, list: if isSignedIn();
       allow create, update, delete: if false;
     }
 
     /**
-     * @description Allows public read and write access to feedback data.
+     * @description Controls access to feedback data.
      * @path /feedback/{feedbackId}
-     * @allow get, list, create: if true;
-     * @deny update, delete: if true;
-     * @principle Public read and write access for feedback submission.
+     * @allow (create) - Authenticated users only.
+     * @deny (get, update, list, delete) - Not accessible by client.
      */
     match /feedback/{feedbackId} {
-      allow get, list, create: if true;
-      allow update, delete: if false;
+      allow create: if isSignedIn();
+      allow get, update, list, delete: if false;
     }
+  }
+
+  // Helper function to determine if the user is signed in.
+  function isSignedIn() {
+    return request.auth != null;
+  }
+
+  // Helper function to determine if the user is the owner of the resource.
+  function isOwner(userId) {
+    return request.auth.uid == userId;
+  }
+
+    //Helper function to determine if the user is the owner of the resource and it exists.
+  function isExistingOwner(userId) {
+    return request.auth.uid == userId && resource != null;
   }
 }
