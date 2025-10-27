@@ -27,6 +27,9 @@ import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { useRouter } from 'next/navigation';
+import { addDocumentNonBlocking, useFirebase } from '@/firebase';
+import { collection, Timestamp } from 'firebase/firestore';
+import { useToast } from '@/hooks/use-toast';
 
 const feedbackSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters.'),
@@ -40,6 +43,8 @@ type FeedbackFormValues = z.infer<typeof feedbackSchema>;
 export default function FeedbackPage() {
   const router = useRouter();
   const [hoverRating, setHoverRating] = useState(0);
+  const { firestore } = useFirebase();
+  const { toast } = useToast();
 
   const form = useForm<FeedbackFormValues>({
     resolver: zodResolver(feedbackSchema),
@@ -52,7 +57,19 @@ export default function FeedbackPage() {
   });
 
   function onSubmit(values: FeedbackFormValues) {
-    console.log(values);
+    if (!firestore) {
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'Could not connect to the database.',
+      });
+      return;
+    }
+    const feedbackCollection = collection(firestore, 'feedback');
+    addDocumentNonBlocking(feedbackCollection, {
+      ...values,
+      createdAt: Timestamp.now(),
+    });
     router.push('/feedback/success');
   }
 

@@ -158,6 +158,37 @@
         "violationTime",
         "violationType"
       ]
+    },
+    "Feedback": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Feedback",
+      "type": "object",
+      "description": "Represents feedback submitted by a user.",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the user submitting feedback."
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "description": "The email of the user."
+        },
+        "rating": {
+          "type": "number",
+          "description": "The rating given by the user."
+        },
+        "feedback": {
+          "type": "string",
+          "description": "The feedback message."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp of when the feedback was submitted."
+        }
+      },
+      "required": ["name", "email", "rating", "feedback", "createdAt"]
     }
   },
   "auth": {
@@ -228,6 +259,22 @@
             {
               "name": "violationId",
               "description": "Unique identifier for the parking violation."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/feedback/{feedbackId}",
+        "definition": {
+          "entityName": "Feedback",
+          "schema": {
+            "$ref": "#/backend/entities/Feedback"
+          },
+          "description": "Stores user feedback.",
+          "params": [
+            {
+              "name": "feedbackId",
+              "description": "Unique identifier for the feedback entry."
             }
           ]
         }

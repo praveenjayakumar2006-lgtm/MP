@@ -10,15 +10,22 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
+import { addDocumentNonBlocking, useFirebase } from '@/firebase';
+import { collection, Timestamp } from 'firebase/firestore';
+import { useToast } from '@/hooks/use-toast';
 
 
 function ViolationResultContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const slotNumber = searchParams.get('slotNumber');
+  const violationType = searchParams.get('violationType');
   const licensePlate = searchParams.get('licensePlate');
 
   const [submissionStatus, setSubmissionStatus] = useState<'pending' | 'confirmed' | 'rejected'>('pending');
   const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const { firestore } = useFirebase();
+  const { toast } = useToast();
 
   useEffect(() => {
     const storedImage = sessionStorage.getItem('violationImage');
@@ -26,6 +33,28 @@ function ViolationResultContent() {
       setImageUrl(storedImage);
     }
   }, []);
+
+  const handleConfirm = () => {
+    if (!firestore || !slotNumber || !violationType || !licensePlate) {
+       toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'Missing required information to submit the report.',
+      });
+      return;
+    }
+    
+    const violationsCollection = collection(firestore, 'violations');
+    addDocumentNonBlocking(violationsCollection, {
+      slotNumber,
+      violationType,
+      licensePlate,
+      imageUrl: imageUrl,
+      createdAt: Timestamp.now(),
+    });
+
+    setSubmissionStatus('confirmed');
+  };
 
   // Formats license plates like 'HR26DQ05551' to 'HR 26 DQ 05551'
   const formatLicensePlate = (plate: string | null) => {
@@ -72,7 +101,7 @@ function ViolationResultContent() {
             <Button 
                 variant="outline"
                 className="border-green-500 text-green-600 hover:bg-green-50 hover:text-green-700"
-                onClick={() => setSubmissionStatus('confirmed')}
+                onClick={handleConfirm}
             >
                 Confirm
             </Button>
