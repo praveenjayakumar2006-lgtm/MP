@@ -132,7 +132,11 @@ export function ViolationChecker() {
         if (currentValues.imageSource === 'camera') {
             router.push(`/violations/camera?${params.toString()}`);
         } else if (currentValues.imageSource === 'upload') {
-            fileInputRef.current?.click();
+            if (selectedFileName) {
+                router.push(`/violations/uploading?${params.toString()}`);
+            } else {
+                fileInputRef.current?.click();
+            }
         }
     });
   };
@@ -143,14 +147,6 @@ export function ViolationChecker() {
       setSelectedFileName(file.name);
       const imageDataUrl = await fileToDataUrl(file);
       sessionStorage.setItem('violationImage', imageDataUrl);
-
-      const currentValues = violationForm.getValues();
-      const params = new URLSearchParams({
-          slotNumber: currentValues.slotNumber,
-          violationType: currentValues.violationType!,
-          licensePlate: currentValues.numberPlate,
-      });
-      router.push(`/violations/uploading?${params.toString()}`);
     } else {
         setSelectedFileName(null);
     }
@@ -292,7 +288,7 @@ export function ViolationChecker() {
                   className="w-full"
                   type="button" 
                 >
-                  {imageSource === 'camera' ? 'Proceed to Camera' : (selectedFileName ? 'Upload and Submit' : 'Select Image from Gallery')}
+                  {imageSource === 'camera' ? 'Proceed to Camera' : (selectedFileName ? 'Submit Report' : 'Select Image from Gallery')}
                 </Button>
               </div>
             </CardContent>
