@@ -58,7 +58,7 @@ function OwnerDashboard() {
     );
 
     const renderFeedback = () => (
-        <Card>
+        <Card className="border-0 shadow-none">
             <CardHeader>
                 <CardTitle>User Feedback</CardTitle>
                 <CardDescription>
