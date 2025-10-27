@@ -72,7 +72,7 @@ export function FeedbackTable() {
                                     <Star
                                     key={star}
                                     className={cn(
-                                        'h-5 w-5',
+                                        'h-4 w-4',
                                         feedback.rating >= star
                                         ? 'text-yellow-400 fill-yellow-400'
                                         : 'text-gray-300'
