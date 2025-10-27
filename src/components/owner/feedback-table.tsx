@@ -1,3 +1,4 @@
+
 'use client';
 import {
   Table,
@@ -26,18 +27,11 @@ type Feedback = {
 
 export function FeedbackTable() {
     const { firestore } = useFirebase();
-    const [isOwner, setIsOwner] = useState(false);
-
-    useEffect(() => {
-      if (localStorage.getItem('role') === 'owner') {
-        setIsOwner(true);
-      }
-    }, []);
 
     const feedbackQuery = useMemoFirebase(() => {
-        if (!firestore || !isOwner) return null;
+        if (!firestore) return null;
         return query(collection(firestore, 'feedback'), orderBy('createdAt', 'desc'));
-    }, [firestore, isOwner]);
+    }, [firestore]);
 
     const { data: feedbackData, isLoading } = useCollection<Feedback>(feedbackQuery);
 
@@ -51,14 +45,6 @@ export function FeedbackTable() {
       </TableRow>
     ))
   );
-
-  if (!isOwner) {
-    return (
-      <div className="text-center p-8 text-muted-foreground">
-        Authenticating...
-      </div>
-    )
-  }
 
   return (
     <Table>

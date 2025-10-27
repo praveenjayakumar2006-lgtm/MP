@@ -3,18 +3,22 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ReportsTable } from "@/components/owner/reports-table";
 import { FeedbackTable } from "@/components/owner/feedback-table";
+import { Loader2 } from "lucide-react";
 
 export default function OwnerPage() {
     const router = useRouter();
+    const [isOwner, setIsOwner] = useState(false);
 
     useEffect(() => {
         const role = localStorage.getItem('role');
         if (role !== 'owner') {
             router.replace('/login');
+        } else {
+            setIsOwner(true);
         }
     }, [router]);
 
@@ -27,38 +31,45 @@ export default function OwnerPage() {
                         <CardDescription>Review user-submitted reports and feedback.</CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <Tabs defaultValue="reports" className="w-full">
-                            <TabsList className="grid w-full grid-cols-2">
-                                <TabsTrigger value="reports">Violation Reports</TabsTrigger>
-                                <TabsTrigger value="feedback">User Feedback</TabsTrigger>
-                            </TabsList>
-                            <TabsContent value="reports">
-                                <Card>
-                                    <CardHeader>
-                                        <CardTitle>Violation Reports</CardTitle>
-                                        <CardDescription>
-                                            All violation reports submitted by users.
-                                        </CardDescription>
-                                    </CardHeader>
-                                    <CardContent>
-                                        <ReportsTable />
-                                    </CardContent>
-                                </Card>
-                            </TabsContent>
-                            <TabsContent value="feedback">
-                                 <Card>
-                                    <CardHeader>
-                                        <CardTitle>User Feedback</CardTitle>
-                                        <CardDescription>
-                                            All feedback submitted by users.
-                                        </CardDescription>
-                                    </CardHeader>
-                                    <CardContent>
-                                        <FeedbackTable />
-                                    </CardContent>
-                                </Card>
-                            </TabsContent>
-                        </Tabs>
+                        {isOwner ? (
+                            <Tabs defaultValue="reports" className="w-full">
+                                <TabsList className="grid w-full grid-cols-2">
+                                    <TabsTrigger value="reports">Violation Reports</TabsTrigger>
+                                    <TabsTrigger value="feedback">User Feedback</TabsTrigger>
+                                </TabsList>
+                                <TabsContent value="reports">
+                                    <Card>
+                                        <CardHeader>
+                                            <CardTitle>Violation Reports</CardTitle>
+                                            <CardDescription>
+                                                All violation reports submitted by users.
+                                            </CardDescription>
+                                        </CardHeader>
+                                        <CardContent>
+                                            <ReportsTable />
+                                        </CardContent>
+                                    </Card>
+                                </TabsContent>
+                                <TabsContent value="feedback">
+                                    <Card>
+                                        <CardHeader>
+                                            <CardTitle>User Feedback</CardTitle>
+                                            <CardDescription>
+                                                All feedback submitted by users.
+                                            </CardDescription>
+                                        </CardHeader>
+                                        <CardContent>
+                                            <FeedbackTable />
+                                        </CardContent>
+                                    </Card>
+                                </TabsContent>
+                            </Tabs>
+                        ) : (
+                             <div className="flex items-center justify-center gap-2 text-muted-foreground p-8">
+                                <Loader2 className="h-5 w-5 animate-spin" />
+                                <span>Authenticating owner...</span>
+                            </div>
+                        )}
                     </CardContent>
                 </Card>
             </div>

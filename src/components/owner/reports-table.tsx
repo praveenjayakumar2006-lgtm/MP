@@ -1,3 +1,4 @@
+
 'use client';
 import {
   Table,
@@ -24,18 +25,11 @@ type Violation = {
 
 export function ReportsTable() {
     const { firestore } = useFirebase();
-    const [isOwner, setIsOwner] = useState(false);
-
-    useEffect(() => {
-      if (localStorage.getItem('role') === 'owner') {
-        setIsOwner(true);
-      }
-    }, []);
 
     const violationsQuery = useMemoFirebase(() => {
-        if (!firestore || !isOwner) return null;
+        if (!firestore) return null;
         return query(collection(firestore, 'violations'), orderBy('createdAt', 'desc'));
-    }, [firestore, isOwner]);
+    }, [firestore]);
 
     const { data: violations, isLoading } = useCollection<Violation>(violationsQuery);
     
@@ -49,14 +43,6 @@ export function ReportsTable() {
       </TableRow>
     ))
   );
-
-  if (!isOwner) {
-    return (
-      <div className="text-center p-8 text-muted-foreground">
-        Authenticating...
-      </div>
-    )
-  }
 
   return (
     <Table>
