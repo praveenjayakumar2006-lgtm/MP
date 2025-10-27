@@ -62,7 +62,16 @@ export default function LoginPage() {
     }
     
     if (values.role === 'owner') {
-      if (values.email !== 'owner@gmail.com' || values.password !== '123456') {
+      if (values.email === 'owner@gmail.com' && values.password === '123456') {
+        localStorage.setItem('role', 'owner');
+        router.replace('/owner');
+        toast({
+          title: 'Owner Login Successful',
+          description: 'Welcome back, Owner!',
+          duration: 2000,
+        });
+        return;
+      } else {
          toast({
           variant: 'destructive',
           title: 'Owner Login Failed',
