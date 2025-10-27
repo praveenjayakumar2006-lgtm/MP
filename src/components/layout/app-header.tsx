@@ -117,7 +117,19 @@ export function AppHeader() {
             </Link>
         </div>
         
-        {role !== 'owner' && (
+        {role === 'owner' ? (
+          <nav className="hidden md:flex items-center justify-center gap-8 text-lg lg:gap-10 absolute left-1/2 -translate-x-1/2">
+            {ownerNavItems.map(item => (
+              <NavLink
+                key={item.href}
+                href={item.href}
+                className="font-medium"
+              >
+                {item.label}
+              </NavLink>
+            ))}
+          </nav>
+        ) : (
             <nav className="hidden md:flex items-center justify-center gap-8 text-lg lg:gap-10 absolute left-1/2 -translate-x-1/2">
             {navItems.map(item => (
                 <NavLink

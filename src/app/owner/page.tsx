@@ -1,4 +1,3 @@
-
 'use client';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -26,7 +25,7 @@ function OwnerDashboard() {
         }
     }, [router]);
 
-    const showLoading = !isOwner || (isUserLoading && !user);
+    const showLoading = !isOwner || isUserLoading;
     
     const handleTabChange = (value: string) => {
         router.push(`/owner?view=${value}`);
@@ -76,6 +75,16 @@ function OwnerDashboard() {
     );
     
     const renderContent = () => {
+        // Only render content if we have confirmed owner role AND a firebase user is present
+        if (!isOwner || !user) {
+            return (
+                 <div className="flex items-center justify-center gap-2 text-muted-foreground p-8">
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                    <span>Authenticating owner...</span>
+                </div>
+            );
+        }
+        
         switch (view) {
             case 'reports':
                 return renderReports();
@@ -94,7 +103,7 @@ function OwnerDashboard() {
                 {showLoading ? (
                         <div className="flex items-center justify-center gap-2 text-muted-foreground p-8">
                         <Loader2 className="h-5 w-5 animate-spin" />
-                        <span>Authenticating owner...</span>
+                        <span>Loading...</span>
                     </div>
                 ) : (
                     renderContent()
