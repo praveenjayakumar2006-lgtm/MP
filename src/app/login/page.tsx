@@ -103,15 +103,46 @@ export default function LoginPage() {
   }
 
   return (
-    <Card className="mx-auto max-w-xs w-full">
+    <Card className="mx-auto max-w-sm w-full">
+      <Form {...form}>
       <CardHeader>
         <CardTitle className="text-2xl">Login</CardTitle>
         <CardDescription>
           Enter your information to Login to your account
         </CardDescription>
+        <FormField
+            control={form.control}
+            name="role"
+            render={({ field }) => (
+              <FormItem className="pt-4">
+                <FormControl>
+                  <RadioGroup
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                    className="flex items-center space-x-4"
+                  >
+                    <FormLabel className="font-normal">Login as:</FormLabel>
+                    <FormItem className="flex items-center space-x-2 space-y-0">
+                      <FormControl>
+                        <RadioGroupItem value="user" id="user" />
+                      </FormControl>
+                      <FormLabel htmlFor="user" className="font-normal cursor-pointer text-base">User</FormLabel>
+                    </FormItem>
+                    <FormItem className="flex items-center space-x-2 space-y-0">
+                      <FormControl>
+                        <RadioGroupItem value="owner" id="owner"/>
+                      </FormControl>
+                      <FormLabel htmlFor="owner" className="font-normal cursor-pointer text-base">Owner</FormLabel>
+                    </FormItem>
+                  </RadioGroup>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
       </CardHeader>
       <CardContent>
-        <Form {...form}>
+        
           <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
             <FormField
               control={form.control}
@@ -144,41 +175,11 @@ export default function LoginPage() {
                 </FormItem>
               )}
             />
-             <FormField
-              control={form.control}
-              name="role"
-              render={({ field }) => (
-                <FormItem className="my-4">
-                  <FormControl>
-                    <RadioGroup
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                      className="grid grid-cols-3 items-center gap-4"
-                    >
-                      <FormLabel className="font-normal -mr-4">Login as</FormLabel>
-                      <FormItem className="flex items-center space-x-2 space-y-0">
-                        <FormControl>
-                          <RadioGroupItem value="user" id="user" />
-                        </FormControl>
-                        <FormLabel htmlFor="user" className="font-normal cursor-pointer text-base">User</FormLabel>
-                      </FormItem>
-                      <FormItem className="flex items-center space-x-2 space-y-0">
-                        <FormControl>
-                          <RadioGroupItem value="owner" id="owner"/>
-                        </FormControl>
-                        <FormLabel htmlFor="owner" className="font-normal cursor-pointer text-base">Owner</FormLabel>
-                      </FormItem>
-                    </RadioGroup>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
             <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
               Login
             </Button>
           </form>
-        </Form>
+        
         <div className="mt-4 text-center text-sm">
           Don&apos;t have an account?{' '}
           <Link href="/signup" className="underline">
@@ -186,6 +187,7 @@ export default function LoginPage() {
           </Link>
         </div>
       </CardContent>
+      </Form>
     </Card>
   );
 }
