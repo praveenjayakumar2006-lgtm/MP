@@ -7,8 +7,9 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Check, CheckCircle2, X } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Suspense, useState } from 'react';
+import { Suspense, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Image from 'next/image';
 
 
 function ViolationResultContent() {
@@ -17,6 +18,14 @@ function ViolationResultContent() {
   const licensePlate = searchParams.get('licensePlate');
   const [isRejected, setIsRejected] = useState(false);
   const [isConfirmed, setIsConfirmed] = useState(false);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    const storedImage = sessionStorage.getItem('violationImage');
+    if (storedImage) {
+      setImageUrl(storedImage);
+    }
+  }, []);
 
   // Formats license plates like 'HR26DQ05551' to 'HR 26 DQ 05551'
   const formatLicensePlate = (plate: string | null) => {
@@ -35,7 +44,7 @@ function ViolationResultContent() {
 
   return (
     <div className="flex flex-1 items-center justify-center">
-      <Card className="max-w-sm w-full text-center p-0">
+      <Card className="max-w-md w-full text-center p-0">
         <CardHeader className="p-4">
           <div className="flex justify-center">
             <CheckCircle2 className="h-12 w-12 text-green-500" />
@@ -46,39 +55,54 @@ function ViolationResultContent() {
           <p className="text-muted-foreground text-sm mb-6">
             Your violation report has been submitted successfully. We appreciate you taking the time to help us improve safety.
           </p>
-          {formattedLicensePlate && (
-             <div className="mb-6 flex flex-col items-center gap-4">
-                <p className="text-sm text-foreground">
-                    Reported License Plate: <span className="font-semibold bg-primary/10 text-primary px-2 py-1 rounded-md">{formattedLicensePlate}</span>
-                </p>
-                <AnimatePresence>
-                  {!selectionMade && (
-                    <motion.div
-                      className="flex items-center gap-4"
-                      exit={{ opacity: 0, y: 10 }}
-                      transition={{ duration: 0.3 }}
-                    >
-                      <Button 
-                        variant="outline"
-                        className="border-green-500 text-green-600 hover:bg-green-50 hover:text-green-700"
-                        onClick={() => setIsConfirmed(true)}
+
+          <div className="mb-6 flex flex-col items-center gap-4">
+            {imageUrl && (
+              <div className="rounded-lg overflow-hidden border">
+                <Image
+                  src={imageUrl}
+                  alt="Violation evidence"
+                  width={200}
+                  height={150}
+                  className="object-cover"
+                />
+              </div>
+            )}
+            {formattedLicensePlate && (
+               <>
+                  <p className="text-sm text-foreground">
+                      Reported License Plate: <span className="font-semibold bg-primary/10 text-primary px-2 py-1 rounded-md">{formattedLicensePlate}</span>
+                  </p>
+                  <AnimatePresence>
+                    {!selectionMade && (
+                      <motion.div
+                        className="flex items-center gap-4"
+                        exit={{ opacity: 0, y: 10 }}
+                        transition={{ duration: 0.3 }}
                       >
-                          <Check className="mr-2 h-4 w-4" />
-                          Confirm
-                      </Button>
-                      <Button
-                          variant="destructive"
-                          className="bg-red-500/10 text-red-600 hover:bg-red-500/20 border border-red-500/20"
-                          onClick={() => setIsRejected(true)}
-                      >
-                          <X className="mr-2 h-4 w-4" />
-                          Reject
-                      </Button>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-            </div>
-          )}
+                        <Button 
+                          variant="outline"
+                          className="border-green-500 text-green-600 hover:bg-green-50 hover:text-green-700"
+                          onClick={() => setIsConfirmed(true)}
+                        >
+                            <Check className="mr-2 h-4 w-4" />
+                            Confirm
+                        </Button>
+                        <Button
+                            variant="destructive"
+                            className="bg-red-500/10 text-red-600 hover:bg-red-500/20 border border-red-500/20"
+                            onClick={() => setIsRejected(true)}
+                        >
+                            <X className="mr-2 h-4 w-4" />
+                            Reject
+                        </Button>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+              </>
+            )}
+          </div>
+
           <div className="flex justify-center gap-4">
             {selectionMade ? (
               <>
@@ -113,6 +137,7 @@ export default function ViolationResultPage() {
                 <CardContent className="items-center flex flex-col gap-4">
                     <Skeleton className="h-5 w-full" />
                      <Skeleton className="h-5 w-full" />
+                     <Skeleton className="h-32 w-48" />
                     <Skeleton className="h-8 w-3/4" />
                      <div className="flex justify-center gap-4 w-full">
                         <Skeleton className="h-9 w-1/2" />
