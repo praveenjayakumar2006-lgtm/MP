@@ -107,6 +107,7 @@ export function AppHeader() {
   ];
 
   const ownerNavItems = [
+    { href: '/owner', label: 'Home'},
     { href: '/owner', label: 'Violation Reports' },
     { href: '/owner', label: 'User Feedback' },
   ];
