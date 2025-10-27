@@ -95,8 +95,6 @@ export function ViolationChecker() {
   const { setValue } = violationForm;
 
   useEffect(() => {
-    // This effect ensures that if the user comes back to this page with query params,
-    // the form is correctly populated.
     const slot = searchParams.get('slotNumber');
     const type = searchParams.get('violationType');
     if (slot) {
@@ -119,7 +117,7 @@ export function ViolationChecker() {
 
   const handleProceedClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    violationForm.trigger(['slotNumber', 'violationType', 'numberPlate']).then((isValid) => {
+    violationForm.trigger().then((isValid) => {
         if (!isValid) {
             return;
         }
@@ -294,7 +292,7 @@ export function ViolationChecker() {
                   className="w-full"
                   type="button" 
                 >
-                  {imageSource === 'camera' ? 'Proceed to Camera' : 'Select Image from Gallery'}
+                  {imageSource === 'camera' ? 'Proceed to Camera' : (selectedFileName ? 'Upload and Submit' : 'Select Image from Gallery')}
                 </Button>
               </div>
             </CardContent>
