@@ -4,7 +4,7 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Check, CheckCircle2, X, AlertCircle } from 'lucide-react';
+import { Check, CheckCircle2, X, AlertCircle, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useState, useEffect } from 'react';
@@ -41,6 +41,10 @@ function ViolationResultContent() {
 
   const formattedLicensePlate = formatLicensePlate(licensePlate);
 
+  const handleBack = () => {
+    router.back();
+  };
+
   const renderInitialState = () => (
     <>
       <CardHeader className="p-4">
@@ -53,7 +57,6 @@ function ViolationResultContent() {
         <div className="mb-6 flex flex-col items-center gap-4">
           {imageUrl && (
             <div className="rounded-lg overflow-hidden border">
-                <p className="text-sm font-semibold text-foreground mb-2">Violation Evidence</p>
                 <Image
                     src={imageUrl}
                     alt="Violation evidence"
@@ -136,8 +139,14 @@ function ViolationResultContent() {
   );
 
   return (
-    <div className="flex flex-1 items-center justify-center">
-      <Card className="max-w-md w-full text-center p-0">
+    <div className="w-full max-w-md">
+      <div className="flex justify-start mb-4">
+        <Button variant="outline" onClick={handleBack}>
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back
+        </Button>
+      </div>
+      <Card className="w-full text-center p-0">
         <AnimatePresence mode="wait">
             <motion.div
                 key={submissionStatus}
