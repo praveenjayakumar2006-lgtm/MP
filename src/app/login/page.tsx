@@ -148,7 +148,7 @@ export default function LoginPage() {
               control={form.control}
               name="role"
               render={({ field }) => (
-                <FormItem className="my-2">
+                <FormItem className="my-4">
                   <FormControl>
                     <RadioGroup
                       onValueChange={field.onChange}
@@ -160,13 +160,13 @@ export default function LoginPage() {
                         <FormControl>
                           <RadioGroupItem value="user" id="user" />
                         </FormControl>
-                        <FormLabel htmlFor="user" className="font-normal cursor-pointer">User</FormLabel>
+                        <FormLabel htmlFor="user" className="font-normal cursor-pointer text-base">User</FormLabel>
                       </FormItem>
                       <FormItem className="flex items-center space-x-2 space-y-0">
                         <FormControl>
                           <RadioGroupItem value="owner" id="owner"/>
                         </FormControl>
-                        <FormLabel htmlFor="owner" className="font-normal cursor-pointer">Owner</FormLabel>
+                        <FormLabel htmlFor="owner" className="font-normal cursor-pointer text-base">Owner</FormLabel>
                       </FormItem>
                     </RadioGroup>
                   </FormControl>
