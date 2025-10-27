@@ -42,7 +42,6 @@ export default function LoginPage() {
   const { toast } = useToast();
   const router = useRouter();
   const { auth } = useFirebase();
-  const [role, setRole] = useState<'user' | 'owner'>('user');
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -104,7 +103,7 @@ export default function LoginPage() {
   }
 
   return (
-    <Card className="mx-auto max-w-lg w-full">
+    <Card className="mx-auto max-w-sm w-full">
       <CardHeader>
         <CardTitle className="text-2xl">Login</CardTitle>
         <CardDescription>
@@ -114,39 +113,6 @@ export default function LoginPage() {
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
-             <FormField
-              control={form.control}
-              name="role"
-              render={({ field }) => (
-                <FormItem className="space-y-3">
-                  <FormLabel>Login as...</FormLabel>
-                  <FormControl>
-                    <RadioGroup
-                      onValueChange={(value) => {
-                        field.onChange(value);
-                        setRole(value as 'user' | 'owner');
-                      }}
-                      defaultValue={field.value}
-                      className="flex space-x-4"
-                    >
-                      <FormItem className="flex items-center space-x-2 space-y-0">
-                        <FormControl>
-                          <RadioGroupItem value="user" />
-                        </FormControl>
-                        <FormLabel className="font-normal cursor-pointer">User</FormLabel>
-                      </FormItem>
-                      <FormItem className="flex items-center space-x-2 space-y-0">
-                        <FormControl>
-                          <RadioGroupItem value="owner" />
-                        </FormControl>
-                        <FormLabel className="font-normal cursor-pointer">Owner</FormLabel>
-                      </FormItem>
-                    </RadioGroup>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
             <FormField
               control={form.control}
               name="email"
@@ -173,6 +139,36 @@ export default function LoginPage() {
                   <FormLabel>Password</FormLabel>
                   <FormControl>
                     <Input id="password" type="password" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+             <FormField
+              control={form.control}
+              name="role"
+              render={({ field }) => (
+                <FormItem className="space-y-3">
+                  <FormLabel>Login as</FormLabel>
+                  <FormControl>
+                    <RadioGroup
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      className="flex items-center space-x-4"
+                    >
+                      <FormItem className="flex items-center space-x-2 space-y-0">
+                        <FormControl>
+                          <RadioGroupItem value="user" />
+                        </FormControl>
+                        <FormLabel className="font-normal cursor-pointer">User</FormLabel>
+                      </FormItem>
+                      <FormItem className="flex items-center space-x-2 space-y-0">
+                        <FormControl>
+                          <RadioGroupItem value="owner" />
+                        </FormControl>
+                        <FormLabel className="font-normal cursor-pointer">Owner</FormLabel>
+                      </FormItem>
+                    </RadioGroup>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
