@@ -85,7 +85,7 @@ export function FeedbackTable() {
                 </CardHeader>
                 <CardContent>
                     <Separator className="my-4" />
-                    <p className="text-base text-foreground whitespace-pre-wrap">{feedback.feedback}</p>
+                    <p className="text-lg text-foreground whitespace-pre-wrap">{feedback.feedback}</p>
                 </CardContent>
                 <CardFooter>
                     <p className="text-xs text-muted-foreground">
