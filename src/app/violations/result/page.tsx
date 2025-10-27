@@ -22,7 +22,7 @@ function ViolationResultContent() {
   const formatLicensePlate = (plate: string | null) => {
     if (!plate || plate === 'NO_LICENSE_PLATE_DETECTED') return null;
     const cleaned = plate.replace(/\s/g, '').toUpperCase();
-    const match = cleaned.match(/^([A-Z]{2})(\d{2})([A-Z]{1,2})(\d{1,4})$/);
+    const match = cleaned.match(/^([A-Z]{2})(\d{1,2})([A-Z]{1,2})(\d{1,4})$/);
     if (match) {
         const [_, state, district, series, number] = match;
         return `${state} ${district} ${series} ${number}`;
@@ -31,6 +31,7 @@ function ViolationResultContent() {
   }
 
   const formattedLicensePlate = formatLicensePlate(licensePlate);
+  const selectionMade = isRejected || isConfirmed;
 
   return (
     <div className="flex flex-1 items-center justify-center">
@@ -51,7 +52,7 @@ function ViolationResultContent() {
                     Reported License Plate: <span className="font-semibold bg-primary/10 text-primary px-2 py-1 rounded-md">{formattedLicensePlate}</span>
                 </p>
                 <AnimatePresence>
-                  {!(isRejected || isConfirmed) && (
+                  {!selectionMade && (
                     <motion.div
                       className="flex items-center gap-4"
                       exit={{ opacity: 0, y: 10 }}
@@ -79,11 +80,17 @@ function ViolationResultContent() {
             </div>
           )}
           <div className="flex justify-center gap-4">
-            <Link href="/home">
-              <Button size="sm">Home</Button>
-            </Link>
-            {(isRejected || isConfirmed) && (
+            {selectionMade ? (
+              <>
+                <Link href="/home">
+                  <Button size="sm">Home</Button>
+                </Link>
                 <Button variant="outline" size="sm" onClick={() => router.replace('/violations')}>Report Another Violation</Button>
+              </>
+            ) : (
+              <Link href="/home">
+                <Button size="sm">Home</Button>
+              </Link>
             )}
           </div>
         </CardContent>
