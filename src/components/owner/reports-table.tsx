@@ -7,7 +7,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { useCollection, useFirebase, useMemoFirebase, useUser } from '@/firebase';
+import { useCollection, useFirebase, useMemoFirebase } from '@/firebase';
 import { collection, query, orderBy } from 'firebase/firestore';
 import { format } from 'date-fns';
 import { Skeleton } from '../ui/skeleton';
@@ -27,14 +27,12 @@ export function ReportsTable() {
     const [isOwner, setIsOwner] = useState(false);
 
     useEffect(() => {
-      // Role is checked on the client after mount
       if (localStorage.getItem('role') === 'owner') {
         setIsOwner(true);
       }
     }, []);
 
     const violationsQuery = useMemoFirebase(() => {
-        // Only create the query if the user is an owner and firestore is available
         if (!firestore || !isOwner) return null;
         return query(collection(firestore, 'violations'), orderBy('createdAt', 'desc'));
     }, [firestore, isOwner]);
@@ -55,7 +53,7 @@ export function ReportsTable() {
   if (!isOwner) {
     return (
       <div className="text-center p-8 text-muted-foreground">
-        Loading data...
+        Authenticating...
       </div>
     )
   }
