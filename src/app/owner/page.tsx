@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,12 +7,10 @@ import { useEffect, useState, Suspense } from "react";
 import { ReportsTable } from "@/components/owner/reports-table";
 import { FeedbackTable } from "@/components/owner/feedback-table";
 import { Loader2 } from "lucide-react";
-import { useUser } from "@/firebase";
 
 function OwnerDashboard() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const { user, isUserLoading } = useUser();
     const [isOwner, setIsOwner] = useState(false);
 
     const view = searchParams.get('view') || 'home';
@@ -25,8 +24,6 @@ function OwnerDashboard() {
         }
     }, [router]);
 
-    const showLoading = !isOwner || isUserLoading;
-    
     const handleTabChange = (value: string) => {
         router.push(`/owner?view=${value}`);
     };
@@ -55,7 +52,7 @@ function OwnerDashboard() {
                 </CardDescription>
             </CardHeader>
             <CardContent>
-                {isOwner && user && <ReportsTable />}
+                <ReportsTable />
             </CardContent>
         </Card>
     );
@@ -69,18 +66,17 @@ function OwnerDashboard() {
                 </CardDescription>
             </CardHeader>
             <CardContent>
-                {isOwner && user && <FeedbackTable />}
+                <FeedbackTable />
             </CardContent>
         </Card>
     );
     
     const renderContent = () => {
-        // Only render content if we have confirmed owner role AND a firebase user is present
-        if (!isOwner || !user) {
+        if (!isOwner) {
             return (
                  <div className="flex items-center justify-center gap-2 text-muted-foreground p-8">
                     <Loader2 className="h-5 w-5 animate-spin" />
-                    <span>Authenticating owner...</span>
+                    <span>Loading...</span>
                 </div>
             );
         }
@@ -100,14 +96,7 @@ function OwnerDashboard() {
     return (
         <div className="flex flex-1 flex-col items-center justify-center bg-background p-4 md:p-6">
             <div className="w-full max-w-6xl">
-                {showLoading ? (
-                        <div className="flex items-center justify-center gap-2 text-muted-foreground p-8">
-                        <Loader2 className="h-5 w-5 animate-spin" />
-                        <span>Loading...</span>
-                    </div>
-                ) : (
-                    renderContent()
-                )}
+                {renderContent()}
             </div>
         </div>
     );
