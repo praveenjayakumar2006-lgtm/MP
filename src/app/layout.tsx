@@ -22,35 +22,47 @@ function AppContent({ children }: { children: React.ReactNode }) {
   const [role, setRole] = useState<string | null>(null);
 
   useEffect(() => {
+    // This effect runs on the client and will re-run if path changes.
+    // It's better to get the role here so it's fresh.
     setRole(localStorage.getItem('role'));
-  }, []);
+  }, [pathname]); // Depend on pathname to re-check role if user navigates
 
   const isAuthPage = useMemo(() => ['/login', '/signup'].includes(pathname), [pathname]);
   const isOwnerPage = useMemo(() => pathname === '/owner', [pathname]);
 
   useEffect(() => {
-    const userRole = localStorage.getItem('role');
-
-    if (!isUserLoading) {
-      if (userRole === 'owner') {
-        if (!isOwnerPage) {
-          router.replace('/owner');
-        }
-        return; 
+    // No need to get from localStorage again, use the state `role`
+    if (role === 'owner') {
+      if (!isOwnerPage) {
+        router.replace('/owner');
       }
-      
-      if (user) {
+      return; // Early return for owner to prevent other checks
+    }
+    
+    // The rest of the logic is for regular users
+    if (!isUserLoading) {
+      if (user) { // User is logged in
         if (isAuthPage) {
             router.replace('/home');
         }
-      } else if (!isAuthPage) {
-        router.replace('/login');
+      } else { // User is not logged in
+        if (!isAuthPage) {
+          router.replace('/login');
+        }
       }
     }
-  }, [user, isUserLoading, isAuthPage, isOwnerPage, router]);
+  }, [user, isUserLoading, isAuthPage, isOwnerPage, router, role]);
 
-  if (isUserLoading || (role === 'owner' && !isOwnerPage) || (!user && role !== 'owner' && !isAuthPage) || (user && isAuthPage)) {
+  // Loading state logic
+  if (role === 'owner' && !isOwnerPage) {
     return <Loading />;
+  }
+  if (role !== 'owner' && !isUserLoading) {
+    if (user && isAuthPage) return <Loading />;
+    if (!user && !isAuthPage) return <Loading />;
+  }
+  if (isUserLoading && !isAuthPage && role !== 'owner') {
+     return <Loading />;
   }
   
   return (
