@@ -42,7 +42,11 @@ function ViolationResultContent() {
   const formattedLicensePlate = formatLicensePlate(licensePlate);
 
   const handleBack = () => {
-    router.back();
+    if (submissionStatus !== 'pending') {
+      setSubmissionStatus('pending');
+    } else {
+      router.back();
+    }
   };
 
   const renderInitialState = () => (
@@ -140,11 +144,13 @@ function ViolationResultContent() {
 
   return (
     <div className="w-full max-w-md">
-      <div className="flex justify-start mb-4">
-        <Button variant="outline" onClick={handleBack}>
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back
-        </Button>
+      <div className="flex justify-start mb-4 h-10">
+        {submissionStatus !== 'pending' && (
+            <Button variant="outline" onClick={handleBack}>
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Back
+            </Button>
+        )}
       </div>
       <Card className="w-full text-center p-0">
         <AnimatePresence mode="wait">
