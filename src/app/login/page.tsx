@@ -62,8 +62,6 @@ export default function LoginPage() {
         });
         localStorage.setItem('role', 'owner');
         router.replace('/owner');
-        // Force a reload to ensure layout updates correctly for owner
-        window.location.href = '/owner';
       } else {
         toast({
           variant: 'destructive',

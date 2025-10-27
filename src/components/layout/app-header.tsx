@@ -21,7 +21,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useEffect, useState } from 'react';
-import { useFirebase, useUser } from '@/firebase';
+import { useUser } from '@/firebase';
 import { Separator } from '@/components/ui/separator';
 import { signOut } from 'firebase/auth';
 import { useToast } from '@/hooks/use-toast';
@@ -69,7 +69,7 @@ export function AppHeader() {
       router.replace('/login');
       return;
     }
-
+    
     if (!auth) return;
 
     try {
@@ -79,7 +79,7 @@ export function AppHeader() {
         description: 'You have been successfully signed out.',
         duration: 2000,
       });
-      router.replace('/login');
+      // The onAuthStateChanged listener in layout.tsx will handle the redirect
     } catch (error) {
       toast({
         variant: 'destructive',
