@@ -61,11 +61,9 @@ export function AppHeader() {
     localStorage.removeItem('role');
     if (role === 'owner') {
         router.replace('/login');
+        return;
     }
     if (!auth) {
-        if (role === 'owner') {
-             router.replace('/login');
-        }
         return;
     };
     try {
@@ -199,7 +197,7 @@ export function AppHeader() {
                     {(user || role === 'owner') && (
                       <div className="mb-4">
                         {user && user.displayName && role !== 'owner' && (
-                            <p className="text-foreground text-xl font-medium mb-4 text-center underline underline-offset-8 decoration-primary decoration-4">{user.displayName}</p>
+                            <p className="text-destructive text-xl font-medium mb-4 text-center underline decoration-destructive">{user.displayName}</p>
                         )}
                         <Button
                           variant="destructive"
@@ -254,4 +252,3 @@ export function AppHeader() {
   );
 }
 
-    
