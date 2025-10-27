@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useContext } from 'react';
@@ -25,6 +24,7 @@ import { ReservationsContext } from '@/context/reservations-context';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 import { Skeleton } from '../ui/skeleton';
+import { useUser } from '@/firebase';
 
 type BookingDetails = {
   vehiclePlate: string;
@@ -34,7 +34,14 @@ type BookingDetails = {
 };
 
 export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails }) {
-  const { addReservation, reservations, removeReservation, isClient } = useContext(ReservationsContext)!;
+  const reservationsContext = useContext(ReservationsContext);
+  const { user } = useUser();
+  
+  if (!reservationsContext) {
+    throw new Error('ParkingMap must be used within a ReservationsProvider');
+  }
+  
+  const { addReservation, reservations, removeReservation, isClient, isLoading } = reservationsContext;
   const [slots] = useState<ParkingSlot[]>(defaultSlots);
   const [selectedSlot, setSelectedSlot] = useState<ParkingSlot | null>(null);
   const [reservationToCancel, setReservationToCancel] = useState<Reservation | null>(null);
@@ -62,10 +69,9 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
   }
 
   const handleSlotClick = (slot: ParkingSlot) => {
-    const status = getSlotStatus(slot.id);
-    const conflictingRes = getConflictingReservation(slot.id);
+    const { status, isUser, conflictingReservation } = getSlotStatus(slot.id);
 
-    if (status.status === 'available') {
+    if (status === 'available') {
       if (!bookingDetails) {
           toast({
             variant: 'destructive',
@@ -76,21 +82,21 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
       }
       setSelectedSlot(slot);
       setShowSuccess(false);
-    } else if (status.status === 'reserved' && status.isUser && conflictingRes) {
-        if (conflictingRes.status === 'Completed') {
+    } else if (status === 'reserved' && isUser && conflictingReservation) {
+        if (conflictingReservation.status === 'Completed') {
              toast({
                 variant: 'destructive',
                 title: 'Action Not Allowed',
                 description: 'This reservation is completed and cannot be cancelled.',
              });
-        } else if (conflictingRes.status === 'Active') {
+        } else if (conflictingReservation.status === 'Active') {
             toast({
                 variant: 'destructive',
                 title: 'Action Not Allowed',
                 description: 'This reservation is active and cannot be cancelled.',
             });
         } else {
-            setReservationToCancel(conflictingRes);
+            setReservationToCancel(conflictingReservation);
         }
     }
   };
@@ -104,16 +110,11 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
     const startDate = parseISO(bookingDetails.date);
     startDate.setHours(hour, minute);
 
-    const newReservation: Reservation = {
-      id: Date.now().toString(),
+    const newReservation: Omit<Reservation, 'id' | 'createdAt' | 'updatedAt' | 'userId' | 'status'> = {
       slotId: selectedSlot.id,
-      userId: 'user-123',
       vehiclePlate: bookingDetails.vehiclePlate,
       startTime: startDate,
       endTime: addHours(startDate, parseInt(bookingDetails.duration, 10)),
-      status: 'Upcoming',
-      createdAt: new Date(),
-      updatedAt: new Date(),
     };
     
     addReservation(newReservation);
@@ -140,22 +141,22 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
     setReservationToCancel(null);
   };
   
-  const getSlotStatus = (slotId: string): { status: 'available' | 'occupied' | 'reserved', isUser: boolean } => {
-    const isOccupied = slots.find(s => s.id === slotId)?.status === 'occupied';
+  const getSlotStatus = (slotId: string): { status: 'available' | 'occupied' | 'reserved', isUser: boolean, conflictingReservation: Reservation | null } => {
+    const isOccupiedByStatus = slots.find(s => s.id === slotId)?.status === 'occupied';
     
     if (!bookingDetails) {
-        return { status: isOccupied ? 'occupied' : 'available', isUser: false };
+        return { status: isOccupiedByStatus ? 'occupied' : 'available', isUser: false, conflictingReservation: null };
     }
 
     const conflictingReservation = getConflictingReservation(slotId);
 
     if (conflictingReservation) {
-        return { status: 'reserved', isUser: conflictingReservation.userId === 'user-123' };
+        return { status: 'reserved', isUser: conflictingReservation.userId === user?.uid, conflictingReservation };
     }
 
-    if(isOccupied) return { status: 'occupied', isUser: false };
+    if(isOccupiedByStatus) return { status: 'occupied', isUser: false, conflictingReservation: null };
     
-    return { status: 'available', isUser: false };
+    return { status: 'available', isUser: false, conflictingReservation: null };
   };
 
 
@@ -183,7 +184,7 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
   const carSlots = slots.filter((slot) => slot.type === 'car');
   const bikeSlots = slots.filter((slot) => slot.type === 'bike');
 
-  if (!isClient) {
+  if (!isClient || isLoading) {
     return <Skeleton className="h-[450px] w-full max-w-4xl" />;
   }
 

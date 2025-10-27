@@ -1,3 +1,4 @@
+
 {
   "entities": {
     "User": {
@@ -77,35 +78,50 @@
         },
         "userId": {
           "type": "string",
-          "description": "Reference to User. (Relationship: User 1:N Reservation)"
+          "description": "The UID of the user who made the reservation."
         },
-        "parkingSlotId": {
+        "slotId": {
           "type": "string",
-          "description": "Reference to ParkingSlot. (Relationship: ParkingSlot 1:N Reservation)"
+          "description": "The ID of the reserved parking slot."
+        },
+        "vehiclePlate": {
+          "type": "string",
+          "description": "The license plate of the vehicle."
         },
         "startTime": {
           "type": "string",
-          "description": "The start time of the reservation.",
-          "format": "date-time"
+          "format": "date-time",
+          "description": "The start time of the reservation."
         },
         "endTime": {
           "type": "string",
-          "description": "The end time of the reservation.",
-          "format": "date-time"
+          "format": "date-time",
+          "description": "The end time of the reservation."
         },
-        "reservationDate": {
+        "status": {
           "type": "string",
-          "description": "The date of the reservation",
-          "format": "date-time"
+          "enum": ["Upcoming", "Active", "Completed"],
+          "description": "The current status of the reservation."
+        },
+        "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "The timestamp when the reservation was created."
+        },
+        "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "The timestamp when the reservation was last updated."
         }
       },
       "required": [
-        "id",
         "userId",
-        "parkingSlotId",
+        "slotId",
+        "vehiclePlate",
         "startTime",
         "endTime",
-        "reservationDate"
+        "status",
+        "createdAt"
       ]
     },
     "Violation": {
@@ -185,18 +201,14 @@
         }
       },
       {
-        "path": "/users/{userId}/reservations/{reservationId}",
+        "path": "/reservations/{reservationId}",
         "definition": {
           "entityName": "Reservation",
           "schema": {
             "$ref": "#/backend/entities/Reservation"
           },
-          "description": "Stores reservation data for each user.  Includes denormalized 'userId' from the parent document for authorization independence.",
+          "description": "Stores all reservation data for the application.",
           "params": [
-            {
-              "name": "userId",
-              "description": "The Firebase Authentication UID of the user making the reservation."
-            },
             {
               "name": "reservationId",
               "description": "Unique identifier for the reservation."
