@@ -148,25 +148,25 @@ export default function LoginPage() {
               control={form.control}
               name="role"
               render={({ field }) => (
-                <FormItem className="space-y-3">
-                  <FormLabel>Login as</FormLabel>
+                <FormItem>
                   <FormControl>
                     <RadioGroup
                       onValueChange={field.onChange}
                       defaultValue={field.value}
-                      className="flex items-center space-x-4"
+                      className="grid grid-cols-3 items-center gap-4"
                     >
+                      <FormLabel className="font-normal -mr-4">Login as</FormLabel>
                       <FormItem className="flex items-center space-x-2 space-y-0">
                         <FormControl>
-                          <RadioGroupItem value="user" />
+                          <RadioGroupItem value="user" id="user" />
                         </FormControl>
-                        <FormLabel className="font-normal cursor-pointer">User</FormLabel>
+                        <FormLabel htmlFor="user" className="font-normal cursor-pointer">User</FormLabel>
                       </FormItem>
                       <FormItem className="flex items-center space-x-2 space-y-0">
                         <FormControl>
-                          <RadioGroupItem value="owner" />
+                          <RadioGroupItem value="owner" id="owner"/>
                         </FormControl>
-                        <FormLabel className="font-normal cursor-pointer">Owner</FormLabel>
+                        <FormLabel htmlFor="owner" className="font-normal cursor-pointer">Owner</FormLabel>
                       </FormItem>
                     </RadioGroup>
                   </FormControl>
