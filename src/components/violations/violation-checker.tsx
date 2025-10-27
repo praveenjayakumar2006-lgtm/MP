@@ -114,31 +114,30 @@ export function ViolationChecker() {
   }, [imageSource]);
 
 
-  const handleProceedClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    violationForm.trigger().then((isValid) => {
-        if (!isValid) {
-            return;
-        }
-
-        const currentValues = violationForm.getValues();
-        const params = new URLSearchParams({
-            slotNumber: currentValues.slotNumber,
-            violationType: currentValues.violationType!,
-            licensePlate: currentValues.numberPlate,
-        });
-
-        if (currentValues.imageSource === 'camera') {
-            router.push(`/violations/camera?${params.toString()}`);
-        } else if (currentValues.imageSource === 'upload') {
-            const imageFile = violationForm.getValues('image');
-            if (imageFile) {
-                 router.push(`/violations/result?${params.toString()}`);
-            } else {
-                fileInputRef.current?.click();
-            }
-        }
+  const handleSubmit = (values: ViolationFormValues) => {
+    const params = new URLSearchParams({
+      slotNumber: values.slotNumber,
+      violationType: values.violationType!,
+      licensePlate: values.numberPlate,
     });
+
+    if (values.imageSource === 'camera') {
+      router.push(`/violations/camera?${params.toString()}`);
+    } else if (values.imageSource === 'upload' && values.image) {
+      router.push(`/violations/result?${params.toString()}`);
+    }
+  };
+  
+  const handleButtonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    const imageSourceValue = violationForm.getValues('imageSource');
+    const imageFile = violationForm.getValues('image');
+
+    if (imageSourceValue === 'upload' && !imageFile) {
+        fileInputRef.current?.click();
+    } else {
+        violationForm.handleSubmit(handleSubmit)();
+    }
   };
 
   async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -165,7 +164,7 @@ export function ViolationChecker() {
       </div>
       <Card className="w-full">
         <Form {...violationForm}>
-          <form>
+          <form onSubmit={violationForm.handleSubmit(handleSubmit)}>
             <CardContent className="space-y-4 pt-6">
               <FormField
                 control={violationForm.control}
@@ -287,7 +286,7 @@ export function ViolationChecker() {
               
               <div className="pt-2">
                 <Button 
-                  onClick={handleProceedClick} 
+                  onClick={handleButtonClick} 
                   className="w-full"
                   type="button" 
                 >
