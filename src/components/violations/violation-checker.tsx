@@ -25,6 +25,7 @@ import {
 } from '@/components/ui/select';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Paperclip } from 'lucide-react';
 
 const violationSchemaBase = z.object({
   slotNumber: z
@@ -73,6 +74,7 @@ export function ViolationChecker() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
 
   const defaultSlotNumber = searchParams.get('slotNumber') || '';
   const defaultViolationType = searchParams.get('violationType');
@@ -105,6 +107,15 @@ export function ViolationChecker() {
     }
   }, [searchParams, setValue]);
 
+  useEffect(() => {
+    if (imageSource === 'camera') {
+      setSelectedFileName(null);
+      if(fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  }, [imageSource]);
+
 
   const handleProceedClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -131,6 +142,7 @@ export function ViolationChecker() {
   async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (file) {
+      setSelectedFileName(file.name);
       const imageDataUrl = await fileToDataUrl(file);
       sessionStorage.setItem('violationImage', imageDataUrl);
 
@@ -141,6 +153,8 @@ export function ViolationChecker() {
           licensePlate: currentValues.numberPlate,
       });
       router.push(`/violations/uploading?${params.toString()}`);
+    } else {
+        setSelectedFileName(null);
     }
   }
 
@@ -149,7 +163,7 @@ export function ViolationChecker() {
       <div className="text-center mb-8">
         <h1 className="text-3xl font-semibold">Report a Violation</h1>
         <p className="text-base text-muted-foreground mt-2">
-          Report a parking violation.
+          Report a parking violation using our <span className="font-semibold text-primary">AI system</span>.
         </p>
       </div>
       <Card className="w-full">
@@ -255,6 +269,12 @@ export function ViolationChecker() {
                         <FormLabel htmlFor="camera" className="font-normal cursor-pointer">Take Photo</FormLabel>
                       </FormItem>
                     </RadioGroup>
+                     {selectedFileName && imageSource === 'upload' && (
+                        <div className="text-sm text-muted-foreground flex items-center gap-2 pt-2">
+                            <Paperclip className="h-4 w-4" />
+                            <span>{selectedFileName}</span>
+                        </div>
+                    )}
                     <FormMessage />
                   </FormItem>
                 )}
@@ -274,11 +294,7 @@ export function ViolationChecker() {
                   className="w-full"
                   type="button" 
                 >
-                  {imageSource === 'camera' ? (
-                    'Proceed to Camera'
-                  ) : (
-                    'Proceed to Gallery'
-                  )}
+                  {imageSource === 'camera' ? 'Proceed to Camera' : 'Select Image from Gallery'}
                 </Button>
               </div>
             </CardContent>
