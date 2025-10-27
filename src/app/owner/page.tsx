@@ -2,18 +2,21 @@
 'use client';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState, Suspense } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ReportsTable } from "@/components/owner/reports-table";
 import { FeedbackTable } from "@/components/owner/feedback-table";
 import { Loader2 } from "lucide-react";
 import { useUser } from "@/firebase";
 
-export default function OwnerPage() {
+function OwnerDashboard() {
     const router = useRouter();
+    const searchParams = useSearchParams();
     const { user, isUserLoading } = useUser();
     const [isOwner, setIsOwner] = useState(false);
+
+    const view = searchParams.get('view') || 'home';
 
     useEffect(() => {
         const role = localStorage.getItem('role');
@@ -24,7 +27,79 @@ export default function OwnerPage() {
         }
     }, [router]);
 
-    const showLoading = !isOwner || isUserLoading;
+    const showLoading = !isOwner || (isUserLoading && !user);
+    
+    const handleTabChange = (value: string) => {
+        router.push(`/owner?view=${value}`);
+    };
+
+    const renderHome = () => (
+        <Card>
+            <CardHeader>
+                <CardTitle>Welcome, Owner!</CardTitle>
+                <CardDescription>
+                    Select a tab to view violation reports or user feedback.
+                </CardDescription>
+            </CardHeader>
+            <CardContent>
+                <p>This is the central dashboard for managing your parking application.</p>
+            </CardContent>
+        </Card>
+    );
+
+    const renderReports = () => (
+         <Card>
+            <CardHeader>
+                <CardTitle>Violation Reports</CardTitle>
+                <CardDescription>
+                    All violation reports submitted by users.
+                </CardDescription>
+            </CardHeader>
+            <CardContent>
+                {isOwner && user && <ReportsTable />}
+            </CardContent>
+        </Card>
+    );
+
+    const renderFeedback = () => (
+        <Card>
+            <CardHeader>
+                <CardTitle>User Feedback</CardTitle>
+                <CardDescription>
+                    All feedback submitted by users.
+                </CardDescription>
+            </CardHeader>
+            <CardContent>
+                {isOwner && user && <FeedbackTable />}
+            </CardContent>
+        </Card>
+    );
+    
+    const renderContent = () => {
+        switch (view) {
+            case 'reports':
+                return renderReports();
+            case 'feedback':
+                return renderFeedback();
+            case 'home':
+            default:
+                return (
+                    <Tabs defaultValue="reports" className="w-full">
+                        <TabsList className="grid w-full grid-cols-2">
+                            <TabsTrigger value="reports" onClick={() => handleTabChange('reports')}>Violation Reports</TabsTrigger>
+                            <TabsTrigger value="feedback" onClick={() => handleTabChange('feedback')}>User Feedback</TabsTrigger>
+                        </TabsList>
+                        <TabsContent value="reports">
+                           {renderReports()}
+                        </TabsContent>
+                        <TabsContent value="feedback">
+                            {renderFeedback()}
+                        </TabsContent>
+                    </Tabs>
+                )
+        }
+    }
+
 
     return (
         <div className="flex flex-1 flex-col items-center justify-center bg-background p-4 md:p-6">
@@ -41,38 +116,7 @@ export default function OwnerPage() {
                                 <span>Authenticating owner...</span>
                             </div>
                         ) : (
-                            <Tabs defaultValue="reports" className="w-full">
-                                <TabsList className="grid w-full grid-cols-2">
-                                    <TabsTrigger value="reports">Violation Reports</TabsTrigger>
-                                    <TabsTrigger value="feedback">User Feedback</TabsTrigger>
-                                </TabsList>
-                                <TabsContent value="reports">
-                                    <Card>
-                                        <CardHeader>
-                                            <CardTitle>Violation Reports</CardTitle>
-                                            <CardDescription>
-                                                All violation reports submitted by users.
-                                            </CardDescription>
-                                        </CardHeader>
-                                        <CardContent>
-                                            <ReportsTable />
-                                        </CardContent>
-                                    </Card>
-                                </TabsContent>
-                                <TabsContent value="feedback">
-                                    <Card>
-                                        <CardHeader>
-                                            <CardTitle>User Feedback</CardTitle>
-                                            <CardDescription>
-                                                All feedback submitted by users.
-                                            </CardDescription>
-                                        </CardHeader>
-                                        <CardContent>
-                                            <FeedbackTable />
-                                        </CardContent>
-                                    </Card>
-                                </TabsContent>
-                            </Tabs>
+                            renderContent()
                         )}
                     </CardContent>
                 </Card>
@@ -80,3 +124,13 @@ export default function OwnerPage() {
         </div>
     );
 }
+
+export default function OwnerPage() {
+    return (
+        <Suspense fallback={<div className="flex items-center justify-center flex-1"><Loader2 className="h-8 w-8 animate-spin" /></div>}>
+            <OwnerDashboard />
+        </Suspense>
+    )
+}
+
+    

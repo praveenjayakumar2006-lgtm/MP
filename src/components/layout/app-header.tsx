@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -71,7 +72,7 @@ export function AppHeader() {
         description: 'You have been successfully signed out.',
         duration: 2000,
       });
-      router.replace('/login');
+      // The onAuthStateChanged listener will handle the redirect
     } catch (error) {
       toast({
         variant: 'destructive',
@@ -108,8 +109,8 @@ export function AppHeader() {
 
   const ownerNavItems = [
     { href: '/owner', label: 'Home'},
-    { href: '/owner', label: 'Violation Reports' },
-    { href: '/owner', label: 'User Feedback' },
+    { href: '/owner?view=reports', label: 'Violation Reports' },
+    { href: '/owner?view=feedback', label: 'User Feedback' },
   ];
 
   return (
@@ -174,7 +175,7 @@ export function AppHeader() {
                   <Separator className="my-2" />
                   {role === 'owner' && ownerNavItems.map(item => (
                       <Link
-                      key={item.label}
+                      key={item.href}
                       href={item.href}
                       onClick={handleLinkClick}
                       className="transition-colors hover:text-primary text-foreground"
@@ -265,3 +266,5 @@ export function AppHeader() {
     </header>
   );
 }
+
+    
