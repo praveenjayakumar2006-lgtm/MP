@@ -38,11 +38,12 @@ function OwnerDashboard() {
             <CardHeader>
                 <CardTitle>Welcome, Owner!</CardTitle>
                 <CardDescription>
-                    Select a tab to view violation reports or user feedback.
+                    This is the central dashboard for managing your parking application.
                 </CardDescription>
             </CardHeader>
             <CardContent>
-                <p>This is the central dashboard for managing your parking application.</p>
+                <p>From here, you can review user-submitted violation reports and read valuable feedback to improve your service.</p>
+                <p className="mt-4">Please use the navigation menu or the links in the header to view reports and feedback.</p>
             </CardContent>
         </Card>
     );
@@ -83,20 +84,7 @@ function OwnerDashboard() {
                 return renderFeedback();
             case 'home':
             default:
-                return (
-                    <Tabs defaultValue="reports" className="w-full">
-                        <TabsList className="grid w-full grid-cols-2">
-                            <TabsTrigger value="reports" onClick={() => handleTabChange('reports')}>Violation Reports</TabsTrigger>
-                            <TabsTrigger value="feedback" onClick={() => handleTabChange('feedback')}>User Feedback</TabsTrigger>
-                        </TabsList>
-                        <TabsContent value="reports">
-                           {renderReports()}
-                        </TabsContent>
-                        <TabsContent value="feedback">
-                            {renderFeedback()}
-                        </TabsContent>
-                    </Tabs>
-                )
+                return renderHome();
         }
     }
 
