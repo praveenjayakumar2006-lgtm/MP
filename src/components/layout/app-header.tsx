@@ -59,6 +59,9 @@ export function AppHeader() {
 
   const handleSignOut = async () => {
     localStorage.removeItem('role');
+    if (role === 'owner') {
+        router.replace('/login');
+    }
     if (!auth) {
         if (role === 'owner') {
              router.replace('/login');
@@ -72,7 +75,7 @@ export function AppHeader() {
         description: 'You have been successfully signed out.',
         duration: 2000,
       });
-      // The auth listener in the root layout will handle the redirect to /login
+      router.replace('/login');
     } catch (error) {
       toast({
         variant: 'destructive',
@@ -195,7 +198,7 @@ export function AppHeader() {
                   <div className="absolute bottom-6 left-6 right-6">
                     {(user || role === 'owner') && (
                       <div className="mb-4">
-                        {user && user.displayName && (
+                        {user && user.displayName && role !== 'owner' && (
                             <p className="text-foreground text-xl font-medium mb-4 text-center underline underline-offset-8 decoration-primary decoration-4">{user.displayName}</p>
                         )}
                         <Button
@@ -250,3 +253,5 @@ export function AppHeader() {
     </header>
   );
 }
+
+    
