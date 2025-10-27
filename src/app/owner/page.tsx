@@ -44,7 +44,7 @@ function OwnerDashboard() {
     );
 
     const renderReports = () => (
-         <Card>
+         <Card className="border-0 shadow-none">
             <CardHeader>
                 <CardTitle className="text-3xl">Violation Reports</CardTitle>
                 <CardDescription>
