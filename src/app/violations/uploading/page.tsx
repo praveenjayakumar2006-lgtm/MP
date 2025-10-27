@@ -24,7 +24,6 @@ function UploadingPageContent() {
       const imageDataUri = sessionStorage.getItem('violationImage');
 
       if (!imageDataUri || !slotNumber || !violationType || !licensePlate) {
-        toast({ variant: 'destructive', title: 'Missing Information', description: 'Could not submit report. Please try again.' });
         router.replace('/violations');
         return;
       }

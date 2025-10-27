@@ -84,7 +84,6 @@ function CameraPageContent() {
   
   const handleConfirm = async () => {
     if (!capturedImage || !slotNumber || !violationType || !licensePlate) {
-        toast({ variant: 'destructive', title: 'Missing Information', description: 'Could not submit report.' });
         return;
     }
     
