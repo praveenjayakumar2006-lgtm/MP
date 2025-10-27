@@ -8,9 +8,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ReportsTable } from "@/components/owner/reports-table";
 import { FeedbackTable } from "@/components/owner/feedback-table";
 import { Loader2 } from "lucide-react";
+import { useUser } from "@/firebase";
 
 export default function OwnerPage() {
     const router = useRouter();
+    const { user, isUserLoading } = useUser();
     const [isOwner, setIsOwner] = useState(false);
 
     useEffect(() => {
@@ -22,6 +24,8 @@ export default function OwnerPage() {
         }
     }, [router]);
 
+    const showLoading = !isOwner || isUserLoading;
+
     return (
         <div className="flex flex-1 flex-col items-center justify-center bg-background p-4 md:p-6">
             <div className="w-full max-w-6xl">
@@ -31,7 +35,12 @@ export default function OwnerPage() {
                         <CardDescription>Review user-submitted reports and feedback.</CardDescription>
                     </CardHeader>
                     <CardContent>
-                        {isOwner ? (
+                        {showLoading ? (
+                             <div className="flex items-center justify-center gap-2 text-muted-foreground p-8">
+                                <Loader2 className="h-5 w-5 animate-spin" />
+                                <span>Authenticating owner...</span>
+                            </div>
+                        ) : (
                             <Tabs defaultValue="reports" className="w-full">
                                 <TabsList className="grid w-full grid-cols-2">
                                     <TabsTrigger value="reports">Violation Reports</TabsTrigger>
@@ -64,11 +73,6 @@ export default function OwnerPage() {
                                     </Card>
                                 </TabsContent>
                             </Tabs>
-                        ) : (
-                             <div className="flex items-center justify-center gap-2 text-muted-foreground p-8">
-                                <Loader2 className="h-5 w-5 animate-spin" />
-                                <span>Authenticating owner...</span>
-                            </div>
                         )}
                     </CardContent>
                 </Card>
