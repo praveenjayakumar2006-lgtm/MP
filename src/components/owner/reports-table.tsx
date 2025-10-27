@@ -1,4 +1,3 @@
-
 'use client';
 import {
   Table,
@@ -8,11 +7,12 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { useCollection, useFirebase, useMemoFirebase } from '@/firebase';
+import { useCollection, useFirebase, useMemoFirebase, useUser } from '@/firebase';
 import { collection, query, orderBy } from 'firebase/firestore';
 import { format } from 'date-fns';
 import { Skeleton } from '../ui/skeleton';
 import { Badge } from '../ui/badge';
+import { useEffect, useState } from 'react';
 
 type Violation = {
     id: string;
@@ -24,11 +24,20 @@ type Violation = {
 
 export function ReportsTable() {
     const { firestore } = useFirebase();
+    const [isOwner, setIsOwner] = useState(false);
+
+    useEffect(() => {
+      // Role is checked on the client after mount
+      if (localStorage.getItem('role') === 'owner') {
+        setIsOwner(true);
+      }
+    }, []);
 
     const violationsQuery = useMemoFirebase(() => {
-        if (!firestore) return null;
+        // Only create the query if the user is an owner and firestore is available
+        if (!firestore || !isOwner) return null;
         return query(collection(firestore, 'violations'), orderBy('createdAt', 'desc'));
-    }, [firestore]);
+    }, [firestore, isOwner]);
 
     const { data: violations, isLoading } = useCollection<Violation>(violationsQuery);
     
@@ -42,6 +51,14 @@ export function ReportsTable() {
       </TableRow>
     ))
   );
+
+  if (!isOwner) {
+    return (
+      <div className="text-center p-8 text-muted-foreground">
+        Loading data...
+      </div>
+    )
+  }
 
   return (
     <Table>
