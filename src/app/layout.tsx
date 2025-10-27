@@ -24,13 +24,14 @@ function AppContent({ children }: { children: React.ReactNode }) {
   
   const isAuthPage = useMemo(() => ['/login', '/signup'].includes(pathname), [pathname]);
   const isOwnerPage = useMemo(() => pathname === '/owner', [pathname]);
+  const isCameraPage = useMemo(() => pathname === '/violations/camera', [pathname]);
 
   const showHeader = useMemo(() => {
-    if (!isClient) return false;
+    if (!isClient || isCameraPage) return false;
     if (role === 'owner' && isOwnerPage) return true;
     if (role !== 'owner' && user && !isAuthPage) return true;
     return false;
-  }, [role, isOwnerPage, user, isAuthPage, isClient]);
+  }, [role, isOwnerPage, user, isAuthPage, isClient, isCameraPage]);
 
   useEffect(() => {
     setIsClient(true);
@@ -56,12 +57,12 @@ function AppContent({ children }: { children: React.ReactNode }) {
             router.replace('/home');
         }
       } else { // Logged-out user
-        if (!isAuthPage) {
+        if (!isAuthPage && !isCameraPage) { // Allow camera page for logged-out users for now
           router.replace('/login');
         }
       }
     }
-  }, [user, isUserLoading, isAuthPage, isOwnerPage, router, isClient, pathname]);
+  }, [user, isUserLoading, isAuthPage, isOwnerPage, router, isClient, pathname, isCameraPage]);
 
   if (!isClient) {
     return <Loading />;
@@ -74,7 +75,7 @@ function AppContent({ children }: { children: React.ReactNode }) {
     if (isUserLoading && !isAuthPage) return <Loading />;
     if (!isUserLoading) {
       if (user && isAuthPage) return <Loading />;
-      if (!user && !isAuthPage) return <Loading />;
+      if (!user && !isAuthPage && !isCameraPage) return <Loading />;
     }
   }
   
