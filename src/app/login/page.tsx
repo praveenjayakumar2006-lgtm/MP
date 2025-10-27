@@ -103,7 +103,7 @@ export default function LoginPage() {
   }
 
   return (
-    <Card className="mx-auto max-w-sm w-full">
+    <Card className="mx-auto max-w-xs w-full">
       <Form {...form}>
       <CardHeader>
         <CardTitle className="text-2xl">Login</CardTitle>
@@ -114,14 +114,14 @@ export default function LoginPage() {
             control={form.control}
             name="role"
             render={({ field }) => (
-              <FormItem className="pt-4">
+              <FormItem className="pt-4 space-y-4">
                 <FormControl>
                   <RadioGroup
                     onValueChange={field.onChange}
                     defaultValue={field.value}
                     className="flex items-center space-x-4"
                   >
-                    <FormLabel className="font-normal">Login as:</FormLabel>
+                    <FormLabel className="font-normal text-lg underline underline-offset-4">Login as:</FormLabel>
                     <FormItem className="flex items-center space-x-2 space-y-0">
                       <FormControl>
                         <RadioGroupItem value="user" id="user" />
