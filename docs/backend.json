@@ -198,88 +198,35 @@
     ]
   },
   "firestore": {
-    "structure": [
-      {
-        "path": "/users/{userId}",
-        "definition": {
-          "entityName": "User",
-          "schema": {
-            "$ref": "#/backend/entities/User"
-          },
-          "description": "Stores user profile data. The 'userId' is the Firebase Authentication UID.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The Firebase Authentication UID of the user."
-            }
-          ]
-        }
+    "/users/{userId}": {
+      "schema": {
+        "$ref": "#/entities/User"
       },
-      {
-        "path": "/parkingSlots/{parkingSlotId}",
-        "definition": {
-          "entityName": "ParkingSlot",
-          "schema": {
-            "$ref": "#/backend/entities/ParkingSlot"
-          },
-          "description": "Stores parking slot information, including availability status.",
-          "params": [
-            {
-              "name": "parkingSlotId",
-              "description": "Unique identifier for the parking slot."
-            }
-          ]
-        }
+      "description": "Stores user profile data. The 'userId' is the Firebase Authentication UID."
+    },
+    "/parkingSlots/{parkingSlotId}": {
+      "schema": {
+        "$ref": "#/entities/ParkingSlot"
       },
-      {
-        "path": "/reservations/{reservationId}",
-        "definition": {
-          "entityName": "Reservation",
-          "schema": {
-            "$ref": "#/backend/entities/Reservation"
-          },
-          "description": "Stores all reservation data for the application.",
-          "params": [
-            {
-              "name": "reservationId",
-              "description": "Unique identifier for the reservation."
-            }
-          ]
-        }
+      "description": "Stores parking slot information, including availability status."
+    },
+    "/reservations/{reservationId}": {
+      "schema": {
+        "$ref": "#/entities/Reservation"
       },
-      {
-        "path": "/violations/{violationId}",
-        "definition": {
-          "entityName": "Violation",
-          "schema": {
-            "$ref": "#/backend/entities/Violation"
-          },
-          "description": "Stores parking violation data.",
-          "params": [
-            {
-              "name": "violationId",
-              "description": "Unique identifier for the parking violation."
-            }
-          ]
-        }
+      "description": "Stores all reservation data for the application."
+    },
+    "/violations/{violationId}": {
+      "schema": {
+        "$ref": "#/entities/Violation"
       },
-      {
-        "path": "/feedback/{feedbackId}",
-        "definition": {
-          "entityName": "Feedback",
-          "schema": {
-            "$ref": "#/backend/entities/Feedback"
-          },
-          "description": "Stores user feedback.",
-          "params": [
-            {
-              "name": "feedbackId",
-              "description": "Unique identifier for the feedback entry."
-            }
-          ]
-        }
-      }
-    ],
-    "reasoning": "This design prioritizes authorization independence and efficient data retrieval for the ParkSmart Reserve application, focusing on the core requirement of displaying real-time parking slot availability and managing reservations. The structure leverages path-based ownership for user-specific data and denormalization to avoid complex security rules. The design incorporates these strategies to deliver a secure, scalable, and easily debuggable Firestore structure.\n\n**Authorization Independence and QAPs:**\n\n*   **`/users/{userId}/reservations/{reservationId}`:** This structure uses path-based ownership, ensuring that only the user with the matching `userId` can access their reservations. This eliminates the need for `get()` calls in security rules, as authorization is directly derived from the path. To support the app requirement of showing occupied slots for other users, the `reservations` data includes parking slot `id` and reservation time frame.\n\n**Structural Segregation:**\n\n*   The design segregates user-specific data (reservations) under the `/users/{userId}` path, maintaining a consistent security posture for all documents within the `reservations` collection. This segregation simplifies security rules and avoids mixing data with different access requirements.\n\n**Access Modeling:**\n\n*   Path-based ownership is consistently used for user-owned data, such as reservations. This approach ensures that authorization rules are straightforward and efficient.\n\n**Data Clarity and Predictability:**\n\n*   The schema for each entity is well-defined, with explicit state modeling (e.g., `isAvailable` in the `ParkingSlot` entity). This clarity makes it easier to understand the data structure and write accurate security rules."
+      "description": "Stores parking violation data."
+    },
+    "/feedback/{feedbackId}": {
+      "schema": {
+        "$ref": "#/entities/Feedback"
+      },
+      "description": "Stores user feedback."
+    }
   }
 }
