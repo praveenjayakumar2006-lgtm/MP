@@ -79,6 +79,7 @@ export function ViolationChecker() {
   const defaultSlotNumber = searchParams.get('slotNumber') || '';
   const defaultViolationType = searchParams.get('violationType');
   const defaultImageSource = searchParams.get('imageSource');
+  const defaultNumberPlate = searchParams.get('numberPlate') || '';
 
   const violationForm = useForm<ViolationFormValues>({
     resolver: zodResolver(violationSchema),
@@ -86,7 +87,7 @@ export function ViolationChecker() {
       slotNumber: defaultSlotNumber,
       violationType: defaultViolationType === 'overstaying' || defaultViolationType === 'unauthorized_parking' ? defaultViolationType : undefined,
       imageSource: defaultImageSource === 'camera' ? 'camera' : 'upload',
-      numberPlate: '',
+      numberPlate: defaultNumberPlate,
       image: null,
     },
   });
@@ -97,12 +98,10 @@ export function ViolationChecker() {
   useEffect(() => {
     const slot = searchParams.get('slotNumber');
     const type = searchParams.get('violationType');
-    if (slot) {
-      setValue('slotNumber', slot);
-    }
-    if (type === 'overstaying' || type === 'unauthorized_parking') {
-      setValue('violationType', type);
-    }
+    const numberPlate = searchParams.get('numberPlate');
+    if (slot) setValue('slotNumber', slot);
+    if (type === 'overstaying' || type === 'unauthorized_parking') setValue('violationType', type);
+    if (numberPlate) setValue('numberPlate', numberPlate);
   }, [searchParams, setValue]);
 
   useEffect(() => {
@@ -145,10 +144,12 @@ export function ViolationChecker() {
     const file = e.target.files?.[0];
     if (file) {
       setSelectedFileName(file.name);
+      violationForm.setValue('image', file);
       const imageDataUrl = await fileToDataUrl(file);
       sessionStorage.setItem('violationImage', imageDataUrl);
     } else {
         setSelectedFileName(null);
+        violationForm.setValue('image', null);
     }
   }
 
