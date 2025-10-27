@@ -61,7 +61,7 @@ export default function LoginPage() {
           duration: 2000,
         });
         localStorage.setItem('role', 'owner');
-        router.replace('/owner');
+        router.push('/owner');
       } else {
         toast({
           variant: 'destructive',
@@ -121,7 +121,7 @@ export default function LoginPage() {
                     defaultValue={field.value}
                     className="flex items-center space-x-4"
                   >
-                    <FormLabel className="font-bold text-lg">Login as:</FormLabel>
+                    <FormLabel className="font-bold">Login as:</FormLabel>
                     <FormItem className="flex items-center space-x-2 space-y-0">
                       <FormControl>
                         <RadioGroupItem value="user" id="user" />

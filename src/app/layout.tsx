@@ -9,7 +9,7 @@ import { AppHeader } from '@/components/layout/app-header';
 import { PageTransition } from '@/components/layout/page-transition';
 import { ReservationsProvider } from '@/context/reservations-context';
 import { usePathname, useRouter } from 'next/navigation';
-import { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { FirebaseClientProvider, useUser } from '@/firebase';
 import Loading from './loading';
 
@@ -21,14 +21,16 @@ function AppContent({ children }: { children: React.ReactNode }) {
   const { user, isUserLoading } = useUser();
   const [role, setRole] = useState<string | null>(null);
   const [isClient, setIsClient] = useState(false);
+  
   const isAuthPage = useMemo(() => ['/login', '/signup'].includes(pathname), [pathname]);
   const isOwnerPage = useMemo(() => pathname === '/owner', [pathname]);
 
   const showHeader = useMemo(() => {
+    if (!isClient) return false;
     if (role === 'owner' && isOwnerPage) return true;
     if (role !== 'owner' && user && !isAuthPage) return true;
     return false;
-  }, [role, isOwnerPage, user, isAuthPage]);
+  }, [role, isOwnerPage, user, isAuthPage, isClient]);
 
   useEffect(() => {
     setIsClient(true);
@@ -38,7 +40,10 @@ function AppContent({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!isClient) return;
 
-    if (role === 'owner') {
+    const currentRole = localStorage.getItem('role');
+    setRole(currentRole);
+
+    if (currentRole === 'owner') {
       if (!isOwnerPage) {
         router.replace('/owner');
       }
@@ -46,29 +51,27 @@ function AppContent({ children }: { children: React.ReactNode }) {
     }
     
     if (!isUserLoading) {
-      if (user) {
+      if (user) { // Logged-in user
         if (isAuthPage) {
             router.replace('/home');
         }
-      } else {
+      } else { // Logged-out user
         if (!isAuthPage) {
           router.replace('/login');
         }
       }
     }
-  }, [user, isUserLoading, isAuthPage, isOwnerPage, router, role, isClient]);
+  }, [user, isUserLoading, isAuthPage, isOwnerPage, router, isClient, pathname]);
 
   if (!isClient) {
     return <Loading />;
   }
 
-  if (isUserLoading && !isAuthPage && role !== 'owner') {
-    return <Loading />;
-  }
-  
-  if (role === 'owner') {
+  const currentRole = role; // Use state variable for consistent value in render
+  if (currentRole === 'owner') {
     if (!isOwnerPage) return <Loading />;
   } else {
+    if (isUserLoading && !isAuthPage) return <Loading />;
     if (!isUserLoading) {
       if (user && isAuthPage) return <Loading />;
       if (!user && !isAuthPage) return <Loading />;
