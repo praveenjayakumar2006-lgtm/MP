@@ -21,14 +21,19 @@ function AppContent({ children }: { children: React.ReactNode }) {
   const { user, isUserLoading } = useUser();
   const [role, setRole] = useState<string | null>(null);
   const [isClient, setIsClient] = useState(false);
+  const isAuthPage = useMemo(() => ['/login', '/signup'].includes(pathname), [pathname]);
+  const isOwnerPage = useMemo(() => pathname === '/owner', [pathname]);
+
+  const showHeader = useMemo(() => {
+    if (role === 'owner' && isOwnerPage) return true;
+    if (role !== 'owner' && user && !isAuthPage) return true;
+    return false;
+  }, [role, isOwnerPage, user, isAuthPage]);
 
   useEffect(() => {
     setIsClient(true);
     setRole(localStorage.getItem('role'));
   }, []);
-
-  const isAuthPage = useMemo(() => ['/login', '/signup'].includes(pathname), [pathname]);
-  const isOwnerPage = useMemo(() => pathname === '/owner', [pathname]);
 
   useEffect(() => {
     if (!isClient) return;
@@ -67,12 +72,6 @@ function AppContent({ children }: { children: React.ReactNode }) {
   if (isUserLoading && !isAuthPage && role !== 'owner') {
      return <Loading />;
   }
-  
-  const showHeader = useMemo(() => {
-    if (role === 'owner' && isOwnerPage) return true;
-    if (role !== 'owner' && user && !isAuthPage) return true;
-    return false;
-  }, [role, isOwnerPage, user, isAuthPage]);
   
   return (
     <>
