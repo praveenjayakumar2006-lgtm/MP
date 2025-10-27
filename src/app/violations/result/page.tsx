@@ -88,9 +88,11 @@ function ViolationResultContent() {
                 <Button variant="outline" size="sm" onClick={() => router.replace('/violations')}>Report Another Violation</Button>
               </>
             ) : (
-              <Link href="/home">
-                <Button size="sm">Home</Button>
-              </Link>
+                !formattedLicensePlate && (
+                    <Link href="/home">
+                        <Button size="sm">Home</Button>
+                    </Link>
+                )
             )}
           </div>
         </CardContent>
