@@ -141,7 +141,7 @@ function ViolationResultContent() {
   );
 
   return (
-    <div className="w-full max-w-md">
+    <div className="w-full max-w-lg">
       <div className="flex justify-start mb-4 h-10">
         {submissionStatus !== 'pending' && (
             <Button variant="outline" onClick={handleBack}>
@@ -173,7 +173,7 @@ function ViolationResultContent() {
 export default function ViolationResultPage() {
     return (
         <Suspense fallback={<div className="flex flex-1 items-center justify-center">
-             <Card className="max-w-sm w-full p-4">
+             <Card className="max-w-lg w-full p-4">
                  <CardHeader className="items-center">
                     <Skeleton className="h-12 w-12 rounded-full" />
                     <Skeleton className="h-7 w-40 mt-4" />
