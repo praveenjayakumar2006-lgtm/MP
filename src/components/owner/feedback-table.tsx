@@ -56,29 +56,28 @@ export function FeedbackTable() {
     <div className="space-y-4">
         {isLoading && renderSkeletons()}
         {!isLoading && feedbackData?.map((feedback) => (
-            <Card key={feedback.id} className="w-full">
+            <Card key={feedback.id} className="w-full border-0">
                 <CardHeader className="flex flex-row items-start gap-4 space-y-0">
                     <Avatar className="h-12 w-12">
                         <AvatarFallback>{feedback.name.charAt(0).toUpperCase()}</AvatarFallback>
                     </Avatar>
                     <div className="flex-1">
                         <div className="flex items-center justify-between">
-                             <div>
+                             <div className="flex items-center gap-4">
                                 <p className="font-semibold">{feedback.name}</p>
-                                <p className="text-sm text-muted-foreground">{feedback.email}</p>
-                            </div>
-                            <div className="flex items-center gap-1">
-                                {[1, 2, 3, 4, 5].map((star) => (
-                                    <Star
-                                    key={star}
-                                    className={cn(
-                                        'h-4 w-4',
-                                        feedback.rating >= star
-                                        ? 'text-yellow-400 fill-yellow-400'
-                                        : 'text-gray-300'
-                                    )}
-                                    />
-                                ))}
+                                <div className="flex items-center gap-1">
+                                    {[1, 2, 3, 4, 5].map((star) => (
+                                        <Star
+                                        key={star}
+                                        className={cn(
+                                            'h-4 w-4',
+                                            feedback.rating >= star
+                                            ? 'text-yellow-400 fill-yellow-400'
+                                            : 'text-gray-300'
+                                        )}
+                                        />
+                                    ))}
+                                </div>
                             </div>
                         </div>
                     </div>
