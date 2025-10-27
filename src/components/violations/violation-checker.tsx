@@ -46,7 +46,7 @@ const violationSchemaBase = z.object({
 
 const violationSchemaUpload = violationSchemaBase.extend({
   imageSource: z.literal('upload'),
-  image: z.any().optional(),
+  image: z.any().refine(val => val, { message: "Image is required." }),
 });
 
 const violationSchemaCamera = violationSchemaBase.extend({
@@ -93,7 +93,7 @@ export function ViolationChecker() {
   });
   
   const imageSource = violationForm.watch('imageSource');
-  const { setValue } = violationForm;
+  const { setValue, clearErrors } = violationForm;
 
   useEffect(() => {
     const slot = searchParams.get('slotNumber');
@@ -131,8 +131,9 @@ export function ViolationChecker() {
         if (currentValues.imageSource === 'camera') {
             router.push(`/violations/camera?${params.toString()}`);
         } else if (currentValues.imageSource === 'upload') {
-            if (selectedFileName) {
-                router.push(`/violations/uploading?${params.toString()}`);
+            const imageFile = violationForm.getValues('image');
+            if (imageFile) {
+                 router.push(`/violations/result?${params.toString()}`);
             } else {
                 fileInputRef.current?.click();
             }
@@ -145,6 +146,7 @@ export function ViolationChecker() {
     if (file) {
       setSelectedFileName(file.name);
       violationForm.setValue('image', file);
+      clearErrors('image');
       const imageDataUrl = await fileToDataUrl(file);
       sessionStorage.setItem('violationImage', imageDataUrl);
     } else {

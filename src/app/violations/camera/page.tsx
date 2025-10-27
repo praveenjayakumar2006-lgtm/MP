@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
-import { Loader2, Camera, VideoOff, CheckCircle2, ArrowLeft } from 'lucide-react';
+import { Loader2, Camera, VideoOff, ArrowLeft } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 function CameraPageContent() {
@@ -18,10 +18,8 @@ function CameraPageContent() {
   const violationType = searchParams.get('violationType') as 'overstaying' | 'unauthorized_parking' | null;
   const licensePlate = searchParams.get('licensePlate');
 
-  const [isLoading, setIsLoading] = useState(false);
   const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
-  const [showConfirmation, setShowConfirmation] = useState(false);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -97,7 +95,7 @@ function CameraPageContent() {
         licensePlate,
     });
     
-    router.replace(`/violations/uploading?${queryParams.toString()}`);
+    router.replace(`/violations/result?${queryParams.toString()}`);
   }
 
   const handleBack = () => {
@@ -112,29 +110,7 @@ function CameraPageContent() {
   return (
     <div className="fixed inset-0 bg-black flex flex-col items-center justify-center text-white">
         <AnimatePresence>
-            {isLoading ? (
-                <motion.div
-                    key="loader"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="absolute z-30 flex flex-col items-center gap-4"
-                >
-                {showConfirmation ? (
-                    <>
-                        <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring' }}>
-                            <CheckCircle2 className="h-16 w-16 text-green-400" />
-                        </motion.div>
-                        <p className="text-xl">Submitting Report...</p>
-                    </>
-                ) : (
-                    <>
-                        <Loader2 className="h-12 w-12 animate-spin text-primary" />
-                        <p className="text-xl">Processing...</p>
-                    </>
-                )}
-                </motion.div>
-            ) : capturedImage ? (
+            {capturedImage ? (
                  <motion.div
                     key="preview"
                     initial={{ opacity: 0, scale: 0.9 }}
