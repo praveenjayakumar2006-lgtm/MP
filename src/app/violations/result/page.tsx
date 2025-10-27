@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Button } from '@/components/ui/button';
@@ -39,12 +40,6 @@ function ViolationResultContent() {
   }
 
   const formattedLicensePlate = formatLicensePlate(licensePlate);
-
-  const handleBack = () => {
-    if (submissionStatus !== 'pending') {
-      setSubmissionStatus('pending');
-    }
-  };
 
   const renderInitialState = () => (
     <>
@@ -139,31 +134,23 @@ function ViolationResultContent() {
 
   return (
     <div className="w-full flex-1 flex flex-col items-center">
-        <div className="w-full max-w-lg flex justify-start mb-4 h-10">
-            {submissionStatus !== 'pending' && (
-                <Button variant="outline" onClick={handleBack}>
-                    <ArrowLeft className="mr-2 h-4 w-4" />
-                    Back
-                </Button>
-            )}
-        </div>
-        <div className="w-full max-w-lg">
-            <Card className="w-full text-center p-0">
-                <AnimatePresence mode="wait">
-                    <motion.div
-                        key={submissionStatus}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -20 }}
-                        transition={{ duration: 0.3 }}
-                    >
-                        {submissionStatus === 'pending' && renderInitialState()}
-                        {submissionStatus === 'confirmed' && renderConfirmedState()}
-                        {submissionStatus === 'rejected' && renderRejectedState()}
-                    </motion.div>
-                </AnimatePresence>
-            </Card>
-        </div>
+      <div className="w-full max-w-lg">
+        <Card className="w-full text-center p-0">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={submissionStatus}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              {submissionStatus === 'pending' && renderInitialState()}
+              {submissionStatus === 'confirmed' && renderConfirmedState()}
+              {submissionStatus === 'rejected' && renderRejectedState()}
+            </motion.div>
+          </AnimatePresence>
+        </Card>
+      </div>
     </div>
   );
 }
