@@ -59,27 +59,19 @@ export function AppHeader() {
 
   const handleSignOut = async () => {
     localStorage.removeItem('role');
-    if (!auth) {
-        if (role === 'owner') {
-             router.replace('/login');
+    if (auth) {
+        try {
+          await signOut(auth);
+        } catch (error) {
+           console.error("Error signing out: ", error);
         }
-        return;
-    };
-    try {
-      await signOut(auth);
-      toast({
+    }
+    router.replace('/login');
+    toast({
         title: 'Signed Out',
         description: 'You have been successfully signed out.',
         duration: 2000,
-      });
-      // The onAuthStateChanged listener will handle the redirect
-    } catch (error) {
-      toast({
-        variant: 'destructive',
-        title: 'Sign Out Failed',
-        description: 'There was a problem signing you out. Please try again.',
-      });
-    }
+    });
   };
 
 
@@ -108,7 +100,7 @@ export function AppHeader() {
   ];
 
   const ownerNavItems = [
-    { href: '/owner', label: 'Home'},
+    { href: '/owner?view=home', label: 'Home'},
     { href: '/owner?view=reports', label: 'Violation Reports' },
     { href: '/owner?view=feedback', label: 'User Feedback' },
   ];
@@ -266,5 +258,3 @@ export function AppHeader() {
     </header>
   );
 }
-
-    
