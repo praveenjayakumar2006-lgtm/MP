@@ -80,6 +80,7 @@ export function FeedbackTable() {
                                 </div>
                             </div>
                         </div>
+                        <p className="text-sm text-muted-foreground">{feedback.email}</p>
                     </div>
                 </CardHeader>
                 <CardContent>
