@@ -37,6 +37,10 @@ const violationSchemaBase = z.object({
   violationType: z.enum(['overstaying', 'unauthorized_parking'], {
     required_error: 'You need to select a violation type.',
   }),
+  numberPlate: z
+    .string()
+    .min(1, 'Number plate is required.')
+    .regex(/^[A-Z]{2}[0-9]{1,2}[A-Z]{1,2}[0-9]{1,4}$/, 'Invalid number plate format.'),
 });
 
 const violationSchemaUpload = violationSchemaBase.extend({
@@ -80,6 +84,7 @@ export function ViolationChecker() {
       slotNumber: defaultSlotNumber,
       violationType: defaultViolationType === 'overstaying' || defaultViolationType === 'unauthorized_parking' ? defaultViolationType : undefined,
       imageSource: defaultImageSource === 'camera' ? 'camera' : 'upload',
+      numberPlate: '',
       image: null,
     },
   });
@@ -103,7 +108,7 @@ export function ViolationChecker() {
 
   const handleProceedClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    violationForm.trigger(['slotNumber', 'violationType']).then((isValid) => {
+    violationForm.trigger(['slotNumber', 'violationType', 'numberPlate']).then((isValid) => {
         if (!isValid) {
             return;
         }
@@ -112,6 +117,7 @@ export function ViolationChecker() {
         const params = new URLSearchParams({
             slotNumber: currentValues.slotNumber,
             violationType: currentValues.violationType!,
+            licensePlate: currentValues.numberPlate,
         });
 
         if (currentValues.imageSource === 'camera') {
@@ -132,6 +138,7 @@ export function ViolationChecker() {
       const params = new URLSearchParams({
           slotNumber: currentValues.slotNumber,
           violationType: currentValues.violationType!,
+          licensePlate: currentValues.numberPlate,
       });
       router.push(`/violations/uploading?${params.toString()}`);
     }
@@ -142,7 +149,7 @@ export function ViolationChecker() {
       <div className="text-center mb-8">
         <h1 className="text-3xl font-semibold">Report a Violation</h1>
         <p className="text-base text-muted-foreground mt-2">
-          Report a parking violation using our AI system.
+          Report a parking violation.
         </p>
       </div>
       <Card className="w-full">
@@ -200,6 +207,29 @@ export function ViolationChecker() {
                         <SelectItem value="unauthorized_parking">Unauthorized Parking</SelectItem>
                       </SelectContent>
                     </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={violationForm.control}
+                name="numberPlate"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Number Plate <span className="text-destructive">*</span></FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Enter vehicle plate"
+                        {...field}
+                        onChange={(e) => {
+                          field.onChange(e.target.value.toUpperCase().replace(/\s/g, ''));
+                          if (e.target.value) {
+                            violationForm.clearErrors('numberPlate');
+                          }
+                        }}
+                        className="hover:bg-accent"
+                      />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}

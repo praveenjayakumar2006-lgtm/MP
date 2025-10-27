@@ -4,9 +4,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
-import { Button } from '@/components/ui/button';
-import { analyzeVehicleImage, analyzeViolationText } from '@/app/violations/actions';
-import { Loader2, ArrowLeft, CheckCircle2 } from 'lucide-react';
+import { Loader2, CheckCircle2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 function UploadingPageContent() {
@@ -16,80 +14,53 @@ function UploadingPageContent() {
 
   const slotNumber = searchParams.get('slotNumber');
   const violationType = searchParams.get('violationType') as 'overstaying' | 'unauthorized_parking' | null;
-  
-  const [status, setStatus] = useState<'loading' | 'analyzing' | 'complete'>('loading');
+  const licensePlate = searchParams.get('licensePlate');
+
+  const [status, setStatus] = useState<'submitting' | 'complete'>('submitting');
 
   useEffect(() => {
-    const analyze = async () => {
-      setStatus('analyzing');
+    const submitReport = async () => {
+      setStatus('submitting');
       const imageDataUri = sessionStorage.getItem('violationImage');
 
-      if (!imageDataUri || !slotNumber || !violationType) {
+      if (!imageDataUri || !slotNumber || !violationType || !licensePlate) {
         toast({ variant: 'destructive', title: 'Missing Information', description: 'Could not submit report. Please try again.' });
         router.replace('/violations');
         return;
       }
 
-      try {
-        const details = `An image has been uploaded for a vehicle in slot ${slotNumber} regarding a potential ${violationType.replace(
-          '_',
-          ' '
-        )} violation.`;
+      // TODO: Actually save the violation report data (slot, type, plate, image)
+      console.log('Violation Report:', {
+        slotNumber,
+        violationType,
+        licensePlate,
+        image: imageDataUri.substring(0, 30) + '...', // log truncated image data
+      });
 
-        const [, vehicleResult] = await Promise.all([
-          analyzeViolationText({
-            slotNumber: slotNumber,
-            violationType: violationType,
-            details: details,
-            timestamp: new Date().toISOString(),
-          }),
-          analyzeVehicleImage({ imageDataUri }),
-        ]);
+      sessionStorage.removeItem('violationImage');
 
-        sessionStorage.removeItem('violationImage');
+      setStatus('complete');
+      const queryParams = new URLSearchParams({
+        licensePlate: licensePlate,
+      });
 
-        if (vehicleResult.licensePlate === 'NO_LICENSE_PLATE_DETECTED') {
-          const params = new URLSearchParams();
-          if (slotNumber) params.set('slotNumber', slotNumber);
-          if (violationType) params.set('violationType', violationType);
-          params.set('imageSource', 'upload');
-          router.replace(`/violations/capture-failed?${params.toString()}`);
-          return;
-        }
-
-        setStatus('complete');
-        const queryParams = new URLSearchParams({
-          licensePlate: vehicleResult.licensePlate,
-        });
-
-        setTimeout(() => {
-          router.replace(`/violations/result?${queryParams.toString()}`);
-        }, 1500);
-
-      } catch (error) {
-        console.error('Error analyzing violation:', error);
-        toast({
-          variant: 'destructive',
-          title: 'Analysis Failed',
-          description: 'There was an error processing your request. Please try again.',
-        });
-        sessionStorage.removeItem('violationImage');
-        router.replace('/violations');
-      }
+      setTimeout(() => {
+        router.replace(`/violations/result?${queryParams.toString()}`);
+      }, 1500);
     };
 
-    analyze();
-  }, [router, searchParams, toast, slotNumber, violationType]);
+    submitReport();
+  }, [router, searchParams, toast, slotNumber, violationType, licensePlate]);
 
 
   return (
     <div className="fixed inset-0 bg-black text-white flex flex-col items-center justify-center">
 
         <div className="flex flex-col items-center gap-4">
-            {status === 'analyzing' && (
+            {status === 'submitting' && (
                 <>
                     <Loader2 className="h-12 w-12 animate-spin text-primary" />
-                    <p className="text-xl">Analyzing Image...</p>
+                    <p className="text-xl">Submitting Report...</p>
                 </>
             )}
             {status === 'complete' && (
@@ -97,13 +68,7 @@ function UploadingPageContent() {
                     <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring' }}>
                         <CheckCircle2 className="h-16 w-16 text-green-400" />
                     </motion.div>
-                    <p className="text-xl">Analysis Complete!</p>
-                </>
-            )}
-             {status === 'loading' && (
-                <>
-                    <Loader2 className="h-12 w-12 animate-spin text-primary" />
-                    <p className="text-xl">Loading...</p>
+                    <p className="text-xl">Report Submitted!</p>
                 </>
             )}
         </div>
