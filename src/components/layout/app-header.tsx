@@ -22,7 +22,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useEffect, useState } from 'react';
-import { useFirebase } from '@/firebase';
+import { useFirebase, useUser } from '@/firebase';
 import { Separator } from '@/components/ui/separator';
 import { signOut } from 'firebase/auth';
 import { useToast } from '@/hooks/use-toast';
@@ -47,7 +47,7 @@ export function AppHeader() {
   const isMobile = useIsMobile();
   const [isClient, setIsClient] = useState(false);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
-  const { user, auth } = useFirebase();
+  const { user, auth } = useUser();
   const router = useRouter();
   const { toast } = useToast();
 
@@ -181,9 +181,9 @@ export function AppHeader() {
                   </div>
                   </nav>
                   <div className="absolute bottom-6 left-6 right-6">
-                    {user && (
+                    {user && user.displayName && (
                       <div className="mb-4">
-                        <p className="text-red-500 text-xl font-medium mb-4 text-center underline underline-offset-4">{user.displayName}</p>
+                        <p className="text-red-500 text-xl font-medium mb-4 text-center underline underline-offset-8">{user.displayName}</p>
                         <Button
                           variant="destructive"
                           size="lg"

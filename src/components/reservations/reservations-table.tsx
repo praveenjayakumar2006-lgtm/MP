@@ -38,6 +38,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { useUser } from '@/firebase';
 
 type Status = 'Active' | 'Completed' | 'Upcoming';
 
@@ -65,6 +66,7 @@ const StatusIcon = ({ status }: { status: Status }) => {
 
 export function ReservationsTable() {
   const context = useContext(ReservationsContext);
+  const { user } = useUser();
   const [filter, setFilter] = useState<Status | 'all'>('all');
   const [displayReservations, setDisplayReservations] = useState<Reservation[]>([]);
   const [reservationToCancel, setReservationToCancel] = useState<Reservation | null>(null);
@@ -73,25 +75,27 @@ export function ReservationsTable() {
   const isMobile = useIsMobile();
 
   useEffect(() => {
-    if (context?.reservations) {
+    if (context?.reservations && user) {
       const now = new Date();
-      const updatedReservations = context.reservations.map(res => {
-        const startTime = new Date(res.startTime);
-        const endTime = new Date(res.endTime);
-        let status: Status;
+      const userReservations = context.reservations
+        .filter(res => res.userId === user.uid)
+        .map(res => {
+          const startTime = new Date(res.startTime);
+          const endTime = new Date(res.endTime);
+          let status: Status;
 
-        if (now > endTime) {
-          status = 'Completed';
-        } else if (now >= startTime && now < endTime) {
-            status = 'Active';
-        } else {
-          status = 'Upcoming';
-        }
-        return { ...res, status };
-      });
-      setDisplayReservations(updatedReservations);
+          if (now > endTime) {
+            status = 'Completed';
+          } else if (now >= startTime && now < endTime) {
+              status = 'Active';
+          } else {
+            status = 'Upcoming';
+          }
+          return { ...res, status };
+        });
+      setDisplayReservations(userReservations);
     }
-  }, [context?.reservations]);
+  }, [context?.reservations, user]);
 
   if (!context) {
     return null; 
