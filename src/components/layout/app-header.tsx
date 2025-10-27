@@ -183,7 +183,7 @@ export function AppHeader() {
                   <div className="absolute bottom-6 left-6 right-6">
                     {user && (
                       <div className="mb-4">
-                        <p className="text-red-500 text-xl font-medium mb-4 text-center underline">{user.displayName}</p>
+                        <p className="text-red-500 text-xl font-medium mb-4 text-center underline underline-offset-4">{user.displayName}</p>
                         <Button
                           variant="destructive"
                           size="lg"
