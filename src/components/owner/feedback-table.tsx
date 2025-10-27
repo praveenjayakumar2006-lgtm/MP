@@ -56,7 +56,7 @@ export function FeedbackTable() {
     <div className="space-y-4">
         {isLoading && renderSkeletons()}
         {!isLoading && feedbackData?.map((feedback) => (
-            <Card key={feedback.id} className="w-full border-0">
+            <Card key={feedback.id} className="w-full">
                 <CardHeader className="flex flex-row items-start gap-4 space-y-0">
                     <Avatar className="h-12 w-12">
                         <AvatarFallback>{feedback.name.charAt(0).toUpperCase()}</AvatarFallback>
