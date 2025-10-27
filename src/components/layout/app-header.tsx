@@ -183,8 +183,7 @@ export function AppHeader() {
                   <div className="absolute bottom-6 left-6 right-6">
                     {user && (
                       <div className="mb-4">
-                        <p className="text-center font-semibold text-foreground">{user.displayName}</p>
-                        <Separator className="my-4" />
+                        <p className="text-red-500 text-xl font-medium mb-4">{user.displayName}</p>
                         <Button
                           variant="destructive"
                           size="lg"
