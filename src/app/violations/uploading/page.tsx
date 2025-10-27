@@ -3,14 +3,12 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useToast } from '@/hooks/use-toast';
 import { Loader2, CheckCircle2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 function UploadingPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { toast } = useToast();
 
   const slotNumber = searchParams.get('slotNumber');
   const violationType = searchParams.get('violationType') as 'overstaying' | 'unauthorized_parking' | null;
@@ -24,7 +22,7 @@ function UploadingPageContent() {
       const imageDataUri = sessionStorage.getItem('violationImage');
 
       if (!imageDataUri || !slotNumber || !violationType || !licensePlate) {
-        router.replace('/violations');
+        router.replace('/violations/capture-failed');
         return;
       }
 
@@ -36,20 +34,26 @@ function UploadingPageContent() {
         image: imageDataUri.substring(0, 30) + '...', // log truncated image data
       });
 
+      // Clear the session storage after "submission"
       sessionStorage.removeItem('violationImage');
 
+      // Short delay to show submission
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
       setStatus('complete');
+
       const queryParams = new URLSearchParams({
         licensePlate: licensePlate,
       });
 
+      // Another short delay to show completion before redirect
       setTimeout(() => {
         router.replace(`/violations/result?${queryParams.toString()}`);
       }, 1500);
     };
 
     submitReport();
-  }, [router, searchParams, toast, slotNumber, violationType, licensePlate]);
+  }, [router, searchParams, slotNumber, violationType, licensePlate]);
 
 
   return (

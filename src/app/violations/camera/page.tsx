@@ -84,33 +84,28 @@ function CameraPageContent() {
   
   const handleConfirm = async () => {
     if (!capturedImage || !slotNumber || !violationType || !licensePlate) {
+        // This case should ideally not be hit if the form is validated before navigation
+        router.replace('/violations/capture-failed');
         return;
     }
     
-    setIsLoading(true);
-    setShowConfirmation(true);
+    // Store image in session storage to pass to the uploading page
+    sessionStorage.setItem('violationImage', capturedImage);
 
-    // TODO: Actually save the violation report data (slot, type, plate, image)
-    console.log('Violation Report:', {
-      slotNumber,
-      violationType,
-      licensePlate,
-      image: capturedImage.substring(0, 30) + '...', // log truncated image data
-    });
-        
     const queryParams = new URLSearchParams({
-        licensePlate: licensePlate,
+        slotNumber,
+        violationType,
+        licensePlate,
     });
     
-    setTimeout(() => {
-         router.replace(`/violations/result?${queryParams.toString()}`);
-    }, 1500);
+    router.replace(`/violations/uploading?${queryParams.toString()}`);
   }
 
   const handleBack = () => {
     const params = new URLSearchParams();
     if (slotNumber) params.set('slotNumber', slotNumber);
     if (violationType) params.set('violationType', violationType);
+    if (licensePlate) params.set('numberPlate', licensePlate);
     router.replace(`/violations?${params.toString()}`);
   }
 
