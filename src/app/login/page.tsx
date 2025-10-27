@@ -53,26 +53,6 @@ export default function LoginPage() {
   });
 
   async function onSubmit(values: LoginFormValues) {
-    if (values.role === 'owner') {
-      if (values.email === 'owner@gmail.com' && values.password === '123456') {
-        toast({
-          title: 'Owner Login Successful',
-          description: 'Welcome, Owner!',
-          duration: 2000,
-        });
-        localStorage.setItem('role', 'owner');
-        router.push('/owner');
-      } else {
-        toast({
-          variant: 'destructive',
-          title: 'Owner Login Failed',
-          description: 'Invalid credentials for owner.',
-        });
-      }
-      return;
-    }
-
-    // User Login
     if (!auth) {
       toast({
         variant: 'destructive',
@@ -80,6 +60,18 @@ export default function LoginPage() {
       });
       return;
     }
+    
+    if (values.role === 'owner') {
+      if (values.email !== 'owner@gmail.com' || values.password !== '123456') {
+         toast({
+          variant: 'destructive',
+          title: 'Owner Login Failed',
+          description: 'Invalid credentials for owner.',
+        });
+        return;
+      }
+    }
+
     try {
       await signInWithEmailAndPassword(auth, values.email, values.password);
       toast({
@@ -87,12 +79,14 @@ export default function LoginPage() {
         description: 'Welcome back!',
         duration: 2000,
       });
-      localStorage.setItem('role', 'user');
+      localStorage.setItem('role', values.role);
       // The onAuthStateChanged listener in the layout will handle the redirect
     } catch (error: any) {
       let description = 'There was a problem with your request.';
       if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
         description = 'Invalid email or password. Please try again.';
+      } else if (error.code === 'auth/too-many-requests') {
+        description = 'Access to this account has been temporarily disabled due to many failed login attempts. You can immediately restore it by resetting your password or you can try again later.'
       }
       toast({
         variant: 'destructive',
