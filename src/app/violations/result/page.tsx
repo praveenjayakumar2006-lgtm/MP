@@ -44,8 +44,6 @@ function ViolationResultContent() {
   const handleBack = () => {
     if (submissionStatus !== 'pending') {
       setSubmissionStatus('pending');
-    } else {
-      router.back();
     }
   };
 
@@ -54,11 +52,11 @@ function ViolationResultContent() {
       <CardHeader className="p-4">
           <CardTitle className="mt-4 text-xl">Confirm Submission</CardTitle>
       </CardHeader>
-      <CardContent className="p-4 pt-0">
-        <p className="text-muted-foreground text-sm mb-6">
+      <CardContent className="p-4 pt-0 space-y-6">
+        <p className="text-muted-foreground text-sm">
           Please review the details below before submitting the violation report.
         </p>
-        <div className="mb-6 flex flex-col items-center gap-4">
+        <div className="flex flex-col items-center gap-4">
           {imageUrl && (
             <div className="rounded-lg overflow-hidden border">
                 <Image
@@ -106,8 +104,8 @@ function ViolationResultContent() {
         </div>
         <CardTitle className="mt-4 text-xl">Report Submitted!</CardTitle>
       </CardHeader>
-      <CardContent className="p-4 pt-0">
-        <p className="text-muted-foreground text-sm mb-6">
+      <CardContent className="p-4 pt-0 space-y-6">
+        <p className="text-muted-foreground text-sm">
           Your violation report has been submitted successfully. We appreciate you taking the time to help us improve safety.
         </p>
         <div className="flex justify-center gap-4">
@@ -128,8 +126,8 @@ function ViolationResultContent() {
         </div>
         <CardTitle className="mt-4 text-xl">Report Cancelled</CardTitle>
       </CardHeader>
-      <CardContent className="p-4 pt-0">
-        <p className="text-muted-foreground text-sm mb-6">
+      <CardContent className="p-4 pt-0 space-y-6">
+        <p className="text-muted-foreground text-sm">
           The violation report has been cancelled and was not submitted.
         </p>
         <div className="flex justify-center gap-4">
