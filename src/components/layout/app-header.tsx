@@ -50,14 +50,21 @@ export function AppHeader() {
   const { user, auth } = useUser();
   const router = useRouter();
   const { toast } = useToast();
+  const [role, setRole] = useState<string | null>(null);
 
   useEffect(() => {
     setIsClient(true);
+    setRole(localStorage.getItem('role'));
   }, []);
 
   const handleSignOut = async () => {
     localStorage.removeItem('role');
-    if (!auth) return;
+    if (!auth) {
+        if (role === 'owner') {
+             router.replace('/login');
+        }
+        return;
+    };
     try {
       await signOut(auth);
       toast({
@@ -104,7 +111,7 @@ export function AppHeader() {
     <header className="sticky top-0 flex h-20 items-center justify-between border-b bg-primary text-primary-foreground px-8 md:px-12 z-50">
         <div className="flex items-center gap-4 text-lg font-semibold">
             <Link
-            href="/home"
+            href={role === 'owner' ? '/owner' : '/home'}
             className="flex items-center gap-4"
             >
             <Car className="h-12 w-12" />
@@ -112,19 +119,21 @@ export function AppHeader() {
             </Link>
         </div>
         
-        <nav className="hidden md:flex items-center justify-center gap-8 text-lg lg:gap-10 absolute left-1/2 -translate-x-1/2">
-          {navItems.map(item => (
-            <NavLink
-              key={item.href}
-              href={item.href}
-              className="font-medium"
-            >
-              {item.label}
-            </NavLink>))}
-        </nav>
+        {role !== 'owner' && (
+            <nav className="hidden md:flex items-center justify-center gap-8 text-lg lg:gap-10 absolute left-1/2 -translate-x-1/2">
+            {navItems.map(item => (
+                <NavLink
+                key={item.href}
+                href={item.href}
+                className="font-medium"
+                >
+                {item.label}
+                </NavLink>))}
+            </nav>
+        )}
         <div className="flex items-center gap-4">
           <div className="hidden md:flex">
-             {user && (
+             {(user || role === 'owner') && (
                 <Button
                   onClick={handleSignOut}
                   variant="ghost"
@@ -150,7 +159,7 @@ export function AppHeader() {
                 </SheetHeader>
                   <nav className="grid gap-6 text-xl font-medium">
                   <Link
-                      href="/home"
+                      href={role === 'owner' ? '/owner' : '/home'}
                       onClick={handleLinkClick}
                       className="flex items-center gap-4 text-3xl font-semibold"
                   >
@@ -158,7 +167,7 @@ export function AppHeader() {
                       <span className="text-foreground">ParkEasy</span>
                   </Link>
                   <Separator className="my-2" />
-                  {mainNavItems.map(item => (
+                  {role !== 'owner' && mainNavItems.map(item => (
                       <Link
                       key={item.href}
                       href={item.href}
@@ -168,23 +177,25 @@ export function AppHeader() {
                       {item.label}
                       </Link>
                   ))}
-                  <div className="border-t pt-4">
-                  {otherItems.map(item => (
-                      <Link
-                      key={item.href}
-                      href={item.href}
-                      onClick={handleLinkClick}
-                      className="block py-2 transition-colors hover:text-primary text-foreground"
-                      >
-                      {item.label}
-                      </Link>
-                  ))}
-                  </div>
+                   {role !== 'owner' && (
+                    <div className="border-t pt-4">
+                        {otherItems.map(item => (
+                            <Link
+                            key={item.href}
+                            href={item.href}
+                            onClick={handleLinkClick}
+                            className="block py-2 transition-colors hover:text-primary text-foreground"
+                            >
+                            {item.label}
+                            </Link>
+                        ))}
+                    </div>
+                   )}
                   </nav>
                   <div className="absolute bottom-6 left-6 right-6">
-                    {user && (
+                    {(user || role === 'owner') && (
                       <div className="mb-4">
-                        {user.displayName && (
+                        {user && user.displayName && (
                             <p className="text-foreground text-xl font-medium mb-4 text-center underline underline-offset-8 decoration-primary decoration-4">{user.displayName}</p>
                         )}
                         <Button
@@ -202,33 +213,35 @@ export function AppHeader() {
                       </div>
                     )}
                     <Separator className="my-4" />
-                    <div className="space-y-4">
-                      <h3 className="text-lg font-semibold text-foreground">Contact Us</h3>
-                      <div className="flex items-start gap-3">
-                          <Mail className="h-5 w-5 mt-1 text-muted-foreground" />
-                          <div>
-                            <h4 className="font-semibold text-sm">Email Support</h4>
-                            <p className="text-xs text-muted-foreground">
-                                For general inquiries and support.
-                            </p>
-                            <a href="mailto:support@parkeasy.com" className="mt-1 inline-block text-sm font-medium text-primary hover:underline">
-                                support@parkeasy.com
-                            </a>
-                          </div>
-                      </div>
-                      <div className="flex items-start gap-3">
-                           <Phone className="h-5 w-5 mt-1 text-muted-foreground" />
-                          <div>
-                            <h4 className="font-semibold text-sm">Phone Support</h4>
-                            <p className="text-xs text-muted-foreground">
-                                Available 24/7 to assist you.
-                            </p>
-                            <a href="tel:+18001234567" className="mt-1 inline-block text-sm font-medium text-primary hover:underline">
-                                1-800-123-4567
-                            </a>
-                          </div>
-                      </div>
-                    </div>
+                    {role !== 'owner' && (
+                        <div className="space-y-4">
+                        <h3 className="text-lg font-semibold text-foreground">Contact Us</h3>
+                        <div className="flex items-start gap-3">
+                            <Mail className="h-5 w-5 mt-1 text-muted-foreground" />
+                            <div>
+                                <h4 className="font-semibold text-sm">Email Support</h4>
+                                <p className="text-xs text-muted-foreground">
+                                    For general inquiries and support.
+                                </p>
+                                <a href="mailto:support@parkeasy.com" className="mt-1 inline-block text-sm font-medium text-primary hover:underline">
+                                    support@parkeasy.com
+                                </a>
+                            </div>
+                        </div>
+                        <div className="flex items-start gap-3">
+                            <Phone className="h-5 w-5 mt-1 text-muted-foreground" />
+                            <div>
+                                <h4 className="font-semibold text-sm">Phone Support</h4>
+                                <p className="text-xs text-muted-foreground">
+                                    Available 24/7 to assist you.
+                                </p>
+                                <a href="tel:+18001234567" className="mt-1 inline-block text-sm font-medium text-primary hover:underline">
+                                    1-800-123-4567
+                                </a>
+                            </div>
+                        </div>
+                        </div>
+                    )}
                   </div>
               </SheetContent>
             </Sheet>
