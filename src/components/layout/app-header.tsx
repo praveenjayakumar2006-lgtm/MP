@@ -60,6 +60,11 @@ export function AppHeader() {
   const handleSignOut = async () => {
     localStorage.removeItem('role');
     if (role === 'owner') {
+        toast({
+            title: 'Signed Out',
+            description: 'You have been successfully signed out.',
+            duration: 2000,
+        });
         router.replace('/login');
         return;
     }
@@ -251,4 +256,3 @@ export function AppHeader() {
     </header>
   );
 }
-
