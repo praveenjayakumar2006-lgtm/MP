@@ -62,15 +62,17 @@ function AppContent({ children }: { children: React.ReactNode }) {
     return <Loading />;
   }
 
-  if (role === 'owner' && !isOwnerPage) {
+  if (isUserLoading && !isAuthPage && role !== 'owner') {
     return <Loading />;
   }
-  if (role !== 'owner' && !isUserLoading) {
-    if (user && isAuthPage) return <Loading />;
-    if (!user && !isAuthPage) return <Loading />;
-  }
-  if (isUserLoading && !isAuthPage && role !== 'owner') {
-     return <Loading />;
+  
+  if (role === 'owner') {
+    if (!isOwnerPage) return <Loading />;
+  } else {
+    if (!isUserLoading) {
+      if (user && isAuthPage) return <Loading />;
+      if (!user && !isAuthPage) return <Loading />;
+    }
   }
   
   return (
