@@ -1,4 +1,3 @@
-
 'use client';
 
 import Link from 'next/link';
@@ -58,19 +57,21 @@ export function AppHeader() {
   }, []);
 
   const handleSignOut = async () => {
+    const isOwner = localStorage.getItem('role') === 'owner';
     localStorage.removeItem('role');
-    if (role === 'owner') {
-        toast({
-            title: 'Signed Out',
-            description: 'You have been successfully signed out.',
-            duration: 2000,
-        });
-        router.replace('/login');
-        return;
+
+    if (isOwner) {
+      toast({
+        title: 'Signed Out',
+        description: 'You have been successfully signed out.',
+        duration: 2000,
+      });
+      router.replace('/login');
+      return;
     }
-    if (!auth) {
-        return;
-    };
+
+    if (!auth) return;
+
     try {
       await signOut(auth);
       toast({
