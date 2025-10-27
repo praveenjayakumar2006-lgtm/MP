@@ -27,7 +27,7 @@ function AppContent({ children }: { children: React.ReactNode }) {
 
   const isAuthPage = useMemo(() => ['/login', '/signup'].includes(pathname), [pathname]);
   const isOwnerPage = useMemo(() => pathname === '/owner', [pathname]);
-  const isHeaderlessPage = useMemo(() => ['/login', '/signup', '/owner', '/violations/camera', '/violations/uploading'].includes(pathname), [pathname]);
+  const isHeaderlessPage = useMemo(() => ['/login', '/signup', '/violations/camera', '/violations/uploading'].includes(pathname), [pathname]);
 
   useEffect(() => {
     const userRole = localStorage.getItem('role');
