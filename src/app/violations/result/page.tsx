@@ -1,10 +1,9 @@
-
 'use client';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Check, CheckCircle2, X, AlertCircle, ArrowLeft } from 'lucide-react';
+import { CheckCircle2, AlertCircle, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useState, useEffect } from 'react';
@@ -80,7 +79,6 @@ function ViolationResultContent() {
                 className="border-green-500 text-green-600 hover:bg-green-50 hover:text-green-700"
                 onClick={() => setSubmissionStatus('confirmed')}
             >
-                <Check className="mr-2 h-4 w-4" />
                 Confirm
             </Button>
             <Button
@@ -88,7 +86,6 @@ function ViolationResultContent() {
                 className="bg-red-500/10 text-red-600 hover:bg-red-500/20 border border-red-500/20"
                 onClick={() => setSubmissionStatus('rejected')}
             >
-                <X className="mr-2 h-4 w-4" />
                 Reject
             </Button>
         </div>
