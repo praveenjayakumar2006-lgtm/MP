@@ -4,7 +4,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState, Suspense } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ReportsTable } from "@/components/owner/reports-table";
 import { FeedbackTable } from "@/components/owner/feedback-table";
 import { Loader2 } from "lucide-react";
@@ -92,22 +91,14 @@ function OwnerDashboard() {
     return (
         <div className="flex flex-1 flex-col items-center justify-center bg-background p-4 md:p-6">
             <div className="w-full max-w-6xl">
-                <Card>
-                    <CardHeader className="text-center">
-                        <CardTitle className="text-2xl">Owner Dashboard</CardTitle>
-                        <CardDescription>Review user-submitted reports and feedback.</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        {showLoading ? (
-                             <div className="flex items-center justify-center gap-2 text-muted-foreground p-8">
-                                <Loader2 className="h-5 w-5 animate-spin" />
-                                <span>Authenticating owner...</span>
-                            </div>
-                        ) : (
-                            renderContent()
-                        )}
-                    </CardContent>
-                </Card>
+                {showLoading ? (
+                        <div className="flex items-center justify-center gap-2 text-muted-foreground p-8">
+                        <Loader2 className="h-5 w-5 animate-spin" />
+                        <span>Authenticating owner...</span>
+                    </div>
+                ) : (
+                    renderContent()
+                )}
             </div>
         </div>
     );
@@ -120,5 +111,3 @@ export default function OwnerPage() {
         </Suspense>
     )
 }
-
-    
