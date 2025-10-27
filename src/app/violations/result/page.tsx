@@ -48,7 +48,7 @@ function ViolationResultContent() {
           {formattedLicensePlate && (
              <div className="mb-6 flex flex-col items-center gap-4">
                 <p className="text-sm text-foreground">
-                    Detected License Plate: <span className="font-semibold bg-primary/10 text-primary px-2 py-1 rounded-md">{formattedLicensePlate}</span>
+                    Reported License Plate: <span className="font-semibold bg-primary/10 text-primary px-2 py-1 rounded-md">{formattedLicensePlate}</span>
                 </p>
                 <AnimatePresence>
                   {!(isRejected || isConfirmed) && (
@@ -82,7 +82,9 @@ function ViolationResultContent() {
             <Link href="/home">
               <Button size="sm">Home</Button>
             </Link>
-            <Button variant="outline" size="sm" onClick={() => router.replace('/violations')}>Report Another Violation</Button>
+            {(isRejected || isConfirmed) && (
+                <Button variant="outline" size="sm" onClick={() => router.replace('/violations')}>Report Another Violation</Button>
+            )}
           </div>
         </CardContent>
       </Card>
