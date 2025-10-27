@@ -121,7 +121,7 @@ export default function LoginPage() {
                     defaultValue={field.value}
                     className="flex items-center space-x-4"
                   >
-                    <FormLabel className="font-normal text-lg underline underline-offset-4">Login as:</FormLabel>
+                    <FormLabel className="font-bold text-lg">Login as:</FormLabel>
                     <FormItem className="flex items-center space-x-2 space-y-0">
                       <FormControl>
                         <RadioGroupItem value="user" id="user" />
