@@ -20,8 +20,15 @@ export const ReservationsProvider: React.FC<{ children: ReactNode }> = ({ childr
   const { firestore } = useFirebase();
   const { user } = useUser();
 
-  const reservationsRef = useMemoFirebase(() => firestore ? collection(firestore, 'reservations') : null, [firestore]);
-  const { data: reservationsData, isLoading, error } = useCollection<Reservation>(reservationsRef);
+  // Conditionally create the query only when the user is logged in.
+  const reservationsQuery = useMemoFirebase(() => {
+    if (firestore && user) {
+      return collection(firestore, 'reservations');
+    }
+    return null; // Return null if not authenticated, preventing the query.
+  }, [firestore, user]);
+
+  const { data: reservationsData, isLoading, error } = useCollection<Reservation>(reservationsQuery);
   
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [isClient, setIsClient] = useState(false);
@@ -40,6 +47,9 @@ export const ReservationsProvider: React.FC<{ children: ReactNode }> = ({ childr
         updatedAt: (r.updatedAt as any)?.toDate(),
       }));
       setReservations(formattedReservations);
+    } else {
+        // Clear reservations if data is null (e.g., on logout)
+        setReservations([]);
     }
   }, [reservationsData]);
 
