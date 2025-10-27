@@ -1,4 +1,3 @@
-
 'use client';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -24,7 +23,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import { useFirebase, setDocumentNonBlocking } from '@/firebase';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { doc, serverTimestamp } from 'firebase/firestore';
 
 const signupSchema = z.object({
@@ -65,6 +64,10 @@ export default function SignupPage() {
       const user = userCredential.user;
 
       if (user) {
+        await updateProfile(user, {
+          displayName: values.fullName,
+        });
+
         const userDocRef = doc(firestore, 'users', user.uid);
         const [firstName, ...lastName] = values.fullName.split(' ');
         

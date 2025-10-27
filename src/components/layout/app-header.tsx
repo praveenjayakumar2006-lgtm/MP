@@ -182,18 +182,22 @@ export function AppHeader() {
                   </nav>
                   <div className="absolute bottom-6 left-6 right-6">
                     {user && (
+                      <div className="mb-4">
+                        <p className="text-center font-semibold text-foreground">{user.displayName}</p>
+                        <Separator className="my-4" />
                         <Button
-                        variant="destructive"
-                        size="lg"
-                        className="w-full text-lg"
-                        onClick={() => {
+                          variant="destructive"
+                          size="lg"
+                          className="w-full text-lg"
+                          onClick={() => {
                             handleSignOut();
                             handleLinkClick();
-                        }}
+                          }}
                         >
-                        <LogOut className="mr-2 h-5 w-5" />
-                        Sign Out
+                          <LogOut className="mr-2 h-5 w-5" />
+                          Sign Out
                         </Button>
+                      </div>
                     )}
                     <Separator className="my-4" />
                     <div className="space-y-4">
