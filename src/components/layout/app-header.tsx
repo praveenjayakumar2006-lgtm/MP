@@ -21,7 +21,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useEffect, useState } from 'react';
-import { useUser } from '@/firebase';
+import { useFirebase, useUser } from '@/firebase';
 import { Separator } from '@/components/ui/separator';
 import { signOut } from 'firebase/auth';
 import { useToast } from '@/hooks/use-toast';
@@ -57,21 +57,13 @@ export function AppHeader() {
   }, []);
 
   const handleSignOut = async () => {
-    const isOwner = localStorage.getItem('role') === 'owner';
     localStorage.removeItem('role');
-
-    if (isOwner) {
-      toast({
-        title: 'Signed Out',
-        description: 'You have been successfully signed out.',
-        duration: 2000,
-      });
-      router.replace('/login');
-      return;
-    }
-    
-    if (!auth) return;
-
+    if (!auth) {
+        if (role === 'owner') {
+             router.replace('/login');
+        }
+        return;
+    };
     try {
       await signOut(auth);
       toast({
@@ -79,7 +71,7 @@ export function AppHeader() {
         description: 'You have been successfully signed out.',
         duration: 2000,
       });
-      // The onAuthStateChanged listener in layout.tsx will handle the redirect
+      router.replace('/login');
     } catch (error) {
       toast({
         variant: 'destructive',
@@ -112,6 +104,11 @@ export function AppHeader() {
     { href: '/home', label: 'Home' },
     { href: '/booking', label: 'Booking' },
     { href: '/violations', label: 'Report a Violation' },
+  ];
+
+  const ownerNavItems = [
+    { href: '/owner', label: 'Violation Reports' },
+    { href: '/owner', label: 'User Feedback' },
   ];
 
   return (
@@ -174,6 +171,16 @@ export function AppHeader() {
                       <span className="text-foreground">ParkEasy</span>
                   </Link>
                   <Separator className="my-2" />
+                  {role === 'owner' && ownerNavItems.map(item => (
+                      <Link
+                      key={item.label}
+                      href={item.href}
+                      onClick={handleLinkClick}
+                      className="transition-colors hover:text-primary text-foreground"
+                      >
+                      {item.label}
+                      </Link>
+                  ))}
                   {role !== 'owner' && mainNavItems.map(item => (
                       <Link
                       key={item.href}
@@ -202,8 +209,8 @@ export function AppHeader() {
                   <div className="absolute bottom-6 left-6 right-6">
                     {(user || role === 'owner') && (
                       <div className="mb-4">
-                        {user && user.displayName && role !== 'owner' && (
-                            <p className="text-destructive text-xl font-medium mb-4 text-center underline decoration-destructive">{user.displayName}</p>
+                        {user && user.displayName && (
+                            <p className="text-foreground text-xl font-medium mb-4 text-center underline underline-offset-8 decoration-primary decoration-4">{user.displayName}</p>
                         )}
                         <Button
                           variant="destructive"
