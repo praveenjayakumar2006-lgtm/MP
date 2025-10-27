@@ -77,6 +77,7 @@ export default function SignupPage() {
           lastName: lastName.join(' '),
           email: values.email,
           signUpDate: serverTimestamp(),
+          role: 'user', // Add role for new users
         }, { merge: true });
       }
 
@@ -85,6 +86,7 @@ export default function SignupPage() {
         description: "You've been successfully signed up.",
         duration: 2000,
       });
+      localStorage.setItem('role', 'user');
       
     } catch (error: any) {
        let description = 'There was a problem with your request.';
@@ -100,11 +102,11 @@ export default function SignupPage() {
   }
 
   return (
-    <Card className="mx-auto max-w-lg">
+    <Card className="mx-auto max-w-lg w-full">
       <CardHeader>
         <CardTitle className="text-2xl">Sign Up</CardTitle>
         <CardDescription>
-          Enter your information to Sign Up your account
+          Enter your information to create your User account
         </CardDescription>
       </CardHeader>
       <CardContent>

@@ -56,6 +56,7 @@ export function AppHeader() {
   }, []);
 
   const handleSignOut = async () => {
+    localStorage.removeItem('role');
     if (!auth) return;
     try {
       await signOut(auth);
@@ -184,7 +185,7 @@ export function AppHeader() {
                     {user && (
                       <div className="mb-4">
                         {user.displayName && (
-                            <p className="text-red-500 text-xl font-medium mb-4 text-center underline underline-offset-8">{user.displayName}</p>
+                            <p className="text-foreground text-xl font-medium mb-4 text-center underline underline-offset-8 decoration-primary decoration-4">{user.displayName}</p>
                         )}
                         <Button
                           variant="destructive"

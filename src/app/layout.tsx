@@ -9,7 +9,7 @@ import { AppHeader } from '@/components/layout/app-header';
 import { PageTransition } from '@/components/layout/page-transition';
 import { ReservationsProvider } from '@/context/reservations-context';
 import { usePathname, useRouter } from 'next/navigation';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { FirebaseClientProvider, useUser } from '@/firebase';
 import Loading from './loading';
 
@@ -19,24 +19,40 @@ function AppContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const { user, isUserLoading } = useUser();
-
-  const isAuthPage = useMemo(() => ['/login', '/signup'].includes(pathname), [pathname]);
-  const isHeaderlessPage = useMemo(() => ['/login', '/signup', '/violations/camera', '/violations/uploading'].includes(pathname), [pathname]);
+  const [role, setRole] = useState<string | null>(null);
 
   useEffect(() => {
+    setRole(localStorage.getItem('role'));
+  }, []);
+
+  const isAuthPage = useMemo(() => ['/login', '/signup'].includes(pathname), [pathname]);
+  const isOwnerPage = useMemo(() => pathname === '/owner', [pathname]);
+  const isHeaderlessPage = useMemo(() => ['/login', '/signup', '/owner', '/violations/camera', '/violations/uploading'].includes(pathname), [pathname]);
+
+  useEffect(() => {
+    const userRole = localStorage.getItem('role');
+
     if (!isUserLoading) {
-      if (user && isAuthPage) {
-        router.replace('/home');
-      } else if (!user && !isHeaderlessPage) {
+      // If owner is trying to access non-owner pages, or vice versa
+      if (userRole === 'owner' && !isOwnerPage && !isAuthPage) {
+        router.replace('/owner');
+        return;
+      }
+
+      if (user) {
+        if (isAuthPage) {
+            router.replace('/home');
+        }
+      } else if (!isAuthPage && userRole !== 'owner') {
         router.replace('/login');
       }
     }
-  }, [user, isUserLoading, isAuthPage, isHeaderlessPage, router]);
+  }, [user, isUserLoading, isAuthPage, isOwnerPage, router]);
 
-  if (isUserLoading || (!user && !isHeaderlessPage) || (user && isAuthPage)) {
+  if (isUserLoading || (!user && !isAuthPage && role !== 'owner') || (user && isAuthPage)) {
     return <Loading />;
   }
-
+  
   return (
     <>
       {!isHeaderlessPage && <AppHeader />}

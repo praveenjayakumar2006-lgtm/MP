@@ -25,10 +25,15 @@ import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import { useFirebase } from '@/firebase';
 import { signInWithEmailAndPassword } from 'firebase/auth';
+import { useState } from 'react';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
 const loginSchema = z.object({
   email: z.string().email('Please enter a valid email address.'),
   password: z.string().min(1, 'Password is required.'),
+  role: z.enum(['user', 'owner'], {
+    required_error: 'You need to select a role.',
+  }),
 });
 
 type LoginFormValues = z.infer<typeof loginSchema>;
@@ -37,16 +42,38 @@ export default function LoginPage() {
   const { toast } = useToast();
   const router = useRouter();
   const { auth } = useFirebase();
+  const [role, setRole] = useState<'user' | 'owner'>('user');
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
       email: '',
       password: '',
+      role: 'user',
     },
   });
 
   async function onSubmit(values: LoginFormValues) {
+    if (values.role === 'owner') {
+      if (values.email === 'owner@gmail.com' && values.password === '123456') {
+        toast({
+          title: 'Owner Login Successful',
+          description: 'Welcome, Owner!',
+          duration: 2000,
+        });
+        localStorage.setItem('role', 'owner');
+        router.replace('/owner');
+      } else {
+        toast({
+          variant: 'destructive',
+          title: 'Owner Login Failed',
+          description: 'Invalid credentials for owner.',
+        });
+      }
+      return;
+    }
+
+    // User Login
     if (!auth) {
       toast({
         variant: 'destructive',
@@ -61,6 +88,7 @@ export default function LoginPage() {
         description: 'Welcome back!',
         duration: 2000,
       });
+      localStorage.setItem('role', 'user');
       // The onAuthStateChanged listener in the layout will handle the redirect
     } catch (error: any) {
       let description = 'There was a problem with your request.';
@@ -76,7 +104,7 @@ export default function LoginPage() {
   }
 
   return (
-    <Card className="mx-auto max-w-lg">
+    <Card className="mx-auto max-w-lg w-full">
       <CardHeader>
         <CardTitle className="text-2xl">Login</CardTitle>
         <CardDescription>
@@ -86,6 +114,39 @@ export default function LoginPage() {
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
+             <FormField
+              control={form.control}
+              name="role"
+              render={({ field }) => (
+                <FormItem className="space-y-3">
+                  <FormLabel>Login as...</FormLabel>
+                  <FormControl>
+                    <RadioGroup
+                      onValueChange={(value) => {
+                        field.onChange(value);
+                        setRole(value as 'user' | 'owner');
+                      }}
+                      defaultValue={field.value}
+                      className="flex space-x-4"
+                    >
+                      <FormItem className="flex items-center space-x-2 space-y-0">
+                        <FormControl>
+                          <RadioGroupItem value="user" />
+                        </FormControl>
+                        <FormLabel className="font-normal cursor-pointer">User</FormLabel>
+                      </FormItem>
+                      <FormItem className="flex items-center space-x-2 space-y-0">
+                        <FormControl>
+                          <RadioGroupItem value="owner" />
+                        </FormControl>
+                        <FormLabel className="font-normal cursor-pointer">Owner</FormLabel>
+                      </FormItem>
+                    </RadioGroup>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name="email"
