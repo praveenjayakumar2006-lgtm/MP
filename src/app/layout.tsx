@@ -20,40 +20,43 @@ function AppContent({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const { user, isUserLoading } = useUser();
   const [role, setRole] = useState<string | null>(null);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    // This effect runs on the client and will re-run if path changes.
-    // It's better to get the role here so it's fresh.
+    setIsClient(true);
     setRole(localStorage.getItem('role'));
-  }, [pathname]); // Depend on pathname to re-check role if user navigates
+  }, []);
 
   const isAuthPage = useMemo(() => ['/login', '/signup'].includes(pathname), [pathname]);
   const isOwnerPage = useMemo(() => pathname === '/owner', [pathname]);
 
   useEffect(() => {
-    // No need to get from localStorage again, use the state `role`
+    if (!isClient) return;
+
     if (role === 'owner') {
       if (!isOwnerPage) {
         router.replace('/owner');
       }
-      return; // Early return for owner to prevent other checks
+      return;
     }
     
-    // The rest of the logic is for regular users
     if (!isUserLoading) {
-      if (user) { // User is logged in
+      if (user) {
         if (isAuthPage) {
             router.replace('/home');
         }
-      } else { // User is not logged in
+      } else {
         if (!isAuthPage) {
           router.replace('/login');
         }
       }
     }
-  }, [user, isUserLoading, isAuthPage, isOwnerPage, router, role]);
+  }, [user, isUserLoading, isAuthPage, isOwnerPage, router, role, isClient]);
 
-  // Loading state logic
+  if (!isClient) {
+    return <Loading />;
+  }
+
   if (role === 'owner' && !isOwnerPage) {
     return <Loading />;
   }
@@ -65,9 +68,15 @@ function AppContent({ children }: { children: React.ReactNode }) {
      return <Loading />;
   }
   
+  const showHeader = useMemo(() => {
+    if (role === 'owner' && isOwnerPage) return true;
+    if (role !== 'owner' && user && !isAuthPage) return true;
+    return false;
+  }, [role, isOwnerPage, user, isAuthPage]);
+  
   return (
     <>
-      <AppHeader />
+      {showHeader && <AppHeader />}
       <main className="flex flex-1 flex-col">
         <PageTransition>{children}</PageTransition>
       </main>
