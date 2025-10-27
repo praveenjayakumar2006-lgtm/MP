@@ -4,7 +4,7 @@
 import React, { createContext, useState, ReactNode, useEffect } from 'react';
 import type { Reservation } from '@/lib/types';
 import { useCollection, useFirebase, useUser, addDocumentNonBlocking, deleteDocumentNonBlocking, useMemoFirebase } from '@/firebase';
-import { collection, Timestamp, doc } from 'firebase/firestore';
+import { collection, Timestamp, doc, query, where } from 'firebase/firestore';
 
 interface ReservationsContextType {
   reservations: Reservation[];
@@ -23,7 +23,8 @@ export const ReservationsProvider: React.FC<{ children: ReactNode }> = ({ childr
   // Conditionally create the query only when the user is logged in.
   const reservationsQuery = useMemoFirebase(() => {
     if (firestore && user) {
-      return collection(firestore, 'reservations');
+      // Query for reservations where the userId matches the current user's UID
+      return query(collection(firestore, 'reservations'), where('userId', '==', user.uid));
     }
     return null; // Return null if not authenticated, preventing the query.
   }, [firestore, user]);
