@@ -70,14 +70,14 @@ export default function LoginPage() {
           description: 'Welcome back, Owner!',
           duration: 2000,
         });
-        return;
+        return; // <-- Explicitly return here
       } else {
          toast({
           variant: 'destructive',
           title: 'Owner Login Failed',
           description: 'Invalid credentials for owner.',
         });
-        return;
+        return; // <-- And return here as well
       }
     }
 
