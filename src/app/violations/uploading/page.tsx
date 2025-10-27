@@ -22,7 +22,7 @@ function UploadingPageContent() {
       const imageDataUri = sessionStorage.getItem('violationImage');
 
       if (!imageDataUri || !slotNumber || !violationType || !licensePlate) {
-        router.replace('/violations/capture-failed');
+        router.replace('/violations');
         return;
       }
 

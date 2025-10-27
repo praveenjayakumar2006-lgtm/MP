@@ -84,8 +84,7 @@ function CameraPageContent() {
   
   const handleConfirm = async () => {
     if (!capturedImage || !slotNumber || !violationType || !licensePlate) {
-        // This case should ideally not be hit if the form is validated before navigation
-        router.replace('/violations/capture-failed');
+        router.replace('/violations');
         return;
     }
     
