@@ -1,6 +1,6 @@
+
 'use client';
 
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -15,11 +15,6 @@ export default function OwnerPage() {
         }
     }, [router]);
 
-    const handleLogout = () => {
-        localStorage.removeItem('role');
-        router.replace('/login');
-    };
-
     return (
         <div className="flex flex-1 flex-col items-center justify-center bg-background">
             <Card className="w-full max-w-md">
@@ -29,7 +24,6 @@ export default function OwnerPage() {
                 </CardHeader>
                 <CardContent className="flex flex-col items-center justify-center p-6">
                     <p className="text-muted-foreground mb-6">This is the owner's private dashboard.</p>
-                    <Button onClick={handleLogout}>Log Out</Button>
                 </CardContent>
             </Card>
         </div>

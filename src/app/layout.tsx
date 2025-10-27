@@ -27,35 +27,35 @@ function AppContent({ children }: { children: React.ReactNode }) {
 
   const isAuthPage = useMemo(() => ['/login', '/signup'].includes(pathname), [pathname]);
   const isOwnerPage = useMemo(() => pathname === '/owner', [pathname]);
-  const isHeaderlessPage = useMemo(() => ['/login', '/signup', '/violations/camera', '/violations/uploading'].includes(pathname), [pathname]);
 
   useEffect(() => {
     const userRole = localStorage.getItem('role');
 
     if (!isUserLoading) {
-      // If owner is trying to access non-owner pages, or vice versa
-      if (userRole === 'owner' && !isOwnerPage && !isAuthPage) {
-        router.replace('/owner');
-        return;
+      if (userRole === 'owner') {
+        if (!isOwnerPage) {
+          router.replace('/owner');
+        }
+        return; 
       }
-
+      
       if (user) {
         if (isAuthPage) {
             router.replace('/home');
         }
-      } else if (!isAuthPage && userRole !== 'owner') {
+      } else if (!isAuthPage) {
         router.replace('/login');
       }
     }
   }, [user, isUserLoading, isAuthPage, isOwnerPage, router]);
 
-  if (isUserLoading || (!user && !isAuthPage && role !== 'owner') || (user && isAuthPage)) {
+  if (isUserLoading || (role === 'owner' && !isOwnerPage) || (!user && role !== 'owner' && !isAuthPage) || (user && isAuthPage)) {
     return <Loading />;
   }
   
   return (
     <>
-      {!isHeaderlessPage && <AppHeader />}
+      <AppHeader />
       <main className="flex flex-1 flex-col">
         <PageTransition>{children}</PageTransition>
       </main>
