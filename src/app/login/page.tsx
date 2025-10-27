@@ -148,7 +148,7 @@ export default function LoginPage() {
               control={form.control}
               name="role"
               render={({ field }) => (
-                <FormItem className="my-1">
+                <FormItem className="my-2">
                   <FormControl>
                     <RadioGroup
                       onValueChange={field.onChange}
