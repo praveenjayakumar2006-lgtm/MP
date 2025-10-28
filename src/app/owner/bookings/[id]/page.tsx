@@ -119,9 +119,9 @@ export default function BookingDetailPage() {
 
   return (
     <div className="w-full max-w-2xl mx-auto">
-        <Button onClick={() => router.push('/owner?view=bookings')} variant="outline" className="mb-6">
+        <Button onClick={() => router.back()} variant="outline" className="mb-6">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Bookings
+            Back
         </Button>
         <Card>
             <CardHeader>
