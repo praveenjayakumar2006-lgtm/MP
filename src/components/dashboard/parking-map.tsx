@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useContext } from 'react';
@@ -98,6 +99,12 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
         } else {
             setReservationToCancel(conflictingReservation);
         }
+    } else if (status === 'occupied' || (status === 'reserved' && !isUser)) {
+         toast({
+            variant: 'destructive',
+            title: 'Slot Unavailable',
+            description: 'This slot is already occupied or reserved for the selected time.',
+          });
     }
   };
 
@@ -142,19 +149,11 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
   };
   
   const getSlotStatus = (slotId: string): { status: 'available' | 'occupied' | 'reserved', isUser: boolean, conflictingReservation: Reservation | null } => {
-    const isOccupiedByStatus = slots.find(s => s.id === slotId)?.status === 'occupied';
-    
-    if (!bookingDetails) {
-        return { status: isOccupiedByStatus ? 'occupied' : 'available', isUser: false, conflictingReservation: null };
-    }
-
     const conflictingReservation = getConflictingReservation(slotId);
 
     if (conflictingReservation) {
         return { status: 'reserved', isUser: conflictingReservation.userId === user?.uid, conflictingReservation };
     }
-
-    if(isOccupiedByStatus) return { status: 'occupied', isUser: false, conflictingReservation: null };
     
     return { status: 'available', isUser: false, conflictingReservation: null };
   };
@@ -199,7 +198,7 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
                   <div className="flex flex-row gap-4">
                   {carSlots.map((slot) => {
                       const { status, isUser } = getSlotStatus(slot.id);
-                      const hasIcon = status === 'occupied' || status === 'reserved' || slot.forceIcon;
+                      const hasIcon = status === 'occupied' || status === 'reserved';
 
                       return (
                       <div
@@ -233,7 +232,7 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
                       <div className="flex flex-row gap-4">
                           {bikeSlots.slice(0, 6).map((slot) => {
                           const { status, isUser } = getSlotStatus(slot.id);
-                          const hasIcon = status === 'occupied' || status === 'reserved' || slot.forceIcon;
+                          const hasIcon = status === 'occupied' || status === 'reserved';
 
                           return (
                               <div
@@ -258,7 +257,7 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
                       <div className="flex flex-row gap-4">
                           {bikeSlots.slice(6, 12).map((slot) => {
                           const { status, isUser } = getSlotStatus(slot.id);
-                          const hasIcon = status === 'occupied' || status === 'reserved' || slot.forceIcon;
+                          const hasIcon = status === 'occupied' || status === 'reserved';
                           
                           return (
                               <div

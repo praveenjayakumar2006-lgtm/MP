@@ -75,10 +75,9 @@ export function ReservationsTable() {
   const isMobile = useIsMobile();
 
   useEffect(() => {
-    if (context?.reservations && user) {
+    if (context?.reservations) {
       const now = new Date();
-      const userReservations = context.reservations
-        .filter(res => res.userId === user.uid)
+      const allReservations = context.reservations
         .map(res => {
           const startTime = new Date(res.startTime);
           const endTime = new Date(res.endTime);
@@ -93,9 +92,9 @@ export function ReservationsTable() {
           }
           return { ...res, status };
         });
-      setDisplayReservations(userReservations);
+      setDisplayReservations(allReservations);
     }
-  }, [context?.reservations, user]);
+  }, [context?.reservations]);
 
   if (!context) {
     return null; 
@@ -152,6 +151,8 @@ export function ReservationsTable() {
   };
 
   const handleRowClick = (reservation: Reservation) => {
+    if (reservation.userId !== user?.uid) return;
+
     if (reservation.status === 'Completed') {
       toast({
         variant: 'destructive',
@@ -203,7 +204,9 @@ export function ReservationsTable() {
     return plate;
   }
 
-  const filteredReservations = displayReservations?.filter((res) => {
+  const userReservations = displayReservations?.filter(res => res.userId === user?.uid);
+
+  const filteredReservations = userReservations?.filter((res) => {
     if (filter === 'all') return true;
     return res.status === filter;
   }).sort((a, b) => new Date(b.startTime).getTime() - new Date(a.startTime).getTime());
