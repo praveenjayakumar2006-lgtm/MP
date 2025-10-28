@@ -27,6 +27,18 @@ type EnrichedReservation = Reservation & {
   };
 };
 
+// Formats license plates like 'TN72FB9999' to 'TN 72 FB 9999'
+const formatLicensePlate = (plate: string | null) => {
+    if (!plate) return null;
+    const cleaned = plate.replace(/\s/g, '').toUpperCase();
+    const match = cleaned.match(/^([A-Z]{2})(\d{1,2})([A-Z]{1,2})(\d{1,4})$/);
+    if (match) {
+        const [_, state, district, series, number] = match;
+        return `${state} ${district} ${series} ${number}`;
+    }
+    return plate;
+}
+
 export function BookingsTable() {
   const { firestore, user: ownerUser, isUserLoading: isOwnerLoading } = useFirebase();
   const [enrichedReservations, setEnrichedReservations] = useState<EnrichedReservation[]>([]);
@@ -166,7 +178,7 @@ export function BookingsTable() {
                                     <Hash className="h-3.5 w-3.5 text-muted-foreground"/>
                                     <span className="font-medium">{reservation.slotId}</span>
                                 </div>
-                                <span className="font-mono bg-muted px-1.5 py-0.5 rounded">{reservation.vehiclePlate}</span>
+                                <span className="font-mono bg-muted px-1.5 py-0.5 rounded">{formatLicensePlate(reservation.vehiclePlate)}</span>
                             </CardHeader>
                             <CardContent className="space-y-2 p-1 pt-2 flex-1 flex flex-col">
                                 <Separator />

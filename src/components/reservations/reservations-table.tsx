@@ -195,11 +195,12 @@ export function ReservationsTable() {
   const formatLicensePlate = (plate: string | null) => {
     if (!plate) return null;
     const cleaned = plate.replace(/\s/g, '').toUpperCase();
-    // Indian license plate format
-    const match = cleaned.match(/^([A-Z]{2})(\d{2})([A-Z]{1,2})(\d{1,4})$/);
-    if (match) {
-        const [_, state, district, series, number] = match;
-        return `${state} ${district} ${series} ${number}`;
+    const match = /^([A-Z]{2})(\d{1,2})([A-Z]{1,2})(\d{1,4})$/;
+    if (match.test(cleaned)) {
+        const parts = cleaned.match(match);
+        if (parts) {
+            return parts.slice(1).filter(Boolean).join(' ');
+        }
     }
     return plate;
   }
