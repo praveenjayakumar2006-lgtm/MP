@@ -95,7 +95,7 @@ function OwnerDashboard() {
 
     const renderReports = () => (
          <Card>
-            <CardHeader>
+            <CardHeader className="text-center">
                 <CardTitle className="text-3xl">Violation Reports</CardTitle>
                 <CardDescription>
                     All violation reports submitted by users.
