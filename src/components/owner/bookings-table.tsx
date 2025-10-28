@@ -170,7 +170,7 @@ export function BookingsTable() {
                             </CardHeader>
                             <CardContent className="space-y-2 p-1 pt-2 flex-1">
                                 <Separator />
-                                <div className="flex justify-between items-start pt-1 text-xs">
+                                <div className="flex justify-between items-start pt-1">
                                   <div className="space-y-1.5">
                                       <div className="flex items-center gap-2">
                                           <Calendar className="h-3.5 w-3.5 text-muted-foreground"/>
