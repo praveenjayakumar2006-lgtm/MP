@@ -155,28 +155,22 @@ export function BookingsTable() {
             {isClient && !isLoading && !isLoadingUsers && enrichedReservations.map((reservation) => (
               <TableRow key={reservation.id}>
                 <TableCell>
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <div className="flex items-center gap-3">
-                          <Avatar>
-                            <AvatarFallback>
-                              {reservation.user?.firstName?.[0]}
-                              {reservation.user?.lastName?.[0]}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <p className="font-medium">
-                              {reservation.user?.firstName} {reservation.user?.lastName}
-                            </p>
-                          </div>
-                        </div>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>{reservation.user?.email}</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
+                  <div className="flex items-center gap-3">
+                    <Avatar>
+                      <AvatarFallback>
+                        {reservation.user?.firstName?.[0]}
+                        {reservation.user?.lastName?.[0]}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <p className="font-medium">
+                        {reservation.user?.firstName} {reservation.user?.lastName}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        {reservation.user?.email}
+                      </p>
+                    </div>
+                  </div>
                 </TableCell>
                 <TableCell className="font-medium">{reservation.slotId}</TableCell>
                 <TableCell>{reservation.vehiclePlate}</TableCell>
