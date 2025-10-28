@@ -27,8 +27,8 @@ import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { useRouter } from 'next/navigation';
-import { addDocumentNonBlocking, useFirebase, useUser } from '@/firebase';
-import { collection, Timestamp } from 'firebase/firestore';
+import { useFirebase, useUser } from '@/firebase';
+import { collection, Timestamp, addDoc } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 
 const feedbackSchema = z.object({
@@ -57,22 +57,39 @@ export default function FeedbackPage() {
     },
   });
 
-  function onSubmit(values: FeedbackFormValues) {
+  async function onSubmit(values: FeedbackFormValues) {
     if (!firestore || !user) {
       toast({
         variant: 'destructive',
-        title: 'Error',
+        title: 'Authentication Error',
         description: 'You must be logged in to submit feedback.',
       });
       return;
     }
-    const feedbackCollection = collection(firestore, 'feedback');
-    addDocumentNonBlocking(feedbackCollection, {
-      ...values,
-      userId: user.uid,
-      createdAt: Timestamp.now(),
-    });
-    router.push('/feedback/success');
+
+    try {
+      const feedbackCollection = collection(firestore, 'feedback');
+      await addDoc(feedbackCollection, {
+        ...values,
+        userId: user.uid,
+        createdAt: Timestamp.now(),
+      });
+      
+      toast({
+        title: 'Feedback Submitted',
+        description: 'Thank you for your feedback!',
+      });
+
+      router.push('/feedback/success');
+
+    } catch (error) {
+      console.error("Error submitting feedback: ", error);
+      toast({
+        variant: 'destructive',
+        title: 'Submission Error',
+        description: 'There was a problem submitting your feedback. Please try again.',
+      });
+    }
   }
 
   return (
@@ -167,7 +184,9 @@ export default function FeedbackPage() {
               />
             </CardContent>
             <CardFooter>
-              <Button type="submit">Submit Feedback</Button>
+              <Button type="submit" disabled={form.formState.isSubmitting}>
+                {form.formState.isSubmitting ? 'Submitting...' : 'Submit Feedback'}
+              </Button>
             </CardFooter>
           </form>
         </Form>
