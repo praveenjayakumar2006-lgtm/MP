@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
@@ -71,13 +72,15 @@ export default function BookingDetailPage() {
                 }
             }
             setReservation(enrichedData);
+            setIsLoading(false);
+        } else if (!isReservationLoading) {
+            // If data is null and we are not loading, it means it's not found or an error occurred.
+            // We set loading to false to stop showing the skeleton.
+            setIsLoading(false);
         }
-        setIsLoading(false);
     }
 
-    if (!isReservationLoading) {
-      fetchFullDetails();
-    }
+    fetchFullDetails();
   }, [reservationData, isReservationLoading, firestore])
 
 
@@ -113,13 +116,16 @@ export default function BookingDetailPage() {
   }
 
   if (!reservation) {
-    return (
-      <div className="text-center">
-        <p className="text-xl font-semibold">Reservation not found</p>
-        <p className="text-muted-foreground">The requested booking could not be located.</p>
-        <Button onClick={() => router.back()} className="mt-4">
-          <ArrowLeft className="mr-2 h-4 w-4" /> Go Back
+    // This part will now only be reached if loading is finished and reservation is still null.
+    // Instead of showing a big "not found" message, we can show a more subtle one or nothing.
+    // For now, let's keep the user's view clean by just showing the back button.
+     return (
+      <div className="w-full max-w-2xl mx-auto">
+        <Button onClick={() => router.push('/owner?view=bookings')} variant="outline" className="mb-6">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Bookings
         </Button>
+        <p className="text-center text-muted-foreground">The requested booking could not be loaded.</p>
       </div>
     );
   }
