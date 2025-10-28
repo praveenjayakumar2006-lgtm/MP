@@ -30,9 +30,6 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-
-  // ✅ Added for static export
-  output: 'export',
 };
 
 export default nextConfig;
