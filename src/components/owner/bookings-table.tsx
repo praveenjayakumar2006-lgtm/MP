@@ -2,11 +2,10 @@
 'use client';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { format } from 'date-fns';
-import { useState, useContext, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import type { Reservation } from '@/lib/types';
 import { Skeleton } from '../ui/skeleton';
-import { ReservationsContext } from '@/context/reservations-context';
-import { useFirebase, useMemoFirebase, FirestorePermissionError, errorEmitter } from '@/firebase';
+import { useFirebase, useCollection, useMemoFirebase, FirestorePermissionError, errorEmitter } from '@/firebase';
 import { collection, query, orderBy, doc, getDoc, FirestoreError } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -29,7 +28,6 @@ type EnrichedReservation = Reservation & {
 };
 
 export function BookingsTable() {
-  const context = useContext(ReservationsContext);
   const { firestore } = useFirebase();
   const [enrichedReservations, setEnrichedReservations] = useState<EnrichedReservation[]>([]);
   const [isLoadingUsers, setIsLoadingUsers] = useState(true);
@@ -37,12 +35,19 @@ export function BookingsTable() {
   const [filter, setFilter] = useState<Status | 'all'>('all');
   const router = useRouter();
 
+  const reservationsQuery = useMemoFirebase(() => {
+    if (!firestore) return null;
+    return query(collection(firestore, 'reservations'), orderBy('createdAt', 'desc'));
+  }, [firestore]);
+
+  const { data: reservations, isLoading, error: collectionError } = useCollection<Reservation>(reservationsQuery);
+
   useEffect(() => {
-    if (context?.reservations && firestore) {
+    if (reservations && firestore) {
       const now = new Date();
-      const allReservations: Reservation[] = context.reservations.map(res => {
-        const startTime = new Date(res.startTime);
-        const endTime = new Date(res.endTime);
+      const allReservations: Reservation[] = reservations.map(res => {
+        const startTime = (res.startTime as any).toDate();
+        const endTime = (res.endTime as any).toDate();
         let status: Status;
 
         if (now > endTime) {
@@ -52,7 +57,7 @@ export function BookingsTable() {
         } else {
           status = 'Upcoming';
         }
-        return { ...res, status };
+        return { ...res, status, startTime, endTime };
       });
 
       const fetchUsers = async () => {
@@ -82,7 +87,7 @@ export function BookingsTable() {
                     operation: 'get',
                   });
                   errorEmitter.emit('permission-error', contextualError);
-                  throw contextualError; 
+                  throw contextualError;
                 }
               }
               return res;
@@ -103,14 +108,16 @@ export function BookingsTable() {
       };
       
       fetchUsers();
+    } else if (!isLoading && !reservations) {
+        setIsLoadingUsers(false);
+        setEnrichedReservations([]);
     }
-  }, [context?.reservations, firestore, toast]);
+  }, [reservations, firestore, toast, isLoading]);
 
-  if (!context) {
-    return null;
-  }
-  
-  const { isLoading, isClient } = context;
+
+  const isDataLoading = isLoading || isLoadingUsers;
+  const isClient = typeof window !== 'undefined';
+
 
   const filteredReservations = enrichedReservations?.filter((res) => {
     if (filter === 'all') return true;
@@ -200,8 +207,8 @@ export function BookingsTable() {
             </div>
             <TabsContent value={filter}>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {(!isClient || isLoading || isLoadingUsers) && renderSkeletons()}
-                {isClient && !isLoading && !isLoadingUsers && filteredReservations.map((reservation) => {
+                {(!isClient || isDataLoading) && renderSkeletons()}
+                {isClient && !isDataLoading && filteredReservations.map((reservation) => {
                     const userFullName = reservation.user ? `${reservation.user.firstName || ''} ${reservation.user.lastName || ''}`.trim() : 'N/A';
                     return (
                         <Card key={reservation.id} className="flex flex-col">
@@ -244,7 +251,7 @@ export function BookingsTable() {
                     )
                 })}
               </div>
-              {isClient && !isLoading && !isLoadingUsers && filteredReservations.length === 0 && (
+              {isClient && !isDataLoading && filteredReservations.length === 0 && (
                 <div className="text-center p-8 text-muted-foreground col-span-full bg-card rounded-lg border">
                   No {filter !== 'all' ? filter.toLowerCase() : ''} bookings found.
                 </div>
@@ -256,3 +263,5 @@ export function BookingsTable() {
 }
 
   
+
+    
