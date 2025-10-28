@@ -206,15 +206,15 @@ export function BookingsTable() {
                 <TabsTrigger value="Completed">Completed</TabsTrigger>
               </TabsList>
             </div>
-            <TabsContent value={filter}>
+            <TabsContent value={filter} className="mt-8">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {(!isClient || isDataLoading) && renderSkeletons()}
                 {isClient && !isDataLoading && filteredReservations.map((reservation) => {
                     const userFullName = reservation.user ? `${reservation.user.firstName || ''} ${reservation.user.lastName || ''}`.trim() : 'N/A';
                     return (
-                        <Card key={reservation.id} className="flex flex-col">
-                           <CardHeader className="flex-row items-center gap-4">
-                                <Avatar className="h-10 w-10">
+                        <Card key={reservation.id} className="flex flex-col text-sm">
+                           <CardHeader className="flex-row items-center gap-3 p-4">
+                                <Avatar className="h-9 w-9">
                                     <AvatarFallback>
                                         {userFullName !== 'N/A' ? userFullName.charAt(0).toUpperCase() : <UserCircle />}
                                     </AvatarFallback>
@@ -224,28 +224,28 @@ export function BookingsTable() {
                                     <p className="text-xs text-muted-foreground">{reservation.user?.email || 'No email'}</p>
                                 </div>
                             </CardHeader>
-                            <CardContent className="space-y-3 pt-0 flex-1">
+                            <CardContent className="space-y-2.5 p-4 pt-0 flex-1">
                                 <Separator />
-                                <div className="grid grid-cols-2 gap-x-4 gap-y-3 text-sm pt-2">
+                                <div className="grid grid-cols-2 gap-x-4 gap-y-2 pt-2 text-xs">
                                     <div className="flex items-center gap-2">
-                                        <Hash className="h-4 w-4 text-muted-foreground"/>
+                                        <Hash className="h-3.5 w-3.5 text-muted-foreground"/>
                                         <span className="font-medium">{reservation.slotId}</span>
                                     </div>
                                     <div className="flex items-center gap-2">
-                                        <Car className="h-4 w-4 text-muted-foreground"/>
-                                        <span className="font-mono text-xs bg-muted px-1.5 py-0.5 rounded">{reservation.vehiclePlate}</span>
+                                        <Car className="h-3.5 w-3.5 text-muted-foreground"/>
+                                        <span className="font-mono bg-muted px-1.5 py-0.5 rounded">{reservation.vehiclePlate}</span>
                                     </div>
                                     <div className="flex items-center gap-2 col-span-2">
-                                        <Calendar className="h-4 w-4 text-muted-foreground"/>
+                                        <Calendar className="h-3.5 w-3.5 text-muted-foreground"/>
                                         <span>{format(new Date(reservation.startTime), 'MMM d, yyyy')}</span>
                                     </div>
                                     <div className="flex items-center gap-2 col-span-2">
-                                        <Clock className="h-4 w-4 text-muted-foreground"/>
+                                        <Clock className="h-3.5 w-3.5 text-muted-foreground"/>
                                         <span>{`${format(new Date(reservation.startTime), 'p')} - ${format(new Date(reservation.endTime), 'p')}`}</span>
                                     </div>
                                 </div>
                             </CardContent>
-                             <CardFooter className="justify-between items-center">
+                             <CardFooter className="p-4 pt-0 justify-between items-center">
                                 <Badge variant={getStatusBadgeVariant(reservation.status)}>{reservation.status}</Badge>
                             </CardFooter>
                         </Card>
