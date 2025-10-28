@@ -73,9 +73,9 @@ export default function BookingDetailPage() {
             }
             setReservation(enrichedData);
             setIsLoading(false);
-        } else if (!isReservationLoading) {
-            // If data is null and we are not loading, it means it's not found or an error occurred.
-            // We set loading to false to stop showing the skeleton.
+        } else if (!isReservationLoading && !reservationData) {
+            // Data is not found, but we want to wait to show anything until we are sure.
+            // Let's ensure loading is false only after a final check.
             setIsLoading(false);
         }
     }
@@ -84,16 +84,16 @@ export default function BookingDetailPage() {
   }, [reservationData, isReservationLoading, firestore])
 
 
-  if (isLoading || isReservationLoading) {
+  if (isLoading || isReservationLoading || !reservation) {
     return (
-        <div className="w-full max-w-2xl">
-            <Skeleton className="h-10 w-24 mb-6" />
+        <div className="w-full max-w-2xl mx-auto">
+            <Skeleton className="h-10 w-40 mb-6" />
             <Card>
                 <CardHeader>
                     <Skeleton className="h-8 w-48" />
                     <Skeleton className="h-4 w-64" />
                 </CardHeader>
-                <CardContent className="space-y-6">
+                <CardContent className="space-y-6 pt-6">
                     <Skeleton className="h-px w-full" />
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         <Skeleton className="h-12 w-full" />
@@ -115,21 +115,6 @@ export default function BookingDetailPage() {
     )
   }
 
-  if (!reservation) {
-    // This part will now only be reached if loading is finished and reservation is still null.
-    // Instead of showing a big "not found" message, we can show a more subtle one or nothing.
-    // For now, let's keep the user's view clean by just showing the back button.
-     return (
-      <div className="w-full max-w-2xl mx-auto">
-        <Button onClick={() => router.push('/owner?view=bookings')} variant="outline" className="mb-6">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Bookings
-        </Button>
-        <p className="text-center text-muted-foreground">The requested booking could not be loaded.</p>
-      </div>
-    );
-  }
-
   const userFullName = reservation.user ? `${reservation.user.firstName || ''} ${reservation.user.lastName || ''}`.trim() : 'Unknown User';
 
   return (
@@ -145,7 +130,7 @@ export default function BookingDetailPage() {
                     Complete information for reservation <span className="font-mono text-primary bg-primary/10 px-1 rounded-sm">{reservation.id.slice(0, 6)}...</span>
                 </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6">
+            <CardContent className="space-y-6 pt-6">
                 <Separator />
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-8">
                    <DetailItem icon={Hash} label="Slot ID" value={reservation.slotId} />
