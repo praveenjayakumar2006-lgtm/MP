@@ -80,7 +80,35 @@ export function ReportsTable() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {isLoading && renderSkeletons()}
-        
+        {!isLoading && violations?.map((violation) => (
+             <Card key={violation.id}>
+                {violation.imageUrl && (
+                    <CardHeader>
+                        <Image
+                            src={violation.imageUrl}
+                            alt={`Violation at ${violation.slotNumber}`}
+                            width={400}
+                            height={225}
+                            className="rounded-t-lg object-cover aspect-video"
+                        />
+                    </CardHeader>
+                )}
+                <CardContent className="space-y-2 pt-4">
+                    <Badge variant={violation.violationType === 'overstaying' ? 'destructive' : 'secondary'}>
+                        {violation.violationType.replace('_', ' ')}
+                    </Badge>
+                    <CardTitle className="text-xl">{formatLicensePlate(violation.licensePlate)}</CardTitle>
+                    <p className="text-muted-foreground">
+                        Slot: <span className="font-semibold text-foreground">{formatSlotId(violation.slotNumber)}</span>
+                    </p>
+                </CardContent>
+                 <CardFooter>
+                    <p className="text-xs text-muted-foreground">
+                       Reported on {violation.createdAt ? format(violation.createdAt.toDate(), 'PPP p') : 'N/A'}
+                    </p>
+                </CardFooter>
+            </Card>
+        ))}
          {!isLoading && (!violations || violations.length === 0) && (
             <div className="col-span-full text-center p-8 text-muted-foreground bg-card rounded-lg">
                 No violation reports found.
