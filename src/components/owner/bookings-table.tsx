@@ -4,27 +4,18 @@ import { format } from 'date-fns';
 import { useState, useEffect } from 'react';
 import type { Reservation } from '@/lib/types';
 import { Skeleton } from '../ui/skeleton';
-import { useFirebase, useCollection, useMemoFirebase, FirestorePermissionError, errorEmitter } from '@/firebase';
-import { collection, query, orderBy, doc, getDoc, FirestoreError } from 'firebase/firestore';
+import { useFirebase, useCollection, useMemoFirebase } from '@/firebase';
+import { collection, query, orderBy } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useIsMobile } from '@/hooks/use-is-mobile';
 import { useRouter } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
-import { User, Car, Calendar, Clock, Hash, CheckCircle, Hourglass, ArrowRight, UserCircle } from 'lucide-react';
-import { Avatar, AvatarFallback } from '../ui/avatar';
+import { Car, Calendar, Clock, Hash, User } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Separator } from '../ui/separator';
 
 type Status = 'Active' | 'Completed' | 'Upcoming';
 
-type EnrichedReservation = Reservation & {
-  user?: {
-    firstName?: string;
-    lastName?: string;
-    email?: string;
-  };
-};
 
 // Formats license plates like 'TN72FB9999' to 'TN 72 FB 9999'
 const formatLicensePlate = (plate: string | null) => {
@@ -49,8 +40,7 @@ const formatSlotId = (slotId: string | null) => {
 
 export function BookingsTable() {
   const { firestore } = useFirebase();
-  const [enrichedReservations, setEnrichedReservations] = useState<EnrichedReservation[]>([]);
-  const [isLoadingUsers, setIsLoadingUsers] = useState(true);
+  const [reservations, setReservations] = useState<Reservation[]>([]);
   const { toast } = useToast();
   const [filter, setFilter] = useState<Status | 'all'>('all');
   const router = useRouter();
@@ -60,12 +50,12 @@ export function BookingsTable() {
     return query(collection(firestore, 'reservations'), orderBy('createdAt', 'desc'));
   }, [firestore]);
 
-  const { data: reservations, isLoading, error: collectionError } = useCollection<Reservation>(reservationsQuery);
+  const { data: reservationsData, isLoading, error: collectionError } = useCollection<Reservation>(reservationsQuery);
 
   useEffect(() => {
-    if (reservations) {
+    if (reservationsData) {
       const now = new Date();
-      const allReservations: EnrichedReservation[] = reservations.map(res => {
+      const allReservations: Reservation[] = reservationsData.map(res => {
         const startTime = (res.startTime as any).toDate();
         const endTime = (res.endTime as any).toDate();
         let status: Status;
@@ -79,20 +69,18 @@ export function BookingsTable() {
         }
         return { ...res, status, startTime, endTime };
       });
-      setEnrichedReservations(allReservations);
-      setIsLoadingUsers(false);
+      setReservations(allReservations);
     } else if (!isLoading) {
-        setIsLoadingUsers(false);
-        setEnrichedReservations([]);
+        setReservations([]);
     }
-  }, [reservations, isLoading]);
+  }, [reservationsData, isLoading]);
 
 
-  const isDataLoading = isLoading || isLoadingUsers;
+  const isDataLoading = isLoading;
   const isClient = typeof window !== 'undefined';
 
 
-  const filteredReservations = enrichedReservations?.filter((res) => {
+  const filteredReservations = reservations?.filter((res) => {
     if (filter === 'all') return true;
     return res.status === filter;
   }).sort((a, b) => new Date(b.startTime).getTime() - new Date(a.startTime).getTime());
@@ -178,7 +166,6 @@ export function BookingsTable() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {(!isClient || isDataLoading) && renderSkeletons()}
                 {isClient && !isDataLoading && filteredReservations && filteredReservations.map((reservation) => {
-                    const userFullName = reservation.user ? `${reservation.user.firstName || ''} ${reservation.user.lastName || ''}`.trim() : '';
                     return (
                         <Card key={reservation.id} className="flex flex-col text-sm p-3">
                            <CardHeader className="p-1 flex-row justify-between items-center space-y-0">
@@ -203,8 +190,16 @@ export function BookingsTable() {
                                   </div>
                                   <Badge variant={getStatusBadgeVariant(reservation.status)}>{reservation.status}</Badge>
                                 </div>
+                                 <Separator />
+                                 <div className="flex items-center gap-2 text-xs pt-1.5 text-muted-foreground">
+                                    <User className="h-3.5 w-3.5" />
+                                    <span className="truncate">User ID: {reservation.userId}</span>
+                                 </div>
                             </CardContent>
                              <CardFooter className="p-1 pt-2 justify-between items-center">
+                               <Button size="sm" variant="outline" onClick={() => router.push(`/owner/bookings/${reservation.id}`)}>
+                                  View Details
+                               </Button>
                             </CardFooter>
                         </Card>
                     )
