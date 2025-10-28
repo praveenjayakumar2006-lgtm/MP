@@ -1,4 +1,3 @@
-
 'use client';
 
 import { Button } from '@/components/ui/button';
@@ -10,7 +9,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
-import { addDocumentNonBlocking, useFirebase } from '@/firebase';
+import { addDocumentNonBlocking, useFirebase, useUser } from '@/firebase';
 import { collection, Timestamp } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 
@@ -25,6 +24,7 @@ function ViolationResultContent() {
   const [submissionStatus, setSubmissionStatus] = useState<'pending' | 'confirmed' | 'rejected'>('pending');
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const { firestore } = useFirebase();
+  const { user } = useUser();
   const { toast } = useToast();
 
   useEffect(() => {
@@ -35,7 +35,7 @@ function ViolationResultContent() {
   }, []);
 
   const handleConfirm = () => {
-    if (!firestore || !slotNumber || !violationType || !licensePlate) {
+    if (!firestore || !user || !slotNumber || !violationType || !licensePlate) {
        toast({
         variant: 'destructive',
         title: 'Error',
@@ -50,6 +50,7 @@ function ViolationResultContent() {
       violationType,
       licensePlate,
       imageUrl: imageUrl,
+      userId: user.uid,
       createdAt: Timestamp.now(),
     });
 
