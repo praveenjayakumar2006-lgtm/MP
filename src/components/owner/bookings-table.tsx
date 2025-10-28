@@ -153,14 +153,6 @@ export function BookingsTable() {
   const renderSkeletons = () =>
     Array.from({ length: 5 }).map((_, i) => (
       <TableRow key={`skel-${i}`}>
-        <TableCell>
-          <div className="flex items-center gap-3">
-            <div className="space-y-1">
-              <Skeleton className="h-4 w-24" />
-              <Skeleton className="h-3 w-32" />
-            </div>
-          </div>
-        </TableCell>
         <TableCell><Skeleton className="h-5 w-16" /></TableCell>
         <TableCell><Skeleton className="h-5 w-24" /></TableCell>
         <TableCell><Skeleton className="h-5 w-40" /></TableCell>
@@ -189,7 +181,6 @@ export function BookingsTable() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>User</TableHead>
                     <TableHead>Slot ID</TableHead>
                     <TableHead>Vehicle Plate</TableHead>
                     <TableHead>Start Time</TableHead>
@@ -200,11 +191,6 @@ export function BookingsTable() {
                   {(!isClient || isLoading || isLoadingUsers) && renderSkeletons()}
                   {isClient && !isLoading && !isLoadingUsers && filteredReservations.map((reservation) => (
                     <TableRow key={reservation.id}>
-                      <TableCell>
-                        <p className="font-medium">
-                          {reservation.user?.firstName} {reservation.user?.lastName}
-                        </p>
-                      </TableCell>
                       <TableCell className="font-medium">{reservation.slotId}</TableCell>
                       <TableCell>{reservation.vehiclePlate}</TableCell>
                       <TableCell>{format(new Date(reservation.startTime), getDateFormat())}</TableCell>
