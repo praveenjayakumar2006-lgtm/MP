@@ -1,4 +1,3 @@
-
 'use client';
 import {
   Table,
@@ -81,7 +80,7 @@ export function ReportsTable() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {isLoading && renderSkeletons()}
-        {!isLoading && violations?.map((violation) => (
+        {!isLoading && violations && violations.map((violation) => (
             <Card key={violation.id}>
                 <CardHeader className="p-0">
                     {violation.imageUrl ? (
