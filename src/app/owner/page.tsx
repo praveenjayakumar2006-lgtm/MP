@@ -6,7 +6,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState, Suspense } from "react";
 import { ReportsTable } from "@/components/owner/reports-table";
 import { FeedbackTable } from "@/components/owner/feedback-table";
-import { Loader2, FileText, MessageSquare, LayoutDashboard } from "lucide-react";
+import { BookingsTable } from "@/components/owner/bookings-table";
+import { Loader2, FileText, MessageSquare, LayoutDashboard, CalendarCheck } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
@@ -42,7 +43,23 @@ function OwnerDashboard() {
                 </div>
             </CardHeader>
             <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
+                     <Card className="hover:bg-accent/50 transition-colors">
+                        <CardHeader className="pb-4">
+                           <div className="flex items-center gap-4">
+                             <CalendarCheck className="h-8 w-8 text-green-500" />
+                             <CardTitle className="text-xl">User Bookings</CardTitle>
+                           </div>
+                        </CardHeader>
+                        <CardContent>
+                            <p className="text-sm text-muted-foreground mb-4">
+                                View all reservations made by users.
+                            </p>
+                             <Link href="/owner?view=bookings">
+                                <Button variant="outline" size="sm">View Bookings</Button>
+                            </Link>
+                        </CardContent>
+                    </Card>
                     <Card className="hover:bg-accent/50 transition-colors">
                         <CardHeader className="pb-4">
                            <div className="flex items-center gap-4">
@@ -107,6 +124,19 @@ function OwnerDashboard() {
             </CardContent>
         </Card>
     );
+     const renderBookings = () => (
+        <Card className="border-0 shadow-none">
+            <CardHeader>
+                <CardTitle className="text-3xl">All Bookings</CardTitle>
+                <CardDescription>
+                    All reservations made by users.
+                </CardDescription>
+            </CardHeader>
+            <CardContent>
+                <BookingsTable />
+            </CardContent>
+        </Card>
+    );
     
     const renderContent = () => {
         if (!isOwner) {
@@ -119,6 +149,8 @@ function OwnerDashboard() {
         }
         
         switch (view) {
+            case 'bookings':
+                return renderBookings();
             case 'reports':
                 return renderReports();
             case 'feedback':
