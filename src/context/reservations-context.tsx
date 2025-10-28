@@ -1,9 +1,10 @@
+
 'use client';
 
 import React, { createContext, useState, ReactNode, useEffect } from 'react';
 import type { Reservation } from '@/lib/types';
 import { useCollection, useFirebase, useUser, addDocumentNonBlocking, deleteDocumentNonBlocking, useMemoFirebase } from '@/firebase';
-import { collection, Timestamp, query, doc } from 'firebase/firestore';
+import { collection, Timestamp, query, doc, where } from 'firebase/firestore';
 
 interface ReservationsContextType {
   reservations: Reservation[];
@@ -20,11 +21,12 @@ export const ReservationsProvider: React.FC<{ children: ReactNode }> = ({ childr
   const { user } = useUser();
 
   const reservationsQuery = useMemoFirebase(() => {
-    if (firestore) {
-      return query(collection(firestore, 'reservations'));
+    if (firestore && user) {
+      // Query only for the reservations belonging to the current user
+      return query(collection(firestore, 'reservations'), where('userId', '==', user.uid));
     }
     return null;
-  }, [firestore]);
+  }, [firestore, user]);
 
   const { data: reservationsData, isLoading, error } = useCollection<Reservation>(reservationsQuery);
   
@@ -46,9 +48,10 @@ export const ReservationsProvider: React.FC<{ children: ReactNode }> = ({ childr
       }));
       setReservations(formattedReservations);
     } else {
+        // If there's no user, or no data, clear the reservations
         setReservations([]);
     }
-  }, [reservationsData]);
+  }, [reservationsData, user]);
 
   const addReservation = (reservation: Omit<Reservation, 'id' | 'createdAt' | 'updatedAt' | 'userId' | 'status'>) => {
     if (!firestore || !user) return;
