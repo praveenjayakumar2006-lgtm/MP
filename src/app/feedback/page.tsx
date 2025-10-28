@@ -27,7 +27,7 @@ import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { useRouter } from 'next/navigation';
-import { addDocumentNonBlocking, useFirebase } from '@/firebase';
+import { addDocumentNonBlocking, useFirebase, useUser } from '@/firebase';
 import { collection, Timestamp } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 
@@ -44,6 +44,7 @@ export default function FeedbackPage() {
   const router = useRouter();
   const [hoverRating, setHoverRating] = useState(0);
   const { firestore } = useFirebase();
+  const { user } = useUser();
   const { toast } = useToast();
 
   const form = useForm<FeedbackFormValues>({
@@ -57,17 +58,18 @@ export default function FeedbackPage() {
   });
 
   function onSubmit(values: FeedbackFormValues) {
-    if (!firestore) {
+    if (!firestore || !user) {
       toast({
         variant: 'destructive',
         title: 'Error',
-        description: 'Could not connect to the database.',
+        description: 'You must be logged in to submit feedback.',
       });
       return;
     }
     const feedbackCollection = collection(firestore, 'feedback');
     addDocumentNonBlocking(feedbackCollection, {
       ...values,
+      userId: user.uid,
       createdAt: Timestamp.now(),
     });
     router.push('/feedback/success');
