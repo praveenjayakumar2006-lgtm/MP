@@ -1,4 +1,3 @@
-
 'use client';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { format } from 'date-fns';
@@ -178,7 +177,7 @@ export function BookingsTable() {
             <TabsContent value={filter} className="mt-8">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {(!isClient || isDataLoading) && renderSkeletons()}
-                {isClient && !isDataLoading && filteredReservations.map((reservation) => {
+                {isClient && !isDataLoading && filteredReservations && filteredReservations.map((reservation) => {
                     const userFullName = reservation.user ? `${reservation.user.firstName || ''} ${reservation.user.lastName || ''}`.trim() : '';
                     return (
                         <Card key={reservation.id} className="flex flex-col text-sm p-3">
@@ -211,7 +210,7 @@ export function BookingsTable() {
                     )
                 })}
               </div>
-              {isClient && !isDataLoading && filteredReservations.length === 0 && (
+              {isClient && !isDataLoading && (!filteredReservations || filteredReservations.length === 0) && (
                 <Card className="mt-6">
                   <CardContent className="pt-6 text-center text-muted-foreground">
                     No {filter !== 'all' ? filter.toLowerCase() : ''} bookings found.
