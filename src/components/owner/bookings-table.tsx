@@ -1,3 +1,4 @@
+
 'use client';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { format } from 'date-fns';
@@ -161,7 +162,7 @@ export function BookingsTable() {
                     return (
                         <Card key={reservation.id} className="flex flex-col text-sm p-3">
                            <CardHeader className="p-1">
-                                <p className="font-semibold text-xs text-muted-foreground">User ID: <span className="font-mono text-foreground">{reservation.userId}</span></p>
+                                
                             </CardHeader>
                             <CardContent className="space-y-2 p-1 pt-2 flex-1">
                                 <Separator />
