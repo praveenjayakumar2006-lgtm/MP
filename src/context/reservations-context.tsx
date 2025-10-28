@@ -20,8 +20,7 @@ export const ReservationsProvider: React.FC<{ children: ReactNode }> = ({ childr
   const { user } = useUser();
 
   const reservationsQuery = useMemoFirebase(() => {
-    if (firestore && user) {
-      // Query only for the reservations belonging to the current user
+    if (firestore && user?.uid) {
       return query(collection(firestore, 'reservations'), where('userId', '==', user.uid));
     }
     return null;
