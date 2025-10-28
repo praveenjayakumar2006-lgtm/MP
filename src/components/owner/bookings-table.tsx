@@ -162,21 +162,21 @@ export function BookingsTable() {
                     return (
                         <Card key={reservation.id} className="flex flex-col text-sm p-3">
                            <CardHeader className="p-1 flex-row justify-between items-center space-y-0">
-                                <span className="font-mono bg-muted px-1.5 py-0.5 rounded">{reservation.vehiclePlate}</span>
                                 <div className="flex items-center gap-2">
                                     <Hash className="h-3.5 w-3.5 text-muted-foreground"/>
                                     <span className="font-medium">{reservation.slotId}</span>
                                 </div>
+                                <span className="font-mono bg-muted px-1.5 py-0.5 rounded">{reservation.vehiclePlate}</span>
                             </CardHeader>
-                            <CardContent className="space-y-2 p-1 pt-2 flex-1">
+                            <CardContent className="space-y-2 p-1 pt-2 flex-1 flex flex-col">
                                 <Separator />
-                                <div className="flex justify-between items-start pt-1">
+                                <div className="flex justify-between items-center pt-1 flex-1">
                                   <div className="space-y-1.5">
-                                      <div className="flex items-center gap-2">
+                                      <div className="flex items-center gap-2 text-base">
                                           <Calendar className="h-3.5 w-3.5 text-muted-foreground"/>
                                           <span>{format(new Date(reservation.startTime), 'MMM d, yyyy')}</span>
                                       </div>
-                                      <div className="flex items-center gap-2">
+                                      <div className="flex items-center gap-2 text-base">
                                           <Clock className="h-3.5 w-3.5 text-muted-foreground"/>
                                           <span>{`${format(new Date(reservation.startTime), 'p')} - ${format(new Date(reservation.endTime), 'p')}`}</span>
                                       </div>
