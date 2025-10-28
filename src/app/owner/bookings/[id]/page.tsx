@@ -72,21 +72,17 @@ export default function BookingDetailPage() {
                 }
             }
             setReservation(enrichedData);
-            setIsLoading(false);
-        } else if (!isReservationLoading && !reservationData) {
-            // Data is not found, but we want to wait to show anything until we are sure.
-            // Let's ensure loading is false only after a final check.
-            setIsLoading(false);
         }
+        setIsLoading(isReservationLoading);
     }
 
     fetchFullDetails();
   }, [reservationData, isReservationLoading, firestore])
 
 
-  if (isLoading || isReservationLoading || !reservation) {
+  if (isLoading || !reservation) {
     return (
-        <div className="w-full max-w-2xl mx-auto">
+        <div className="w-full max-w-lg mx-auto">
             <Skeleton className="h-10 w-40 mb-6" />
             <Card>
                 <CardHeader>
@@ -118,7 +114,7 @@ export default function BookingDetailPage() {
   const userFullName = reservation.user ? `${reservation.user.firstName || ''} ${reservation.user.lastName || ''}`.trim() : 'Unknown User';
 
   return (
-    <div className="w-full max-w-2xl mx-auto">
+    <div className="w-full max-w-lg mx-auto">
         <Button onClick={() => router.back()} variant="outline" className="mb-6">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back
