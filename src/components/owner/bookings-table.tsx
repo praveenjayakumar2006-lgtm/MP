@@ -36,7 +36,6 @@ export function BookingsTable() {
 
   const reservationsQuery = useMemoFirebase(() => {
     if (!firestore) return null;
-    // For the owner, we fetch all reservations.
     return query(collection(firestore, 'reservations'), orderBy('createdAt', 'desc'));
   }, [firestore]);
 
@@ -209,18 +208,18 @@ export function BookingsTable() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {(!isClient || isDataLoading) && renderSkeletons()}
                 {isClient && !isDataLoading && filteredReservations.map((reservation) => {
-                    const userFullName = reservation.user ? `${reservation.user.firstName || ''} ${reservation.user.lastName || ''}`.trim() : 'N/A';
+                    const userFullName = reservation.user ? `${reservation.user.firstName || ''} ${reservation.user.lastName || ''}`.trim() : '';
                     return (
                         <Card key={reservation.id} className="flex flex-col text-sm p-3">
                            <CardHeader className="flex-row items-center gap-3 p-1">
                                 <Avatar className="h-9 w-9">
                                     <AvatarFallback>
-                                        {userFullName !== 'N/A' ? userFullName.charAt(0).toUpperCase() : <UserCircle />}
+                                        {userFullName ? userFullName.charAt(0).toUpperCase() : <UserCircle />}
                                     </AvatarFallback>
                                 </Avatar>
                                 <div>
-                                    <p className="font-semibold">{userFullName}</p>
-                                    <p className="text-xs text-muted-foreground">{reservation.user?.email || 'No email'}</p>
+                                    <p className="font-semibold">{userFullName || 'N/A'}</p>
+                                    <p className="text-xs text-muted-foreground">{reservation.user?.email || 'No email available'}</p>
                                 </div>
                             </CardHeader>
                             <CardContent className="space-y-2 p-1 pt-2 flex-1">
