@@ -2,8 +2,8 @@
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
-import { useDoc, useFirebase, useMemoFirebase } from '@/firebase';
-import { doc, getDoc } from 'firebase/firestore';
+import { useDoc, useFirebase, useMemoFirebase, FirestorePermissionError, errorEmitter } from '@/firebase';
+import { doc, getDoc, FirestoreError } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -61,17 +61,26 @@ export default function BookingDetailPage() {
             };
 
             if (reservationData.userId) {
-                try {
-                    const userDocRef = doc(firestore, 'users', reservationData.userId);
-                    const userDoc = await getDoc(userDocRef);
+                const userDocRef = doc(firestore, 'users', reservationData.userId);
+                getDoc(userDocRef)
+                  .then(userDoc => {
                     if (userDoc.exists()) {
                         enrichedData.user = userDoc.data() as UserProfile;
                     }
-                } catch (error) {
-                    console.error("Failed to fetch user details:", error);
-                }
+                  })
+                  .catch(error => {
+                      const permissionError = new FirestorePermissionError({
+                          path: userDocRef.path,
+                          operation: 'get',
+                      });
+                      errorEmitter.emit('permission-error', permissionError);
+                  })
+                  .finally(() => {
+                    setReservation(enrichedData);
+                  });
+            } else {
+                setReservation(enrichedData);
             }
-            setReservation(enrichedData);
         }
         setIsLoading(isReservationLoading);
     }
@@ -83,7 +92,10 @@ export default function BookingDetailPage() {
   if (isLoading || !reservation) {
     return (
         <div className="w-full max-w-md mx-auto">
-            <Skeleton className="h-9 w-24 mb-4" />
+            <Button onClick={() => router.back()} variant="outline" size="sm" className="mb-4">
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Back
+            </Button>
             <Card>
                 <CardHeader>
                     <Skeleton className="h-7 w-40" />
