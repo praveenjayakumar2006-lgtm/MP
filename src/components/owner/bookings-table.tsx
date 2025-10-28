@@ -24,7 +24,7 @@ import {
 } from '@/components/ui/tooltip';
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useIsMobile } from '@/hooks/use-is-mobile';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { Activity, CalendarClock, CheckCircle2 } from 'lucide-react';
 
 type Status = 'Active' | 'Completed' | 'Upcoming';
