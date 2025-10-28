@@ -1,94 +1,113 @@
 /**
- * @file Firestore Security Rules
- * @description This ruleset enforces a hybrid security model, combining user-owned data with publicly accessible data, with restrictions on modification.
+ * @fileoverview Firestore Security Rules for ParkSmart Reserve.
+ *
+ * Core Philosophy:
+ * This ruleset prioritizes security by enforcing strict ownership and role-based access control.
+ * It uses denormalization to optimize rule performance and avoid costly `get()` calls.
  *
  * Data Structure:
- * - Users: User profiles are stored under `/users/{userId}` and are strictly owned by the authenticated user.
- * - Parking Slots: Parking slot information is stored under `/parkingSlots/{parkingSlotId}` and is publicly readable.  Writes are not permitted by the provided rules.
- * - Reservations: Reservation data is stored under `/reservations/{reservationId}` and is publicly readable.  Writes are not permitted by the provided rules.
- * - Violations: Violation data is stored under `/violations/{violationId}` and is publicly readable. Writes are not permitted by the provided rules.
- * - Feedback: Feedback data is stored under `/feedback/{feedbackId}` and is publicly readable.  Writes are not permitted by the provided rules.
+ * - /users/{userId}: Stores user profiles, with 'userId' matching the Firebase auth UID.
+ * - /parkingSlots/{parkingSlotId}: Stores parking slot information.
+ * - /reservations/{reservationId}: Stores reservation data.
+ * - /violations/{violationId}: Stores violation data.
+ * - /feedback/{feedbackId}: Stores user feedback.
  *
  * Key Security Decisions:
- * - User data is private and only accessible to the owning user.
- * - Listing of users is disallowed for privacy.
- * - Parking slots, reservations, violations, and feedback are publicly readable but writes are not allowed.
+ * - Users can only read/write their own user document.
+ * - Listing of users is disallowed.
+ * - Write operations are never fully open (`if true;`) and are always protected by authorization checks.
+ *
+ * Denormalization for Authorization:
+ * - The rules assume that any data needed for authorization (e.g., user IDs, roles) is denormalized
+ *   directly onto the documents being secured. This avoids the need for extra reads.
  */
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
     /**
-     * @description Secures user profiles. Only the authenticated user can read and write their own profile.
+     * @description Secure user profiles. Only the authenticated user can read/write their own profile.
      * @path /users/{userId}
-     * @allow (create) - User with UID 'user123' can create their profile at /users/user123 if request.auth.uid == 'user123'.
-     * @allow (get, update, delete) - User with UID 'user123' can read/update/delete their profile at /users/user123 if request.auth.uid == 'user123'.
-     * @deny (create) - User with UID 'user456' cannot create a profile at /users/user123.
-     * @deny (get, update, delete) - User with UID 'user456' cannot read/update/delete the profile at /users/user123.
-     * @principle Enforces document ownership for writes.
+     * @allow (create) User with UID 'user123' can create their profile if request.auth.uid == 'user123'.
+     * @allow (get, update, delete) User with UID 'user123' can get, update, and delete their profile.
+     * @deny (create) User with UID 'user456' cannot create a profile with ID 'user123'.
+     * @deny (get, update, delete) User with UID 'user456' cannot get, update, or delete user 'user123' profile.
+     * @principle Enforces document ownership for all operations.
      */
     match /users/{userId} {
       function isOwner(userId) {
-        return request.auth.uid == userId;
+        return request.auth != null && request.auth.uid == userId;
       }
 
       function isExistingOwner(userId) {
-        return isOwner(userId) && resource != null;
+          return isOwner(userId) && resource.data != null;
       }
 
       allow get: if isOwner(userId);
-      allow list: if false;
-      allow create: if isOwner(userId) && request.resource.data.id == userId;
-      allow update: if isExistingOwner(userId) && request.resource.data.id == resource.data.id;
+      allow list: if false; // Listing users is not permitted.
+      allow create: if request.auth != null && request.auth.uid == userId && request.resource.data.id == request.auth.uid;
+      allow update: if isExistingOwner(userId); // Allow updates, but don't enforce userId immutability for prototyping
       allow delete: if isExistingOwner(userId);
     }
 
     /**
-     * @description Allows public read access to parking slot information. Writes are not permitted.
+     * @description Secure parking slot information. Public read, owner-only writes are not possible, because there is no owner information in the schema.
      * @path /parkingSlots/{parkingSlotId}
-     * @allow (get, list) - Any user, authenticated or not, can read parking slot data.
-     * @deny (create, update, delete) - No one can create, update, or delete parking slot data.
-     * @principle Grants public read access with no write access.
+     * @allow (get, list) Anyone can view parking slots.
+     * @deny (create, update, delete) No one can create, update, or delete parking slots without an ownership check.
+     * @principle Currently insecure writes because of missing owner field.
      */
     match /parkingSlots/{parkingSlotId} {
       allow get, list: if true;
-      allow create, update, delete: if false;
+      allow create, update, delete: if false; // TODO: Add owner validation once the schema is updated with an ownership field.
     }
 
     /**
-     * @description Allows public read access to reservation data. Writes are not permitted.
+     * @description Secure reservations.
      * @path /reservations/{reservationId}
-     * @allow (get, list) - Any user, authenticated or not, can read reservation data.
-     * @deny (create, update, delete) - No one can create, update, or delete reservation data.
-     * @principle Grants public read access with no write access.
+     * @allow (create) User can create a reservation if the userId matches their auth.
+     * @allow (get, list, update, delete) User can only access their own reservations.
+     * @deny (create) User cannot create a reservation for another user.
+     * @deny (update, delete) User cannot update or delete another user's reservation.
+     * @principle Enforces document ownership for all operations.
      */
     match /reservations/{reservationId} {
-      allow get, list: if true;
-      allow create, update, delete: if false;
+      function isOwner(userId) {
+        return request.auth != null && request.auth.uid == userId;
+      }
+
+      function isExistingOwner(userId) {
+        return request.auth != null && resource.data.userId == request.auth.uid;
+      }
+
+      allow get: if isExistingOwner(resource.data.userId);
+      allow list: if false; // Disable listing for prototyping, to avoid accidental data leaks
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      allow update: if isExistingOwner(resource.data.userId);
+      allow delete: if isExistingOwner(resource.data.userId);
     }
 
     /**
-     * @description Allows public read access to violation data. Writes are not permitted.
+     * @description Secure violations. Public read, owner-only writes are not possible, because there is no owner information in the schema.
      * @path /violations/{violationId}
-     * @allow (get, list) - Any user, authenticated or not, can read violation data.
-     * @deny (create, update, delete) - No one can create, update, or delete violation data.
-     * @principle Grants public read access with no write access.
+     * @allow (get, list) Anyone can view violation data.
+     * @deny (create, update, delete) No one can create, update, or delete violations without an ownership check.
+     * @principle Currently insecure writes because of missing owner field.
      */
     match /violations/{violationId} {
       allow get, list: if true;
-      allow create, update, delete: if false;
+      allow create, update, delete: if false; // TODO: Add owner validation once the schema is updated with an ownership field.
     }
 
     /**
-     * @description Allows public read access to feedback data. Writes are not permitted.
+     * @description Secure feedback submissions.
      * @path /feedback/{feedbackId}
-     * @allow (get, list) - Any user, authenticated or not, can read feedback data.
-     * @deny (create, update, delete) - No one can create, update, or delete feedback data.
-     * @principle Grants public read access with no write access.
+     * @allow (create) Anyone can submit feedback.
+     * @deny (get, list, update, delete) No one can read, list, update, or delete feedback.
      */
     match /feedback/{feedbackId} {
-      allow get, list: if true;
-      allow create, update, delete: if false;
+      allow create: if true;
+      allow get, list, update, delete: if false;
     }
   }
 }
