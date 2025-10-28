@@ -170,19 +170,21 @@ export function BookingsTable() {
                             </CardHeader>
                             <CardContent className="space-y-2 p-1 pt-2 flex-1">
                                 <Separator />
-                                <div className="grid grid-cols-2 gap-x-4 gap-y-2 pt-1 text-xs">
-                                    <div className="flex items-center gap-2 col-span-2">
-                                        <Calendar className="h-3.5 w-3.5 text-muted-foreground"/>
-                                        <span>{format(new Date(reservation.startTime), 'MMM d, yyyy')}</span>
-                                    </div>
-                                    <div className="flex items-center gap-2 col-span-2">
-                                        <Clock className="h-3.5 w-3.5 text-muted-foreground"/>
-                                        <span>{`${format(new Date(reservation.startTime), 'p')} - ${format(new Date(reservation.endTime), 'p')}`}</span>
-                                    </div>
+                                <div className="flex justify-between items-start pt-1 text-xs">
+                                  <div className="space-y-1.5">
+                                      <div className="flex items-center gap-2">
+                                          <Calendar className="h-3.5 w-3.5 text-muted-foreground"/>
+                                          <span>{format(new Date(reservation.startTime), 'MMM d, yyyy')}</span>
+                                      </div>
+                                      <div className="flex items-center gap-2">
+                                          <Clock className="h-3.5 w-3.5 text-muted-foreground"/>
+                                          <span>{`${format(new Date(reservation.startTime), 'p')} - ${format(new Date(reservation.endTime), 'p')}`}</span>
+                                      </div>
+                                  </div>
+                                  <Badge variant={getStatusBadgeVariant(reservation.status)}>{reservation.status}</Badge>
                                 </div>
                             </CardContent>
                              <CardFooter className="p-1 pt-2 justify-between items-center">
-                                <Badge variant={getStatusBadgeVariant(reservation.status)}>{reservation.status}</Badge>
                             </CardFooter>
                         </Card>
                     )
