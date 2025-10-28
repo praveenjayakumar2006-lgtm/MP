@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { createContext, useState, ReactNode, useEffect } from 'react';
@@ -47,11 +46,11 @@ export const ReservationsProvider: React.FC<{ children: ReactNode }> = ({ childr
         updatedAt: (r.updatedAt as any)?.toDate(),
       }));
       setReservations(formattedReservations);
-    } else {
-        // If there's no user, or no data, clear the reservations
+    } else if (!isLoading && user) {
+        // If there's a user but no data, clear the reservations
         setReservations([]);
     }
-  }, [reservationsData, user]);
+  }, [reservationsData, user, isLoading]);
 
   const addReservation = (reservation: Omit<Reservation, 'id' | 'createdAt' | 'updatedAt' | 'userId' | 'status'>) => {
     if (!firestore || !user) return;

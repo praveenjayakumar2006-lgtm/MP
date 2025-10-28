@@ -1,99 +1,122 @@
+/**
+ * @file Firestore Security Rules for ParkSmart Reserve
+ * @description This ruleset enforces a user-ownership model for user profiles and allows public read access to parking slot information.
+ *
+ * Data Structure:
+ * - /users/{userId}: Stores user profile data, with 'userId' matching the Firebase Auth UID.
+ * - /parkingSlots/{parkingSlotId}: Stores parking slot information.
+ * - /reservations/{reservationId}: Stores parking reservation data.
+ * - /violations/{violationId}: Stores parking violation data.
+ * - /feedback/{feedbackId}: Stores user feedback data.
+ *
+ * Key Security Decisions:
+ * - User profiles are strictly controlled by the owning user.
+ * - Listing of users is disallowed for privacy.
+ * - Parking slots are publicly readable, but write access is not defined.
+ * - Feedback data is open to all.
+ */
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
     /**
-     * @description Manages user profile data, ensuring only the user can read and write their own data.
+     * @description Controls access to user profile documents.
      * @path /users/{userId}
-     * @allow (create) - User with UID 'user_abc' can create their own profile.
-     * @allow (get, update, delete, list) - User with UID 'user_abc' can read, update, and delete their own profile.
-     * @deny (create, update, delete, get, list) - User with UID 'user_xyz' cannot access user 'user_abc' profile.
-     * @principle Enforces document ownership for all operations.
+     * @allow (create) User with UID 'user123' can create their profile at /users/user123.
+     * @deny (create) User with UID 'user123' cannot create a profile at /users/user456.
+     * @allow (get) User with UID 'user123' can read their profile at /users/user123.
+     * @deny (get) User with UID 'user123' cannot read the profile at /users/user456.
+     * @allow (update) User with UID 'user123' can update their profile at /users/user123.
+     * @deny (update) User with UID 'user123' cannot update the profile at /users/user456.
+     * @allow (delete) User with UID 'user123' can delete their profile at /users/user123.
+     * @deny (delete) User with UID 'user123' cannot delete the profile at /users/user456.
+     * @deny (list) No user can list all user profiles.
+     * @principle Enforces document ownership for writes.
      */
     match /users/{userId} {
-      function isSignedIn() {
-        return request.auth != null;
-      }
-      function isOwner(userId) {
-        return request.auth.uid == userId;
-      }
-
-      allow get: if isSignedIn() && isOwner(userId);
+      allow get: if isOwner(userId);
       allow list: if false;
-      allow create: if isSignedIn() && isOwner(userId);
-      allow update: if isSignedIn() && isOwner(userId);
-      allow delete: if isSignedIn() && isOwner(userId);
+      allow create: if isOwner(userId) && request.resource.data.id == userId;
+      allow update: if isExistingOwner(userId) && request.resource.data.id == resource.data.id;
+      allow delete: if isExistingOwner(userId);
     }
 
     /**
-     * @description Manages parking slot information, allowing public read access and restricted write access.
+     * @description Controls access to parking slot documents.
      * @path /parkingSlots/{parkingSlotId}
-     * @allow (get, list) - Any user can read parking slot data.
-     * @deny (create, update, delete) - No user can create, update, or delete parking slot data.
-     * @principle Allows public read access with restricted write access.
+     * @allow (get) Any user can read parking slot data.
+     * @allow (list) Any user can list parking slots.
+     * @deny (create) No user can create parking slots through client-side rules.
+     * @deny (update) No user can update parking slots through client-side rules.
+     * @deny (delete) No user can delete parking slots through client-side rules.
      */
     match /parkingSlots/{parkingSlotId} {
-      allow get: if true;
-      allow list: if true;
+      allow get, list: if true;
       allow create: if false;
       allow update: if false;
       allow delete: if false;
     }
 
     /**
-     * @description Manages reservation data, ensuring only the user who made the reservation can access it.
+     * @description Controls access to reservation documents.
      * @path /reservations/{reservationId}
-     * @allow (create) - User with UID 'user_abc' can create a reservation.
-     * @allow (get, update, delete, list) - User with UID 'user_abc' can read, update, and delete their own reservations.
-     * @deny (create, update, delete, get, list) - User with UID 'user_xyz' cannot access reservation 'reservation_abc'.
-     * @principle Enforces document ownership for all operations.
+     * @allow (create) Any authenticated user can create a reservation.
+     * @deny (create) An unauthenticated user cannot create a reservation.
+     * @allow (get) Any user can read reservation data.
+     * @allow (list) Any user can list reservations.
+     * @deny (update) No user can update reservations through client-side rules.
+     * @deny (delete) No user can delete reservations through client-side rules.
      */
     match /reservations/{reservationId} {
-      function isSignedIn() {
-        return request.auth != null;
-      }
-      function isOwner(userId) {
-        return request.auth.uid == resource.data.userId;
-      }
-
-      allow get: if isSignedIn() && isOwner(userId);
-      allow list: if isSignedIn();
-      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
-      allow update: if isSignedIn() && isOwner(userId);
-      allow delete: if isSignedIn() && isOwner(userId);
+      allow get, list: if true;
+      allow create: if isSignedIn();
+      allow update: if false;
+      allow delete: if false;
     }
 
-      /**
-       * @description Manages parking violation data.
-       * @path /violations/{violationId}
-       * @allow (get, list) - Any user can read violation data.
-       * @deny (create, update, delete) - No user can create, update, or delete parking violation data.
-       * @principle Allows public read access with restricted write access.
-       */
+     /**
+      * @description Controls access to violation documents.
+      * @path /violations/{violationId}
+      * @allow (get) Any user can read violation data.
+      * @allow (list) Any user can list violations.
+      * @deny (create) No user can create violations through client-side rules.
+      * @deny (update) No user can update violations through client-side rules.
+      * @deny (delete) No user can delete violations through client-side rules.
+      */
     match /violations/{violationId} {
-      allow get: if true;
-      allow list: if true;
+      allow get, list: if true;
       allow create: if false;
       allow update: if false;
       allow delete: if false;
     }
 
     /**
-     * @description Manages user feedback.
+     * @description Controls access to feedback documents.
      * @path /feedback/{feedbackId}
-     * @allow (create) - Any signed in user can submit feedback.
-     * @deny (get, update, delete, list) - Signed in user cannot get, update, delete, or list feedback.
+     * @allow (get) Any user can read feedback data.
+     * @allow (list) Any user can list feedback.
+     * @allow (create) Any user can create a feedback document.
+     * @deny (update) No user can update feedback documents.
+     * @deny (delete) No user can delete feedback documents.
      */
     match /feedback/{feedbackId} {
-      function isSignedIn() {
-        return request.auth != null;
-      }
-
-      allow create: if isSignedIn();
-      allow get: if false;
-      allow list: if false;
+      allow get, list: if true;
+      allow create: if true;
       allow update: if false;
       allow delete: if false;
     }
+  }
+
+  // Helper functions
+  function isSignedIn() {
+    return request.auth != null;
+  }
+
+  function isOwner(userId) {
+    return request.auth.uid == userId;
+  }
+
+  function isExistingOwner(userId) {
+    return isOwner(userId) && resource != null;
   }
 }
