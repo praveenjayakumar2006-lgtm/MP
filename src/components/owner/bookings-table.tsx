@@ -10,7 +10,7 @@ import { useFirebase, useMemoFirebase, FirestorePermissionError, errorEmitter } 
 import { collection, query, orderBy, doc, getDoc, FirestoreError } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useIsMobile } from '@/hooks/use-mobile';
+import { useIsMobile } from '@/hooks/use-is-mobile';
 import { useRouter } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
 import { User, Car, Calendar, Clock, Hash, CheckCircle, Hourglass, ArrowRight, UserCircle } from 'lucide-react';
@@ -237,7 +237,7 @@ export function BookingsTable() {
                                     </div>
                                 </div>
                             </CardContent>
-                             <CardFooter className="justify-start items-center">
+                             <CardFooter className="justify-between items-center">
                                 <Badge variant={getStatusBadgeVariant(reservation.status)}>{reservation.status}</Badge>
                             </CardFooter>
                         </Card>
