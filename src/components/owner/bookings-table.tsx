@@ -24,6 +24,9 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { useToast } from '@/hooks/use-toast';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { Activity, CalendarClock, CheckCircle2 } from 'lucide-react';
 
 type Status = 'Active' | 'Completed' | 'Upcoming';
 
@@ -35,12 +38,36 @@ type EnrichedReservation = Reservation & {
   };
 };
 
+const StatusIcon = ({ status }: { status: Status }) => {
+  const iconMap: Record<Status, React.ReactElement> = {
+    Active: <Activity className="h-5 w-5 text-blue-500" />,
+    Completed: <CheckCircle2 className="h-5 w-5 text-green-500" />,
+    Upcoming: <CalendarClock className="h-5 w-5 text-yellow-500" />,
+  };
+
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <span>{iconMap[status]}</span>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>{status}</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+};
+
+
 export function BookingsTable() {
   const context = useContext(ReservationsContext);
   const { firestore } = useFirebase();
   const [enrichedReservations, setEnrichedReservations] = useState<EnrichedReservation[]>([]);
   const [isLoadingUsers, setIsLoadingUsers] = useState(true);
   const { toast } = useToast();
+  const [filter, setFilter] = useState<Status | 'all'>('all');
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     if (context?.reservations && firestore) {
@@ -94,7 +121,7 @@ export function BookingsTable() {
               return res;
             })
           );
-          setEnrichedReservations(enriched.sort((a, b) => new Date(b.startTime).getTime() - new Date(a.startTime).getTime()));
+          setEnrichedReservations(enriched);
         } catch (error) {
             if (!(error instanceof FirestorePermissionError)) {
                 toast({
@@ -118,6 +145,12 @@ export function BookingsTable() {
   
   const { isLoading, isClient } = context;
 
+  const filteredReservations = enrichedReservations?.filter((res) => {
+    if (filter === 'all') return true;
+    return res.status === filter;
+  }).sort((a, b) => new Date(b.startTime).getTime() - new Date(a.startTime).getTime());
+
+
   const renderSkeletons = () =>
     Array.from({ length: 5 }).map((_, i) => (
       <TableRow key={`skel-${i}`}>
@@ -134,57 +167,79 @@ export function BookingsTable() {
         <TableCell><Skeleton className="h-5 w-24" /></TableCell>
         <TableCell><Skeleton className="h-5 w-40" /></TableCell>
         <TableCell><Skeleton className="h-5 w-40" /></TableCell>
+        <TableCell><Skeleton className="h-5 w-16" /></TableCell>
       </TableRow>
     ));
+
+  const getDateFormat = () => {
+    return isMobile ? 'MMM d, h:mm a' : 'MMM d, yyyy, h:mm a';
+  };
+
 
   return (
     <Card>
       <CardContent className="p-0">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>User</TableHead>
-              <TableHead>Slot ID</TableHead>
-              <TableHead>Vehicle Plate</TableHead>
-              <TableHead>Start Time</TableHead>
-              <TableHead>End Time</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {(!isClient || isLoading || isLoadingUsers) && renderSkeletons()}
-            {isClient && !isLoading && !isLoadingUsers && enrichedReservations.map((reservation) => (
-              <TableRow key={reservation.id}>
-                <TableCell>
-                  <div className="flex items-center gap-3">
-                    <Avatar>
-                      <AvatarFallback>
-                        {reservation.user?.firstName?.[0]}
-                        {reservation.user?.lastName?.[0]}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <p className="font-medium">
-                        {reservation.user?.firstName} {reservation.user?.lastName}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        {reservation.user?.email}
-                      </p>
-                    </div>
-                  </div>
-                </TableCell>
-                <TableCell className="font-medium">{reservation.slotId}</TableCell>
-                <TableCell>{reservation.vehiclePlate}</TableCell>
-                <TableCell>{format(new Date(reservation.startTime), 'MMM d, yyyy, h:mm a')}</TableCell>
-                <TableCell>{format(new Date(reservation.endTime), 'MMM d, yyyy, h:mm a')}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-        {isClient && !isLoading && !isLoadingUsers && enrichedReservations.length === 0 && (
-          <div className="text-center p-8 text-muted-foreground">
-            No bookings found.
-          </div>
-        )}
+         <Tabs value={filter} onValueChange={(value) => setFilter(value as any)} className="w-full">
+            <div className="flex items-center justify-center p-4">
+              <TabsList>
+                <TabsTrigger value="all">All</TabsTrigger>
+                <TabsTrigger value="Active">Active</TabsTrigger>
+                <TabsTrigger value="Upcoming">Upcoming</TabsTrigger>
+                <TabsTrigger value="Completed">Completed</TabsTrigger>
+              </TabsList>
+            </div>
+            <TabsContent value={filter}>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>User</TableHead>
+                    <TableHead>Slot ID</TableHead>
+                    <TableHead>Vehicle Plate</TableHead>
+                    <TableHead>Start Time</TableHead>
+                    <TableHead>End Time</TableHead>
+                    <TableHead>Status</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {(!isClient || isLoading || isLoadingUsers) && renderSkeletons()}
+                  {isClient && !isLoading && !isLoadingUsers && filteredReservations.map((reservation) => (
+                    <TableRow key={reservation.id}>
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          <Avatar>
+                            <AvatarFallback>
+                              {reservation.user?.firstName?.[0]}
+                              {reservation.user?.lastName?.[0]}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <p className="font-medium">
+                              {reservation.user?.firstName} {reservation.user?.lastName}
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                              {reservation.user?.email}
+                            </p>
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell className="font-medium">{reservation.slotId}</TableCell>
+                      <TableCell>{reservation.vehiclePlate}</TableCell>
+                      <TableCell>{format(new Date(reservation.startTime), getDateFormat())}</TableCell>
+                      <TableCell>{format(new Date(reservation.endTime), getDateFormat())}</TableCell>
+                      <TableCell>
+                        <StatusIcon status={reservation.status} />
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+              {isClient && !isLoading && !isLoadingUsers && filteredReservations.length === 0 && (
+                <div className="text-center p-8 text-muted-foreground">
+                  No {filter !== 'all' ? filter.toLowerCase() : ''} bookings found.
+                </div>
+              )}
+            </TabsContent>
+        </Tabs>
       </CardContent>
     </Card>
   );
