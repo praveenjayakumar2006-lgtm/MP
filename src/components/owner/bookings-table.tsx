@@ -56,9 +56,10 @@ export function BookingsTable() {
   const router = useRouter();
 
   const reservationsQuery = useMemoFirebase(() => {
-    if (!firestore) return null;
+    // Only query if firestore is available and it's the owner user
+    if (!firestore || !ownerUser) return null;
     return query(collection(firestore, 'reservations'), orderBy('createdAt', 'desc'));
-  }, [firestore]);
+  }, [firestore, ownerUser]);
 
   const { data: reservations, isLoading, error: collectionError } = useCollection<Reservation>(reservationsQuery);
 
