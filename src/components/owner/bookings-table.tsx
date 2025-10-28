@@ -16,7 +16,6 @@ import { Skeleton } from '../ui/skeleton';
 import { ReservationsContext } from '@/context/reservations-context';
 import { useFirebase, useCollection, useMemoFirebase, FirestorePermissionError, errorEmitter } from '@/firebase';
 import { collection, query, orderBy, doc, getDoc, FirestoreError } from 'firebase/firestore';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
   Tooltip,
   TooltipContent,
@@ -156,7 +155,6 @@ export function BookingsTable() {
       <TableRow key={`skel-${i}`}>
         <TableCell>
           <div className="flex items-center gap-3">
-            <Skeleton className="h-10 w-10 rounded-full" />
             <div className="space-y-1">
               <Skeleton className="h-4 w-24" />
               <Skeleton className="h-3 w-32" />
@@ -203,21 +201,13 @@ export function BookingsTable() {
                   {isClient && !isLoading && !isLoadingUsers && filteredReservations.map((reservation) => (
                     <TableRow key={reservation.id}>
                       <TableCell>
-                        <div className="flex items-center gap-3">
-                          <Avatar>
-                            <AvatarFallback>
-                              {reservation.user?.firstName?.[0]}
-                              {reservation.user?.lastName?.[0]}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <p className="font-medium">
-                              {reservation.user?.firstName} {reservation.user?.lastName}
-                            </p>
-                            <p className="text-sm text-muted-foreground">
-                              {reservation.user?.email}
-                            </p>
-                          </div>
+                        <div>
+                          <p className="font-medium">
+                            {reservation.user?.firstName} {reservation.user?.lastName}
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            {reservation.user?.email}
+                          </p>
                         </div>
                       </TableCell>
                       <TableCell className="font-medium">{reservation.slotId}</TableCell>
