@@ -1,4 +1,3 @@
-
 'use client';
 import {
   Table,
@@ -16,16 +15,10 @@ import { Skeleton } from '../ui/skeleton';
 import { ReservationsContext } from '@/context/reservations-context';
 import { useFirebase, useCollection, useMemoFirebase, FirestorePermissionError, errorEmitter } from '@/firebase';
 import { collection, query, orderBy, doc, getDoc, FirestoreError } from 'firebase/firestore';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { Activity, CalendarClock, CheckCircle2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 type Status = 'Active' | 'Completed' | 'Upcoming';
 
@@ -37,28 +30,6 @@ type EnrichedReservation = Reservation & {
   };
 };
 
-const StatusIcon = ({ status }: { status: Status }) => {
-  const iconMap: Record<Status, React.ReactElement> = {
-    Active: <Activity className="h-5 w-5 text-blue-500" />,
-    Completed: <CheckCircle2 className="h-5 w-5 text-green-500" />,
-    Upcoming: <CalendarClock className="h-5 w-5 text-yellow-500" />,
-  };
-
-  return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <span>{iconMap[status]}</span>
-        </TooltipTrigger>
-        <TooltipContent>
-          <p>{status}</p>
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
-  );
-};
-
-
 export function BookingsTable() {
   const context = useContext(ReservationsContext);
   const { firestore } = useFirebase();
@@ -67,6 +38,7 @@ export function BookingsTable() {
   const { toast } = useToast();
   const [filter, setFilter] = useState<Status | 'all'>('all');
   const isMobile = useIsMobile();
+  const router = useRouter();
 
   useEffect(() => {
     if (context?.reservations && firestore) {
@@ -222,7 +194,11 @@ export function BookingsTable() {
                   <TableBody>
                     {(!isClient || isLoading || isLoadingUsers) && renderSkeletons()}
                     {isClient && !isLoading && !isLoadingUsers && filteredReservations.map((reservation) => (
-                      <TableRow key={reservation.id}>
+                      <TableRow 
+                        key={reservation.id} 
+                        onClick={() => router.push(`/owner/bookings/${reservation.id}`)}
+                        className="cursor-pointer hover:bg-muted/50"
+                      >
                         <TableCell className="font-medium">{reservation.slotId}</TableCell>
                         <TableCell>{reservation.vehiclePlate}</TableCell>
                         <TableCell>{format(new Date(reservation.startTime), getDateFormat())}</TableCell>
