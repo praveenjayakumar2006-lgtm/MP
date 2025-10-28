@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { createContext, useState, ReactNode, useEffect } from 'react';
@@ -22,10 +21,9 @@ export const ReservationsProvider: React.FC<{ children: ReactNode }> = ({ childr
 
   const reservationsQuery = useMemoFirebase(() => {
     if (firestore) {
-      // Query for all reservations to check for conflicts
       return query(collection(firestore, 'reservations'));
     }
-    return null; // Return null if firestore is not available
+    return null;
   }, [firestore]);
 
   const { data: reservationsData, isLoading, error } = useCollection<Reservation>(reservationsQuery);
@@ -58,7 +56,7 @@ export const ReservationsProvider: React.FC<{ children: ReactNode }> = ({ childr
     const newReservation = {
       ...reservation,
       userId: user.uid,
-      status: 'Upcoming',
+      status: 'Upcoming' as const,
       createdAt: Timestamp.now(),
       updatedAt: Timestamp.now(),
       startTime: Timestamp.fromDate(reservation.startTime),
