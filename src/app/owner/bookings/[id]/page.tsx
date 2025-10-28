@@ -26,11 +26,11 @@ type EnrichedReservation = Reservation & {
 
 function DetailItem({ icon: Icon, label, value }: { icon: React.ElementType, label: string, value: React.ReactNode }) {
     return (
-        <div className="flex items-start gap-4">
-            <Icon className="h-5 w-5 text-muted-foreground mt-1" />
+        <div className="flex items-start gap-2.5">
+            <Icon className="h-4 w-4 text-muted-foreground mt-0.5" />
             <div className="flex-1">
-                <p className="text-sm text-muted-foreground">{label}</p>
-                <p className="font-medium text-base">{value}</p>
+                <p className="text-xs text-muted-foreground">{label}</p>
+                <p className="font-medium text-sm">{value}</p>
             </div>
         </div>
     )
@@ -82,27 +82,27 @@ export default function BookingDetailPage() {
 
   if (isLoading || !reservation) {
     return (
-        <div className="w-full max-w-lg mx-auto">
-            <Skeleton className="h-10 w-40 mb-6" />
+        <div className="w-full max-w-md mx-auto">
+            <Skeleton className="h-9 w-24 mb-4" />
             <Card>
                 <CardHeader>
-                    <Skeleton className="h-8 w-48" />
-                    <Skeleton className="h-4 w-64" />
+                    <Skeleton className="h-7 w-40" />
+                    <Skeleton className="h-4 w-56" />
                 </CardHeader>
-                <CardContent className="space-y-6 pt-6">
+                <CardContent className="space-y-4 pt-4">
                     <Skeleton className="h-px w-full" />
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                        <Skeleton className="h-12 w-full" />
-                        <Skeleton className="h-12 w-full" />
-                        <Skeleton className="h-12 w-full" />
-                        <Skeleton className="h-12 w-full" />
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <Skeleton className="h-10 w-full" />
+                        <Skeleton className="h-10 w-full" />
+                        <Skeleton className="h-10 w-full" />
+                        <Skeleton className="h-10 w-full" />
                     </div>
                      <Skeleton className="h-px w-full" />
                      <div className="flex items-center gap-4">
-                        <Skeleton className="h-12 w-12 rounded-full" />
+                        <Skeleton className="h-10 w-10 rounded-full" />
                         <div className="space-y-2">
-                             <Skeleton className="h-5 w-32" />
-                             <Skeleton className="h-4 w-48" />
+                             <Skeleton className="h-5 w-28" />
+                             <Skeleton className="h-4 w-40" />
                         </div>
                      </div>
                 </CardContent>
@@ -114,38 +114,38 @@ export default function BookingDetailPage() {
   const userFullName = reservation.user ? `${reservation.user.firstName || ''} ${reservation.user.lastName || ''}`.trim() : 'Unknown User';
 
   return (
-    <div className="w-full max-w-lg mx-auto">
-        <Button onClick={() => router.back()} variant="outline" className="mb-6">
+    <div className="w-full max-w-md mx-auto">
+        <Button onClick={() => router.back()} variant="outline" size="sm" className="mb-4">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back
         </Button>
         <Card>
-            <CardHeader>
-                <CardTitle className="text-2xl">Booking Details</CardTitle>
+            <CardHeader className="pb-4">
+                <CardTitle className="text-xl">Booking Details</CardTitle>
                 <CardDescription>
-                    Complete information for reservation <span className="font-mono text-primary bg-primary/10 px-1 rounded-sm">{reservation.id.slice(0, 6)}...</span>
+                    ID: <span className="font-mono text-primary bg-primary/10 text-xs px-1 rounded-sm">{reservation.id}</span>
                 </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6 pt-6">
+            <CardContent className="space-y-4 pt-0">
                 <Separator />
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4 pt-2">
                    <DetailItem icon={Hash} label="Slot ID" value={reservation.slotId} />
                    <DetailItem icon={Car} label="Vehicle Plate" value={reservation.vehiclePlate} />
-                   <DetailItem icon={Calendar} label="Start Time" value={format(new Date(reservation.startTime), 'PPP p')} />
-                   <DetailItem icon={Clock} label="End Time" value={format(new Date(reservation.endTime), 'PPP p')} />
+                   <DetailItem icon={Calendar} label="Start Time" value={format(new Date(reservation.startTime), 'PPp')} />
+                   <DetailItem icon={Clock} label="End Time" value={format(new Date(reservation.endTime), 'PPp')} />
                 </div>
                 {reservation.user && (
                     <>
                         <Separator />
                         <div>
-                            <h3 className="text-lg font-semibold mb-4">User Information</h3>
-                             <div className="flex items-center gap-4">
-                                <Avatar className="h-12 w-12">
+                            <h3 className="text-base font-semibold mb-3">User Information</h3>
+                             <div className="flex items-center gap-3">
+                                <Avatar className="h-10 w-10">
                                     <AvatarFallback>{userFullName.charAt(0).toUpperCase()}</AvatarFallback>
                                 </Avatar>
                                 <div>
-                                    <p className="font-semibold">{userFullName}</p>
-                                    <p className="text-sm text-muted-foreground">{reservation.user.email}</p>
+                                    <p className="font-semibold text-sm">{userFullName}</p>
+                                    <p className="text-xs text-muted-foreground">{reservation.user.email}</p>
                                 </div>
                             </div>
                         </div>
