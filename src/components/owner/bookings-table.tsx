@@ -153,6 +153,7 @@ export function BookingsTable() {
   const renderSkeletons = () =>
     Array.from({ length: 5 }).map((_, i) => (
       <TableRow key={`skel-${i}`}>
+        <TableCell><Skeleton className="h-5 w-24" /></TableCell>
         <TableCell><Skeleton className="h-5 w-16" /></TableCell>
         <TableCell><Skeleton className="h-5 w-24" /></TableCell>
         <TableCell><Skeleton className="h-5 w-40" /></TableCell>
@@ -192,12 +193,12 @@ export function BookingsTable() {
 
 
   return (
-    <>
+    <Card>
       <CardHeader>
           <CardTitle className="text-3xl">{getTitle()}</CardTitle>
           <CardDescription>{getDescription()}</CardDescription>
       </CardHeader>
-      <CardContent className="p-0">
+      <CardContent>
          <Tabs value={filter} onValueChange={(value) => setFilter(value as any)} className="w-full">
             <div className="flex items-center justify-center p-4">
               <TabsList>
@@ -208,27 +209,29 @@ export function BookingsTable() {
               </TabsList>
             </div>
             <TabsContent value={filter}>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Slot ID</TableHead>
-                    <TableHead>Vehicle Plate</TableHead>
-                    <TableHead>Start Time</TableHead>
-                    <TableHead>End Time</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {(!isClient || isLoading || isLoadingUsers) && renderSkeletons()}
-                  {isClient && !isLoading && !isLoadingUsers && filteredReservations.map((reservation) => (
-                    <TableRow key={reservation.id}>
-                      <TableCell className="font-medium">{reservation.slotId}</TableCell>
-                      <TableCell>{reservation.vehiclePlate}</TableCell>
-                      <TableCell>{format(new Date(reservation.startTime), getDateFormat())}</TableCell>
-                      <TableCell>{format(new Date(reservation.endTime), getDateFormat())}</TableCell>
+              <div className="border rounded-md">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Slot ID</TableHead>
+                      <TableHead>Vehicle Plate</TableHead>
+                      <TableHead>Start Time</TableHead>
+                      <TableHead>End Time</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {(!isClient || isLoading || isLoadingUsers) && renderSkeletons()}
+                    {isClient && !isLoading && !isLoadingUsers && filteredReservations.map((reservation) => (
+                      <TableRow key={reservation.id}>
+                        <TableCell className="font-medium">{reservation.slotId}</TableCell>
+                        <TableCell>{reservation.vehiclePlate}</TableCell>
+                        <TableCell>{format(new Date(reservation.startTime), getDateFormat())}</TableCell>
+                        <TableCell>{format(new Date(reservation.endTime), getDateFormat())}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
               {isClient && !isLoading && !isLoadingUsers && filteredReservations.length === 0 && (
                 <div className="text-center p-8 text-muted-foreground">
                   No {filter !== 'all' ? filter.toLowerCase() : ''} bookings found.
@@ -237,6 +240,6 @@ export function BookingsTable() {
             </TabsContent>
         </Tabs>
       </CardContent>
-    </>
+    </Card>
   );
 }
