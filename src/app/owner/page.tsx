@@ -126,15 +126,7 @@ function OwnerDashboard() {
     );
      const renderBookings = () => (
         <Card className="border-0 shadow-none">
-            <CardHeader>
-                <CardTitle className="text-3xl">All Bookings</CardTitle>
-                <CardDescription>
-                    All reservations made by users.
-                </CardDescription>
-            </CardHeader>
-            <CardContent>
-                <BookingsTable />
-            </CardContent>
+            <BookingsTable />
         </Card>
     );
     

@@ -8,7 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { format } from 'date-fns';
 import { useState, useContext, useEffect } from 'react';
 import type { Reservation } from '@/lib/types';
@@ -164,9 +164,39 @@ export function BookingsTable() {
     return isMobile ? 'MMM d, h:mm a' : 'MMM d, yyyy, h:mm a';
   };
 
+  const getTitle = () => {
+    switch (filter) {
+      case 'Active':
+        return 'Active Bookings';
+      case 'Upcoming':
+        return 'Upcoming Bookings';
+      case 'Completed':
+        return 'Completed Bookings';
+      default:
+        return 'All Bookings';
+    }
+  };
+
+  const getDescription = () => {
+    switch (filter) {
+      case 'Active':
+        return 'Reservations that are currently in progress.';
+      case 'Upcoming':
+        return 'Reservations that are scheduled for the future.';
+      case 'Completed':
+        return 'Reservations that have already ended.';
+      default:
+        return 'A comprehensive list of all user reservations.';
+    }
+  };
+
 
   return (
-    <Card>
+    <>
+      <CardHeader>
+          <CardTitle className="text-3xl">{getTitle()}</CardTitle>
+          <CardDescription>{getDescription()}</CardDescription>
+      </CardHeader>
       <CardContent className="p-0">
          <Tabs value={filter} onValueChange={(value) => setFilter(value as any)} className="w-full">
             <div className="flex items-center justify-center p-4">
@@ -181,6 +211,7 @@ export function BookingsTable() {
               <Table>
                 <TableHeader>
                   <TableRow>
+                    <TableHead>User</TableHead>
                     <TableHead>Slot ID</TableHead>
                     <TableHead>Vehicle Plate</TableHead>
                     <TableHead>Start Time</TableHead>
@@ -191,6 +222,9 @@ export function BookingsTable() {
                   {(!isClient || isLoading || isLoadingUsers) && renderSkeletons()}
                   {isClient && !isLoading && !isLoadingUsers && filteredReservations.map((reservation) => (
                     <TableRow key={reservation.id}>
+                       <TableCell className="font-medium">
+                        {reservation.user ? `${reservation.user.firstName || ''} ${reservation.user.lastName || ''}`.trim() : 'N/A'}
+                      </TableCell>
                       <TableCell className="font-medium">{reservation.slotId}</TableCell>
                       <TableCell>{reservation.vehiclePlate}</TableCell>
                       <TableCell>{format(new Date(reservation.startTime), getDateFormat())}</TableCell>
@@ -207,6 +241,6 @@ export function BookingsTable() {
             </TabsContent>
         </Tabs>
       </CardContent>
-    </Card>
+    </>
   );
 }
