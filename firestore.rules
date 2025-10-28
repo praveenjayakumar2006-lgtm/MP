@@ -1,127 +1,114 @@
 /**
- * @file Firestore Security Rules for ParkSmart Reserve.
+ * @file Firestore Security Rules
+ * @description This ruleset enforces a strict user-ownership model for user data, 
+ *              allows public read access to parking slots, reservations, violations, and feedback
+ *              but restricts write access to these collections based on authorization checks.
  *
- * @corePhilosophy
- * This ruleset enforces a user-ownership model for user profiles and a public-read,
- * owner-write model for parking slots, reservations, violations, and feedback.
+ * Data Structure:
+ * - /users/{userId}: Stores individual user profiles, accessible only by the user themselves.
+ * - /parkingSlots/{parkingSlotId}: Stores parking slot data, publicly readable.
+ * - /reservations/{reservationId}: Stores reservation data, publicly readable.
+ * - /violations/{violationId}: Stores violation data, publicly readable.
+ * - /feedback/{feedbackId}: Stores user feedback, publicly readable.
  *
- * @dataStructure
- * - /users/{userId}: Stores individual user profiles, accessible only by the user.
- * - /parkingSlots/{parkingSlotId}: Stores parking slot data, publicly readable but writable only by an authorized entity.
- * - /reservations/{reservationId}: Stores reservation data, publicly readable but writable with ownership constraints.
- * - /violations/{violationId}: Stores violation data, publicly readable but writable with ownership constraints.
- * - /feedback/{feedbackId}: Stores user feedback data, publicly readable but writable by anyone.
+ * Key Security Decisions:
+ * - Users can only read and write their own user data. Listing all users is disallowed.
+ * - Parking slot data is publicly readable but requires appropriate authorization for writes (TODO).
+ * - Reservation data is publicly readable but requires appropriate authorization for writes (TODO).
+ * - Violation data is publicly readable but requires appropriate authorization for writes (TODO).
+ * - Feedback data is publicly readable but requires appropriate authorization for writes (TODO).
  *
- * @keySecurityDecisions
- * - Users can only access their own profile data.
- * - Listing of users is disallowed.
- * - Public read access is granted for parking slots, reservations, violations, and feedback to facilitate discovery.
- * - Write access to reservations is restricted to the user who owns the reservation, but new reservations are open to all authenticated users.
- * - The `id` field is validated on `create` operations to ensure path consistency.
- *
- * @denormalizationForAuthorization
- * - Reservations include the `userId` field to enable ownership-based access control.
- *
- * @structuralSegregation
- * - There is no segregation of data; all collections are top-level.
+ * Structural Segregation: No private vs. public segregation is required as user data
+ * is stored separately under /users/{userId} and other collections are top-level.
  */
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
     /**
-     * @description Grants access to user profile data only to the authenticated user.
-     * @path /users/{userId}
-     * @allow (get, create, update, delete, list) if the user's UID matches the 'userId' path segment.
-     * @deny (get, create, update, delete, list) if the user is not authenticated or the UID does not match.
-     * @principle Enforces document ownership for all operations on user profiles.
+     * @description Checks if the request is authenticated.
      */
-    match /users/{userId} {
-      function isSignedIn() {
-        return request.auth != null;
-      }
-      function isOwner(userId) {
-        return request.auth.uid == userId;
-      }
-      function isExistingOwner(userId) {
-        return isOwner(userId) && resource.data.id == userId;
-      }
-
-      allow get: if isOwner(userId);
-      allow list: if false;
-
-      allow create: if isSignedIn() && isOwner(userId) && request.resource.data.id == request.auth.uid;
-      allow update: if isSignedIn() && isExistingOwner(userId);
-      allow delete: if isSignedIn() && isExistingOwner(userId);
+    function isSignedIn() {
+      return request.auth != null;
     }
 
     /**
-     * @description Allows public read access to parking slot data, but restricts writes.
+     * @description Checks if the authenticated user's UID matches the provided userId.
+     */
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    /**
+     * @description Checks if the authenticated user's UID matches the provided userId and if the resource exists.
+     */
+    function isExistingOwner(userId) {
+        return isOwner(userId) && resource != null;
+    }
+
+    /**
+     * @description Enforces access control for user profile documents.
+     * @path /users/{userId}
+     * @allow (get, update, delete) if the user is the owner.
+     * @allow (create) if the user is creating their own document.
+     * @deny (get, update, delete) if the user is not the owner.
+     * @deny (create) if the user is not creating their own document.
+     * @principle Enforces document ownership for all operations.
+     */
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow list: if false; // Listing users is not allowed.
+      allow create: if isOwner(userId) && request.resource.data.id == userId;
+      allow update: if isExistingOwner(userId) && request.resource.data.id == resource.data.id;
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description Allows public read access to parking slot documents, but restricts write access.
      * @path /parkingSlots/{parkingSlotId}
-     * @allow (get, list) to anyone.
-     * @deny (create, update, delete) to everyone.
-     * @principle Provides public information about parking slots while restricting modifications.
+     * @allow (get, list) public read access
+     * @deny (create, update, delete) all writes.
+     * @principle Public read access with restricted writes.
      */
     match /parkingSlots/{parkingSlotId} {
       allow get, list: if true;
-      allow create: if false;
-      allow update: if false;
-      allow delete: if false;
+      allow create, update, delete: if false; // TODO: Add owner validation once the schema is updated with an ownership field.
     }
 
     /**
-     * @description Allows public read access to reservation data and allows a user to create a reservation for themselves.
+     * @description Allows public read access to reservation documents, but restricts write access.
      * @path /reservations/{reservationId}
-     * @allow (get, list) to anyone.
-     * @allow (create) if the user is authenticated and the `userId` field matches the user's UID.
-     * @allow (update, delete) if the user is the owner of the reservation.
-     * @deny (create, update, delete) if the user is not authenticated or does not own the reservation.
-     * @principle Allows users to manage their own reservations.
+     * @allow (get, list) public read access
+     * @deny (create, update, delete) all writes.
+     * @principle Public read access with restricted writes.
      */
     match /reservations/{reservationId} {
-      function isSignedIn() {
-        return request.auth != null;
-      }
-      function isOwner(userId) {
-        return request.auth.uid == userId;
-      }
-      function isExistingOwner() {
-          return isSignedIn() && resource.data.userId == request.auth.uid;
-      }
-
       allow get, list: if true;
-
-      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
-      allow update: if isExistingOwner();
-      allow delete: if isExistingOwner();
+      allow create, update, delete: if false; // TODO: Add owner validation once the schema is updated with an ownership field.
     }
 
     /**
-     * @description Allows public read access to violation data, but restricts writes.
+     * @description Allows public read access to violation documents, but restricts write access.
      * @path /violations/{violationId}
-     * @allow (get, list) to anyone.
-     * @deny (create, update, delete) to everyone.
-     * @principle Provides public information about violations while restricting modifications.
+     * @allow (get, list) public read access
+     * @deny (create, update, delete) all writes.
+     * @principle Public read access with restricted writes.
      */
     match /violations/{violationId} {
       allow get, list: if true;
-      allow create: if false;
-      allow update: if false;
-      allow delete: if false;
+      allow create, update, delete: if false; // TODO: Add owner validation once the schema is updated with an ownership field.
     }
 
-    /**
-     * @description Allows public read access to feedback data, but restricts writes.
+     /**
+     * @description Allows public read access to feedback documents, but restricts write access.
      * @path /feedback/{feedbackId}
-     * @allow (get, list) to anyone.
-     * @allow (create) to anyone.
-     * @deny (update, delete) to everyone.
-     * @principle Provides public information about feedback and allows users to submit feedback.
+     * @allow (get, list) public read access
+     * @deny (create, update, delete) all writes.
+     * @principle Public read access with restricted writes.
      */
     match /feedback/{feedbackId} {
-        allow get, list, create: if true;
-        allow update: if false;
-        allow delete: if false;
+      allow get, list: if true;
+      allow create, update, delete: if false; // TODO: Add owner validation once the schema is updated with an ownership field.
     }
   }
 }
