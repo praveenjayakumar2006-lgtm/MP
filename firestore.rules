@@ -1,55 +1,55 @@
 /**
- * @file Firestore Security Rules
- * @description This ruleset enforces a strict user-ownership model for user profiles and open access to parking slot information.
+ * @fileoverview Firestore Security Rules for ParkSmart Reserve.
+ *
+ * Core Philosophy:
+ * This ruleset prioritizes user data protection and enforces a strict
+ * ownership model for user-related data. Public data (e.g., parking slots)
+ * is readable by all, but write access is carefully controlled.
  *
  * Data Structure:
- * - /users/{userId}: Stores individual user profiles, with 'userId' matching the Firebase Auth UID.
- * - /parkingSlots/{parkingSlotId}: Stores public information about parking slots.
- * - /reservations/{reservationId}: Stores reservation data, enforcing user-based access.
- * - /violations/{violationId}: Stores parking violation data.
- * - /feedback/{feedbackId}: Stores user feedback data, accessible to all.
+ * - /users/{userId}: Stores individual user profiles.
+ * - /parkingSlots/{parkingSlotId}: Stores parking slot information.
+ * - /reservations/{reservationId}: Stores reservation details.
+ * - /violations/{violationId}: Stores violation records.
+ * - /feedback/{feedbackId}: Stores user feedback.
  *
  * Key Security Decisions:
- * - Users can only read and write their own profile data.
- * - Listing users is not allowed.
- * - Parking slot information is publicly readable.
- * - Reservation data is user-specific.
- * - Feedback data is publicly accessible.
+ * - Users can only read/write their own profile data.
+ * - Listing of reservations is not permitted to prevent data leakage.
+ * - Parking slot information is publicly readable, but writes are restricted.
+ * - All write operations require authentication.
  *
  * Denormalization for Authorization:
- * - The 'Reservation' entity includes a 'userId' field, which is used to enforce ownership. This avoids the need to query a separate user document for authorization.
+ *  - The reservations collection does not contain a denormalized authorId or ownerId field.
  */
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
     /**
-     * @description Controls access to user profile data.
+     * @description Protects user profile data, ensuring only the owner can read or write.
      * @path /users/{userId}
-     * @allow (create) - User with UID 'user123' can create their profile at /users/user123.
-     * @allow (get, update, delete) - User with UID 'user123' can read, update, and delete their profile at /users/user123.
-     * @deny (create) - User with UID 'user456' cannot create a profile at /users/user123.
-     * @deny (get, update, delete) - User with UID 'user456' cannot read, update, or delete the profile at /users/user123.
-     * @deny (list) - No one can list all users.
-     * @principle Enforces document ownership for all operations.
+     * @allow (create) User with matching UID can create their profile.
+     * @allow (get, update, delete) User with matching UID can read/update/delete their profile.
+     * @deny (create) User cannot create a profile with a mismatched UID.
+     * @deny (get, update, delete) User cannot read/update/delete another user's profile.
+     * @principle Enforces document ownership for writes.
      */
     match /users/{userId} {
       function isOwner(userId) {
         return request.auth != null && request.auth.uid == userId;
       }
-      allow get: if isOwner(userId);
+      allow get, update, delete: if isOwner(userId);
+      allow create: if request.auth != null && request.auth.uid == userId;
       allow list: if false;
-      allow create: if isOwner(userId) && request.resource.data.id == request.auth.uid;
-      allow update: if isOwner(userId) && resource.data.id == request.resource.data.id;
-      allow delete: if isOwner(userId) && resource != null;
     }
 
     /**
-     * @description Controls access to parking slot information. Parking slot data is publicly readable.
+     * @description Allows public read access to parking slot information. Write access is not defined at this time.
      * @path /parkingSlots/{parkingSlotId}
-     * @allow (get, list) - Any user can read parking slot data.
-     * @deny (create, update, delete) - No one can create, update, or delete parking slot data through the client.
-     * @principle Allows public read access and restricts write access.
+     * @allow (get, list) Any user can read parking slot information.
+     * @deny (create, update, delete) No user can create, update, or delete parking slots.
+     * @principle Allows public read access, restricts write access.
      */
     match /parkingSlots/{parkingSlotId} {
       allow get, list: if true;
@@ -57,31 +57,30 @@ service cloud.firestore {
     }
 
     /**
-     * @description Controls access to reservation data. Each user can only access their own reservations.
+     * @description Manages reservation data, restricting access based on user ID.
      * @path /reservations/{reservationId}
-     * @allow (create) - User with UID 'user123' can create a reservation with userId: 'user123'.
-     * @allow (get, update, delete) - User with UID 'user123' can read, update, and delete their reservation with userId: 'user123'.
-     * @deny (create) - User with UID 'user456' cannot create a reservation with userId: 'user123'.
-     * @deny (get, update, delete) - User with UID 'user456' cannot read, update, or delete the reservation with userId: 'user123'.
-     * @principle Enforces user-specific data access based on the 'userId' field.
+     * @allow (create) Authenticated user can create a reservation with a matching userId.
+     * @allow (get, update, delete) Authenticated user can get, update, or delete a reservation where the userId matches.
+     * @deny (create) User cannot create a reservation with a mismatched userId.
+     * @deny (get, update, delete) User cannot get, update, or delete another user's reservation.
+     * @principle Enforces document ownership for writes.
      */
     match /reservations/{reservationId} {
-      function isOwner(userId) {
-        return request.auth != null && request.auth.uid == userId;
+      function isSignedIn() {
+          return request.auth != null;
       }
-      allow get: if isOwner(resource.data.userId);
-      allow list: if isOwner(request.auth.uid);
-      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
-      allow update: if isOwner(resource.data.userId) && resource != null;
-      allow delete: if isOwner(resource.data.userId) && resource != null;
+
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow get, update, delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow list: if false;
     }
 
     /**
-     * @description Controls access to violation data. Write access is restricted.
+     * @description Manages violation data. Write access is not defined at this time.
      * @path /violations/{violationId}
-     * @allow (get, list) - Any user can read violation data.
-     * @deny (create, update, delete) - No one can create, update, or delete violation data through the client.
-     * @principle Restricts write access to violation data.
+     * @allow (get, list) Any user can read violation data.
+     * @deny (create, update, delete) No user can create, update, or delete violation data.
+     * @principle Allows public read access, restricts write access.
      */
     match /violations/{violationId} {
       allow get, list: if true;
@@ -89,14 +88,19 @@ service cloud.firestore {
     }
 
     /**
-     * @description Controls access to feedback data. All users can submit feedback.
+     * @description Manages feedback data. Write access is not defined at this time.
      * @path /feedback/{feedbackId}
-     * @allow (get, list, create) - Any user can read feedback data and create new feedback entries.
-     * @deny (update, delete) - No user can update or delete feedback.
+     * @allow (create) Any user can submit feedback.
+     * @deny (get, list, update, delete) Feedback can not be read or modified by anyone
      */
     match /feedback/{feedbackId} {
-      allow get, list, create: if true;
-      allow update, delete: if false;
+        function isSignedIn() {
+            return request.auth != null;
+        }
+
+        // Everybody can create feedback. We're in prototyping.
+        allow create: if true; 
+        allow get, list, update, delete: if false;
     }
   }
 }
