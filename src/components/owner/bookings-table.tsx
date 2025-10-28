@@ -14,8 +14,8 @@ import { useState, useContext, useEffect } from 'react';
 import type { Reservation } from '@/lib/types';
 import { Skeleton } from '../ui/skeleton';
 import { ReservationsContext } from '@/context/reservations-context';
-import { useFirebase, useCollection, useMemoFirebase } from '@/firebase';
-import { collection, query, orderBy, doc, getDoc } from 'firebase/firestore';
+import { useFirebase, useCollection, useMemoFirebase, FirestorePermissionError, errorEmitter } from '@/firebase';
+import { collection, query, orderBy, doc, getDoc, FirestoreError } from 'firebase/firestore';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
   Tooltip,
@@ -23,6 +23,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { useToast } from '@/hooks/use-toast';
 
 type Status = 'Active' | 'Completed' | 'Upcoming';
 
@@ -39,6 +40,7 @@ export function BookingsTable() {
   const { firestore } = useFirebase();
   const [enrichedReservations, setEnrichedReservations] = useState<EnrichedReservation[]>([]);
   const [isLoadingUsers, setIsLoadingUsers] = useState(true);
+  const { toast } = useToast();
 
   useEffect(() => {
     if (context?.reservations && firestore) {
@@ -60,36 +62,55 @@ export function BookingsTable() {
 
       const fetchUsers = async () => {
         setIsLoadingUsers(true);
-        const enriched = await Promise.all(
-          allReservations.map(async res => {
-            if (!res.userId) return res;
-            try {
-              const userDocRef = doc(firestore, 'users', res.userId);
-              const userDoc = await getDoc(userDocRef);
-              if (userDoc.exists()) {
-                const userData = userDoc.data();
-                return {
-                  ...res,
-                  user: {
-                    firstName: userData.firstName,
-                    lastName: userData.lastName,
-                    email: userData.email,
-                  },
-                };
+        try {
+          const enriched = await Promise.all(
+            allReservations.map(async res => {
+              if (!res.userId) return res;
+              try {
+                const userDocRef = doc(firestore, 'users', res.userId);
+                const userDoc = await getDoc(userDocRef);
+                if (userDoc.exists()) {
+                  const userData = userDoc.data();
+                  return {
+                    ...res,
+                    user: {
+                      firstName: userData.firstName,
+                      lastName: userData.lastName,
+                      email: userData.email,
+                    },
+                  };
+                }
+              } catch (e) {
+                if (e instanceof FirestoreError && e.code === 'permission-denied') {
+                  const contextualError = new FirestorePermissionError({
+                    path: `users/${res.userId}`,
+                    operation: 'get',
+                  });
+                  errorEmitter.emit('permission-error', contextualError);
+                  // Stop further processing if a permission error occurs.
+                  throw contextualError; 
+                }
               }
-            } catch (e) {
-              console.error("Error fetching user:", e);
+              return res;
+            })
+          );
+          setEnrichedReservations(enriched.sort((a, b) => new Date(b.startTime).getTime() - new Date(a.startTime).getTime()));
+        } catch (error) {
+            if (!(error instanceof FirestorePermissionError)) {
+                toast({
+                    variant: 'destructive',
+                    title: 'Error fetching user data',
+                    description: 'Could not load all booking details.',
+                });
             }
-            return res;
-          })
-        );
-        setEnrichedReservations(enriched.sort((a, b) => new Date(b.startTime).getTime() - new Date(a.startTime).getTime()));
-        setIsLoadingUsers(false);
+        } finally {
+            setIsLoadingUsers(false);
+        }
       };
       
       fetchUsers();
     }
-  }, [context?.reservations, firestore]);
+  }, [context?.reservations, firestore, toast]);
 
   if (!context) {
     return null;
