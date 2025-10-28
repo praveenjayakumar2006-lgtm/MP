@@ -1,4 +1,3 @@
-
 'use client';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { format } from 'date-fns';
@@ -128,25 +127,25 @@ export function BookingsTable() {
 
   const renderSkeletons = () =>
     Array.from({ length: 3 }).map((_, i) => (
-      <Card key={`skel-${i}`}>
-          <CardHeader className="flex-row items-center gap-4">
-              <Skeleton className="h-10 w-10 rounded-full" />
+      <Card key={`skel-${i}`} className="text-sm p-3">
+          <CardHeader className="flex-row items-center gap-3 p-1">
+              <Skeleton className="h-9 w-9 rounded-full" />
               <div className="space-y-1.5">
-                  <Skeleton className="h-5 w-32" />
-                  <Skeleton className="h-4 w-40" />
+                  <Skeleton className="h-4 w-28" />
+                  <Skeleton className="h-3 w-36" />
               </div>
           </CardHeader>
-          <CardContent className="space-y-4 pt-0">
+          <CardContent className="space-y-2 p-1 pt-2">
                <Skeleton className="h-px w-full" />
-               <div className="grid grid-cols-2 gap-4">
-                  <Skeleton className="h-8 w-full" />
-                  <Skeleton className="h-8 w-full" />
-                  <Skeleton className="h-8 w-full" />
-                  <Skeleton className="h-8 w-full" />
+               <div className="grid grid-cols-2 gap-x-4 gap-y-2 pt-1 text-xs">
+                  <Skeleton className="h-6 w-full" />
+                  <Skeleton className="h-6 w-full" />
+                  <Skeleton className="h-6 w-full" />
+                  <Skeleton className="h-6 w-full" />
                </div>
           </CardContent>
-           <CardFooter>
-              <Skeleton className="h-9 w-32" />
+           <CardFooter className="p-1 pt-2">
+              <Skeleton className="h-5 w-20" />
           </CardFooter>
       </Card>
     ));
@@ -193,7 +192,7 @@ export function BookingsTable() {
 
   return (
     <div>
-        <div className="mb-8 mt-8">
+        <div className="mb-8 mt-8 text-center">
             <h1 className="text-3xl font-bold tracking-tight">{getTitle()}</h1>
             <p className="text-muted-foreground mt-2">{getDescription()}</p>
         </div>
@@ -212,8 +211,8 @@ export function BookingsTable() {
                 {isClient && !isDataLoading && filteredReservations.map((reservation) => {
                     const userFullName = reservation.user ? `${reservation.user.firstName || ''} ${reservation.user.lastName || ''}`.trim() : 'N/A';
                     return (
-                        <Card key={reservation.id} className="flex flex-col text-sm">
-                           <CardHeader className="flex-row items-center gap-3 p-4">
+                        <Card key={reservation.id} className="flex flex-col text-sm p-3">
+                           <CardHeader className="flex-row items-center gap-3 p-1">
                                 <Avatar className="h-9 w-9">
                                     <AvatarFallback>
                                         {userFullName !== 'N/A' ? userFullName.charAt(0).toUpperCase() : <UserCircle />}
@@ -224,9 +223,9 @@ export function BookingsTable() {
                                     <p className="text-xs text-muted-foreground">{reservation.user?.email || 'No email'}</p>
                                 </div>
                             </CardHeader>
-                            <CardContent className="space-y-2.5 p-4 pt-0 flex-1">
+                            <CardContent className="space-y-2 p-1 pt-2 flex-1">
                                 <Separator />
-                                <div className="grid grid-cols-2 gap-x-4 gap-y-2 pt-2 text-xs">
+                                <div className="grid grid-cols-2 gap-x-4 gap-y-2 pt-1 text-xs">
                                     <div className="flex items-center gap-2">
                                         <Hash className="h-3.5 w-3.5 text-muted-foreground"/>
                                         <span className="font-medium">{reservation.slotId}</span>
@@ -245,7 +244,7 @@ export function BookingsTable() {
                                     </div>
                                 </div>
                             </CardContent>
-                             <CardFooter className="p-4 pt-0 justify-between items-center">
+                             <CardFooter className="p-1 pt-2 justify-between items-center">
                                 <Badge variant={getStatusBadgeVariant(reservation.status)}>{reservation.status}</Badge>
                             </CardFooter>
                         </Card>
