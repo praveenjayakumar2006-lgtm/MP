@@ -48,7 +48,7 @@ const formatSlotId = (slotId: string | null) => {
 }
 
 export function BookingsTable() {
-  const { firestore, user: ownerUser, isUserLoading: isOwnerLoading } = useFirebase();
+  const { firestore } = useFirebase();
   const [enrichedReservations, setEnrichedReservations] = useState<EnrichedReservation[]>([]);
   const [isLoadingUsers, setIsLoadingUsers] = useState(true);
   const { toast } = useToast();
@@ -56,10 +56,9 @@ export function BookingsTable() {
   const router = useRouter();
 
   const reservationsQuery = useMemoFirebase(() => {
-    // Only query if firestore is available and it's the owner user
-    if (!firestore || !ownerUser) return null;
+    if (!firestore) return null;
     return query(collection(firestore, 'reservations'), orderBy('createdAt', 'desc'));
-  }, [firestore, ownerUser]);
+  }, [firestore]);
 
   const { data: reservations, isLoading, error: collectionError } = useCollection<Reservation>(reservationsQuery);
 
@@ -89,7 +88,7 @@ export function BookingsTable() {
   }, [reservations, isLoading]);
 
 
-  const isDataLoading = isLoading || isLoadingUsers || isOwnerLoading;
+  const isDataLoading = isLoading || isLoadingUsers;
   const isClient = typeof window !== 'undefined';
 
 
