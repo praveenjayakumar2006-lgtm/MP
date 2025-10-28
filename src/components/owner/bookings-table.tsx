@@ -39,6 +39,15 @@ const formatLicensePlate = (plate: string | null) => {
     return plate;
 }
 
+const formatSlotId = (slotId: string | null) => {
+    if (!slotId) return null;
+    const match = slotId.match(/^([A-Z])(\d+)$/);
+    if (match) {
+        return `${match[1]} ${match[2]}`;
+    }
+    return slotId;
+}
+
 export function BookingsTable() {
   const { firestore, user: ownerUser, isUserLoading: isOwnerLoading } = useFirebase();
   const [enrichedReservations, setEnrichedReservations] = useState<EnrichedReservation[]>([]);
@@ -176,7 +185,7 @@ export function BookingsTable() {
                            <CardHeader className="p-1 flex-row justify-between items-center space-y-0">
                                 <div className="flex items-center gap-2">
                                     <Hash className="h-3.5 w-3.5 text-muted-foreground"/>
-                                    <span className="font-medium">{reservation.slotId}</span>
+                                    <span className="font-medium">{formatSlotId(reservation.slotId)}</span>
                                 </div>
                                 <span className="font-mono bg-muted px-1.5 py-0.5 rounded">{formatLicensePlate(reservation.vehiclePlate)}</span>
                             </CardHeader>
