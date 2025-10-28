@@ -9,8 +9,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
-import { addDocumentNonBlocking, useFirebase, useUser } from '@/firebase';
-import { collection, Timestamp } from 'firebase/firestore';
+import { useFirebase, useUser } from '@/firebase';
+import { collection, Timestamp, addDoc } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 
 
@@ -34,7 +34,7 @@ function ViolationResultContent() {
     }
   }, []);
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     if (!firestore || !user || !slotNumber || !violationType || !licensePlate) {
        toast({
         variant: 'destructive',
@@ -44,17 +44,25 @@ function ViolationResultContent() {
       return;
     }
     
-    const violationsCollection = collection(firestore, 'violations');
-    addDocumentNonBlocking(violationsCollection, {
-      slotNumber,
-      violationType,
-      licensePlate,
-      imageUrl: imageUrl,
-      userId: user.uid,
-      createdAt: Timestamp.now(),
-    });
-
-    setSubmissionStatus('confirmed');
+    try {
+      const violationsCollection = collection(firestore, 'violations');
+      await addDoc(violationsCollection, {
+        slotNumber,
+        violationType,
+        licensePlate,
+        imageUrl: imageUrl,
+        userId: user.uid,
+        createdAt: Timestamp.now(),
+      });
+      setSubmissionStatus('confirmed');
+    } catch (error) {
+      console.error("Error submitting violation: ", error);
+      toast({
+        variant: 'destructive',
+        title: 'Submission Error',
+        description: 'There was a problem submitting your report. Please try again.',
+      });
+    }
   };
 
   // Formats license plates like 'HR26DQ05551' to 'HR 26 DQ 05551'

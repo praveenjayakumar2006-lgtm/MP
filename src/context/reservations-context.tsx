@@ -2,8 +2,9 @@
 
 import React, { createContext, useState, ReactNode, useEffect } from 'react';
 import type { Reservation } from '@/lib/types';
-import { useCollection, useFirebase, useUser, addDocumentNonBlocking, deleteDocumentNonBlocking, useMemoFirebase } from '@/firebase';
-import { collection, Timestamp, query, doc, where } from 'firebase/firestore';
+import { useCollection, useFirebase, useUser, useMemoFirebase } from '@/firebase';
+import { collection, Timestamp, query, doc, where, addDoc, deleteDoc } from 'firebase/firestore';
+import { useToast } from '@/hooks/use-toast';
 
 interface ReservationsContextType {
   reservations: Reservation[];
@@ -18,6 +19,7 @@ export const ReservationsContext = createContext<ReservationsContextType | undef
 export const ReservationsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const { firestore } = useFirebase();
   const { user } = useUser();
+  const { toast } = useToast();
 
   const reservationsQuery = useMemoFirebase(() => {
     if (firestore && user?.uid) {
@@ -46,12 +48,11 @@ export const ReservationsProvider: React.FC<{ children: ReactNode }> = ({ childr
       }));
       setReservations(formattedReservations);
     } else if (!isLoading && user) {
-        // If there's a user but no data, clear the reservations
         setReservations([]);
     }
   }, [reservationsData, user, isLoading]);
 
-  const addReservation = (reservation: Omit<Reservation, 'id' | 'createdAt' | 'updatedAt' | 'userId' | 'status'>) => {
+  const addReservation = async (reservation: Omit<Reservation, 'id' | 'createdAt' | 'updatedAt' | 'userId' | 'status'>) => {
     if (!firestore || !user) return;
     
     const newReservation = {
@@ -64,13 +65,31 @@ export const ReservationsProvider: React.FC<{ children: ReactNode }> = ({ childr
       endTime: Timestamp.fromDate(reservation.endTime),
     };
     
-    addDocumentNonBlocking(collection(firestore, 'reservations'), newReservation);
+    try {
+      await addDoc(collection(firestore, 'reservations'), newReservation);
+    } catch(e) {
+      console.error("Error adding reservation: ", e);
+       toast({
+        variant: 'destructive',
+        title: 'Reservation Error',
+        description: 'Could not save your reservation. Please try again.',
+      });
+    }
   };
 
-  const removeReservation = (reservationId: string) => {
+  const removeReservation = async (reservationId: string) => {
     if (!firestore) return;
     const reservationDocRef = doc(firestore, 'reservations', reservationId);
-    deleteDocumentNonBlocking(reservationDocRef);
+    try {
+      await deleteDoc(reservationDocRef);
+    } catch(e) {
+      console.error("Error deleting reservation: ", e);
+      toast({
+        variant: 'destructive',
+        title: 'Cancellation Error',
+        description: 'Could not cancel your reservation. Please try again.',
+      });
+    }
   };
 
   if (error) {
