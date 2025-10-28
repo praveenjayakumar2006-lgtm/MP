@@ -42,9 +42,9 @@ export function BookingsTable() {
   const { data: reservations, isLoading, error: collectionError } = useCollection<Reservation>(reservationsQuery);
 
   useEffect(() => {
-    if (reservations && firestore) {
+    if (reservations) {
       const now = new Date();
-      const allReservations: Reservation[] = reservations.map(res => {
+      const allReservations: EnrichedReservation[] = reservations.map(res => {
         const startTime = (res.startTime as any).toDate();
         const endTime = (res.endTime as any).toDate();
         let status: Status;
@@ -58,60 +58,13 @@ export function BookingsTable() {
         }
         return { ...res, status, startTime, endTime };
       });
-
-      const fetchUsers = async () => {
-        setIsLoadingUsers(true);
-        try {
-          const enriched = await Promise.all(
-            allReservations.map(async res => {
-              if (!res.userId) return res;
-              try {
-                const userDocRef = doc(firestore, 'users', res.userId);
-                const userDoc = await getDoc(userDocRef);
-                if (userDoc.exists()) {
-                  const userData = userDoc.data();
-                  return {
-                    ...res,
-                    user: {
-                      firstName: userData.firstName,
-                      lastName: userData.lastName,
-                      email: userData.email,
-                    },
-                  };
-                }
-              } catch (e) {
-                if (e instanceof FirestoreError && e.code === 'permission-denied') {
-                  const contextualError = new FirestorePermissionError({
-                    path: `users/${res.userId}`,
-                    operation: 'get',
-                  });
-                  errorEmitter.emit('permission-error', contextualError);
-                  throw contextualError;
-                }
-              }
-              return res;
-            })
-          );
-          setEnrichedReservations(enriched);
-        } catch (error) {
-            if (!(error instanceof FirestorePermissionError)) {
-                toast({
-                    variant: 'destructive',
-                    title: 'Error fetching user data',
-                    description: 'Could not load all booking details.',
-                });
-            }
-        } finally {
-            setIsLoadingUsers(false);
-        }
-      };
-      
-      fetchUsers();
-    } else if (!isLoading && !reservations) {
+      setEnrichedReservations(allReservations);
+      setIsLoadingUsers(false);
+    } else if (!isLoading) {
         setIsLoadingUsers(false);
         setEnrichedReservations([]);
     }
-  }, [reservations, firestore, toast, isLoading]);
+  }, [reservations, isLoading]);
 
 
   const isDataLoading = isLoading || isLoadingUsers || isOwnerLoading;
@@ -127,15 +80,11 @@ export function BookingsTable() {
   const renderSkeletons = () =>
     Array.from({ length: 3 }).map((_, i) => (
       <Card key={`skel-${i}`} className="text-sm p-3">
-          <CardHeader className="flex-row items-center gap-3 p-1">
-              <Skeleton className="h-9 w-9 rounded-full" />
-              <div className="space-y-1.5">
-                  <Skeleton className="h-4 w-28" />
-                  <Skeleton className="h-3 w-36" />
-              </div>
+          <CardHeader className="p-1">
+              <Skeleton className="h-4 w-28" />
           </CardHeader>
           <CardContent className="space-y-2 p-1 pt-2">
-               <Skeleton className="h-px w-full" />
+               <Separator />
                <div className="grid grid-cols-2 gap-x-4 gap-y-2 pt-1 text-xs">
                   <Skeleton className="h-6 w-full" />
                   <Skeleton className="h-6 w-full" />
@@ -211,16 +160,8 @@ export function BookingsTable() {
                     const userFullName = reservation.user ? `${reservation.user.firstName || ''} ${reservation.user.lastName || ''}`.trim() : '';
                     return (
                         <Card key={reservation.id} className="flex flex-col text-sm p-3">
-                           <CardHeader className="flex-row items-center gap-3 p-1">
-                                <Avatar className="h-9 w-9">
-                                    <AvatarFallback>
-                                        {userFullName ? userFullName.charAt(0).toUpperCase() : <UserCircle />}
-                                    </AvatarFallback>
-                                </Avatar>
-                                <div>
-                                    <p className="font-semibold">{userFullName || 'N/A'}</p>
-                                    <p className="text-xs text-muted-foreground">{reservation.user?.email || 'No email available'}</p>
-                                </div>
+                           <CardHeader className="p-1">
+                                <p className="font-semibold text-xs text-muted-foreground">User ID: <span className="font-mono text-foreground">{reservation.userId}</span></p>
                             </CardHeader>
                             <CardContent className="space-y-2 p-1 pt-2 flex-1">
                                 <Separator />
