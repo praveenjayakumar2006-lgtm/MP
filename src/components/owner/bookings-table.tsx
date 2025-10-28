@@ -161,20 +161,16 @@ export function BookingsTable() {
                     const userFullName = reservation.user ? `${reservation.user.firstName || ''} ${reservation.user.lastName || ''}`.trim() : '';
                     return (
                         <Card key={reservation.id} className="flex flex-col text-sm p-3">
-                           <CardHeader className="p-1">
-                                
+                           <CardHeader className="p-1 flex-row justify-between items-center space-y-0">
+                                <span className="font-mono bg-muted px-1.5 py-0.5 rounded">{reservation.vehiclePlate}</span>
+                                <div className="flex items-center gap-2">
+                                    <Hash className="h-3.5 w-3.5 text-muted-foreground"/>
+                                    <span className="font-medium">{reservation.slotId}</span>
+                                </div>
                             </CardHeader>
                             <CardContent className="space-y-2 p-1 pt-2 flex-1">
                                 <Separator />
                                 <div className="grid grid-cols-2 gap-x-4 gap-y-2 pt-1 text-xs">
-                                    <div className="flex items-center gap-2">
-                                        <Hash className="h-3.5 w-3.5 text-muted-foreground"/>
-                                        <span className="font-medium">{reservation.slotId}</span>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <Car className="h-3.5 w-3.5 text-muted-foreground"/>
-                                        <span className="font-mono bg-muted px-1.5 py-0.5 rounded">{reservation.vehiclePlate}</span>
-                                    </div>
                                     <div className="flex items-center gap-2 col-span-2">
                                         <Calendar className="h-3.5 w-3.5 text-muted-foreground"/>
                                         <span>{format(new Date(reservation.startTime), 'MMM d, yyyy')}</span>
