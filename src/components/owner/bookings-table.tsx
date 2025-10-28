@@ -1,3 +1,4 @@
+
 'use client';
 import {
   Table,
@@ -23,7 +24,7 @@ import {
 } from '@/components/ui/tooltip';
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useIsMobile } from '@/hooks/use-mobile';
+import { useIsMobile } from '@/hooks/use-is-mobile';
 import { Activity, CalendarClock, CheckCircle2 } from 'lucide-react';
 
 type Status = 'Active' | 'Completed' | 'Upcoming';
@@ -200,14 +201,9 @@ export function BookingsTable() {
                   {isClient && !isLoading && !isLoadingUsers && filteredReservations.map((reservation) => (
                     <TableRow key={reservation.id}>
                       <TableCell>
-                        <div>
-                          <p className="font-medium">
-                            {reservation.user?.firstName} {reservation.user?.lastName}
-                          </p>
-                          <p className="text-sm text-muted-foreground">
-                            {reservation.user?.email}
-                          </p>
-                        </div>
+                        <p className="font-medium">
+                          {reservation.user?.firstName} {reservation.user?.lastName}
+                        </p>
                       </TableCell>
                       <TableCell className="font-medium">{reservation.slotId}</TableCell>
                       <TableCell>{reservation.vehiclePlate}</TableCell>
