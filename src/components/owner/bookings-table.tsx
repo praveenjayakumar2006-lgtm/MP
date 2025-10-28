@@ -211,7 +211,6 @@ export function BookingsTable() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>User</TableHead>
                     <TableHead>Slot ID</TableHead>
                     <TableHead>Vehicle Plate</TableHead>
                     <TableHead>Start Time</TableHead>
@@ -222,9 +221,6 @@ export function BookingsTable() {
                   {(!isClient || isLoading || isLoadingUsers) && renderSkeletons()}
                   {isClient && !isLoading && !isLoadingUsers && filteredReservations.map((reservation) => (
                     <TableRow key={reservation.id}>
-                       <TableCell className="font-medium">
-                        {reservation.user ? `${reservation.user.firstName || ''} ${reservation.user.lastName || ''}`.trim() : 'N/A'}
-                      </TableCell>
                       <TableCell className="font-medium">{reservation.slotId}</TableCell>
                       <TableCell>{reservation.vehiclePlate}</TableCell>
                       <TableCell>{format(new Date(reservation.startTime), getDateFormat())}</TableCell>
