@@ -26,6 +26,28 @@ type Violation = {
     imageUrl?: string;
 };
 
+// Formats license plates like 'TN72FB9999' to 'TN 72 FB 9999'
+const formatLicensePlate = (plate: string | null) => {
+    if (!plate) return null;
+    const cleaned = plate.replace(/\s/g, '').toUpperCase();
+    const match = cleaned.match(/^([A-Z]{2})(\d{1,2})([A-Z]{1,2})(\d{1,4})$/);
+    if (match) {
+        const [_, state, district, series, number] = match;
+        return `${state} ${district} ${series} ${number}`;
+    }
+    return plate;
+}
+
+const formatSlotId = (slotId: string | null) => {
+    if (!slotId) return null;
+    const match = slotId.match(/^([A-Z])(\d+)$/);
+    if (match) {
+        return `${match[1]} ${match[2]}`;
+    }
+    return slotId;
+}
+
+
 export function ReportsTable() {
     const { firestore } = useFirebase();
 
@@ -77,10 +99,10 @@ export function ReportsTable() {
                     )}
                 </CardHeader>
                 <CardContent className="p-4 space-y-2">
-                    <CardTitle className="text-lg">Slot: {violation.slotNumber}</CardTitle>
+                    <CardTitle className="text-lg">Slot: {formatSlotId(violation.slotNumber)}</CardTitle>
                     <div>
                         <p className="text-sm font-medium text-foreground">
-                            Plate: <span className="font-mono bg-muted px-2 py-1 rounded-md">{violation.licensePlate}</span>
+                            Plate: <span className="font-mono bg-muted px-2 py-1 rounded-md">{formatLicensePlate(violation.licensePlate)}</span>
                         </p>
                     </div>
                      <div>
