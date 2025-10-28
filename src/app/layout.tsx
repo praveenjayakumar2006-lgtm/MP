@@ -23,7 +23,7 @@ function AppContent({ children }: { children: React.ReactNode }) {
   const [isClient, setIsClient] = useState(false);
   
   const isAuthPage = useMemo(() => ['/login', '/signup'].includes(pathname), [pathname]);
-  const isOwnerPage = useMemo(() => pathname === '/owner', [pathname]);
+  const isOwnerPage = useMemo(() => pathname.startsWith('/owner'), [pathname]);
   const isCameraPage = useMemo(() => pathname === '/violations/camera', [pathname]);
 
   const showHeader = useMemo(() => {
