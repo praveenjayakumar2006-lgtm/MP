@@ -28,7 +28,7 @@ type EnrichedReservation = Reservation & {
 };
 
 export function BookingsTable() {
-  const { firestore } = useFirebase();
+  const { firestore, user: ownerUser, isUserLoading: isOwnerLoading } = useFirebase();
   const [enrichedReservations, setEnrichedReservations] = useState<EnrichedReservation[]>([]);
   const [isLoadingUsers, setIsLoadingUsers] = useState(true);
   const { toast } = useToast();
@@ -37,6 +37,7 @@ export function BookingsTable() {
 
   const reservationsQuery = useMemoFirebase(() => {
     if (!firestore) return null;
+    // For the owner, we fetch all reservations.
     return query(collection(firestore, 'reservations'), orderBy('createdAt', 'desc'));
   }, [firestore]);
 
@@ -115,7 +116,7 @@ export function BookingsTable() {
   }, [reservations, firestore, toast, isLoading]);
 
 
-  const isDataLoading = isLoading || isLoadingUsers;
+  const isDataLoading = isLoading || isLoadingUsers || isOwnerLoading;
   const isClient = typeof window !== 'undefined';
 
 
@@ -192,9 +193,9 @@ export function BookingsTable() {
 
   return (
     <div>
-        <div className="mb-8">
+        <div className="mb-8 mt-8">
             <h1 className="text-3xl font-bold tracking-tight">{getTitle()}</h1>
-            <p className="text-muted-foreground">{getDescription()}</p>
+            <p className="text-muted-foreground mt-2">{getDescription()}</p>
         </div>
          <Tabs value={filter} onValueChange={(value) => setFilter(value as any)} className="w-full">
             <div className="flex items-center justify-center mb-6">
@@ -252,16 +253,14 @@ export function BookingsTable() {
                 })}
               </div>
               {isClient && !isDataLoading && filteredReservations.length === 0 && (
-                <div className="text-center p-8 text-muted-foreground col-span-full bg-card rounded-lg border">
-                  No {filter !== 'all' ? filter.toLowerCase() : ''} bookings found.
-                </div>
+                <Card className="mt-6">
+                  <CardContent className="pt-6 text-center text-muted-foreground">
+                    No {filter !== 'all' ? filter.toLowerCase() : ''} bookings found.
+                  </CardContent>
+                </Card>
               )}
             </TabsContent>
         </Tabs>
       </div>
   );
 }
-
-  
-
-    
