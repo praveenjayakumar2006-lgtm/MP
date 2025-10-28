@@ -4,7 +4,7 @@
 import React, { createContext, useState, ReactNode, useEffect } from 'react';
 import type { Reservation } from '@/lib/types';
 import { useCollection, useFirebase, useUser, addDocumentNonBlocking, deleteDocumentNonBlocking, useMemoFirebase } from '@/firebase';
-import { collection, Timestamp, query } from 'firebase/firestore';
+import { collection, Timestamp, query, doc } from 'firebase/firestore';
 
 interface ReservationsContextType {
   reservations: Reservation[];
