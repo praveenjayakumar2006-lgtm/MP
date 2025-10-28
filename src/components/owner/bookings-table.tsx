@@ -1,24 +1,21 @@
 'use client';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { format } from 'date-fns';
 import { useState, useContext, useEffect } from 'react';
 import type { Reservation } from '@/lib/types';
 import { Skeleton } from '../ui/skeleton';
 import { ReservationsContext } from '@/context/reservations-context';
-import { useFirebase, useCollection, useMemoFirebase, FirestorePermissionError, errorEmitter } from '@/firebase';
+import { useFirebase, useMemoFirebase, FirestorePermissionError, errorEmitter } from '@/firebase';
 import { collection, query, orderBy, doc, getDoc, FirestoreError } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useRouter } from 'next/navigation';
+import { Badge } from '@/components/ui/badge';
+import { User, Car, Calendar, Clock, Hash, CheckCircle, Hourglass, ArrowRight, UserCircle } from 'lucide-react';
+import { Avatar, AvatarFallback } from '../ui/avatar';
+import { Button } from '../ui/button';
+import { Separator } from '../ui/separator';
 
 type Status = 'Active' | 'Completed' | 'Upcoming';
 
@@ -37,7 +34,6 @@ export function BookingsTable() {
   const [isLoadingUsers, setIsLoadingUsers] = useState(true);
   const { toast } = useToast();
   const [filter, setFilter] = useState<Status | 'all'>('all');
-  const isMobile = useIsMobile();
   const router = useRouter();
 
   useEffect(() => {
@@ -85,7 +81,6 @@ export function BookingsTable() {
                     operation: 'get',
                   });
                   errorEmitter.emit('permission-error', contextualError);
-                  // Stop further processing if a permission error occurs.
                   throw contextualError; 
                 }
               }
@@ -123,18 +118,41 @@ export function BookingsTable() {
 
 
   const renderSkeletons = () =>
-    Array.from({ length: 5 }).map((_, i) => (
-      <TableRow key={`skel-${i}`}>
-        <TableCell><Skeleton className="h-5 w-24" /></TableCell>
-        <TableCell><Skeleton className="h-5 w-16" /></TableCell>
-        <TableCell><Skeleton className="h-5 w-24" /></TableCell>
-        <TableCell><Skeleton className="h-5 w-40" /></TableCell>
-        <TableCell><Skeleton className="h-5 w-40" /></TableCell>
-      </TableRow>
+    Array.from({ length: 3 }).map((_, i) => (
+      <Card key={`skel-${i}`}>
+          <CardHeader className="flex-row items-center gap-4">
+              <Skeleton className="h-10 w-10 rounded-full" />
+              <div className="space-y-1.5">
+                  <Skeleton className="h-5 w-32" />
+                  <Skeleton className="h-4 w-40" />
+              </div>
+          </CardHeader>
+          <CardContent className="space-y-4 pt-0">
+               <Skeleton className="h-px w-full" />
+               <div className="grid grid-cols-2 gap-4">
+                  <Skeleton className="h-8 w-full" />
+                  <Skeleton className="h-8 w-full" />
+                  <Skeleton className="h-8 w-full" />
+                  <Skeleton className="h-8 w-full" />
+               </div>
+          </CardContent>
+           <CardFooter>
+              <Skeleton className="h-9 w-32" />
+          </CardFooter>
+      </Card>
     ));
 
-  const getDateFormat = () => {
-    return isMobile ? 'MMM d, h:mm a' : 'MMM d, yyyy, h:mm a';
+  const getStatusBadgeVariant = (status: Status) => {
+    switch (status) {
+      case 'Active':
+        return 'default';
+      case 'Completed':
+        return 'secondary';
+      case 'Upcoming':
+        return 'outline';
+      default:
+        return 'default';
+    }
   };
 
   const getTitle = () => {
@@ -146,7 +164,7 @@ export function BookingsTable() {
       case 'Completed':
         return 'Completed Bookings';
       default:
-        return 'All Bookings';
+        return 'All User Bookings';
     }
   };
 
@@ -159,20 +177,19 @@ export function BookingsTable() {
       case 'Completed':
         return 'Reservations that have already ended.';
       default:
-        return 'A comprehensive list of all user reservations.';
+        return 'A comprehensive list of all reservations made by users.';
     }
   };
 
 
   return (
-    <Card>
-      <CardHeader>
-          <CardTitle className="text-3xl">{getTitle()}</CardTitle>
-          <CardDescription>{getDescription()}</CardDescription>
-      </CardHeader>
-      <CardContent>
+    <div>
+        <div className="mb-6">
+            <h1 className="text-3xl font-bold tracking-tight">{getTitle()}</h1>
+            <p className="text-muted-foreground">{getDescription()}</p>
+        </div>
          <Tabs value={filter} onValueChange={(value) => setFilter(value as any)} className="w-full">
-            <div className="flex items-center justify-center p-4">
+            <div className="flex items-center justify-center mb-6">
               <TabsList>
                 <TabsTrigger value="all">All</TabsTrigger>
                 <TabsTrigger value="Active">Active</TabsTrigger>
@@ -181,41 +198,62 @@ export function BookingsTable() {
               </TabsList>
             </div>
             <TabsContent value={filter}>
-              <div className="border rounded-md">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Slot ID</TableHead>
-                      <TableHead>Vehicle Plate</TableHead>
-                      <TableHead>Start Time</TableHead>
-                      <TableHead>End Time</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {(!isClient || isLoading || isLoadingUsers) && renderSkeletons()}
-                    {isClient && !isLoading && !isLoadingUsers && filteredReservations.map((reservation) => (
-                      <TableRow 
-                        key={reservation.id} 
-                        onClick={() => router.push(`/owner/bookings/${reservation.id}`)}
-                        className="cursor-pointer hover:bg-muted/50"
-                      >
-                        <TableCell className="font-medium">{reservation.slotId}</TableCell>
-                        <TableCell>{reservation.vehiclePlate}</TableCell>
-                        <TableCell>{format(new Date(reservation.startTime), getDateFormat())}</TableCell>
-                        <TableCell>{format(new Date(reservation.endTime), getDateFormat())}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {(!isClient || isLoading || isLoadingUsers) && renderSkeletons()}
+                {isClient && !isLoading && !isLoadingUsers && filteredReservations.map((reservation) => {
+                    const userFullName = reservation.user ? `${reservation.user.firstName || ''} ${reservation.user.lastName || ''}`.trim() : 'N/A';
+                    return (
+                        <Card key={reservation.id} className="flex flex-col">
+                           <CardHeader className="flex-row items-center gap-4">
+                                <Avatar className="h-10 w-10">
+                                    <AvatarFallback>
+                                        {userFullName !== 'N/A' ? userFullName.charAt(0).toUpperCase() : <UserCircle />}
+                                    </AvatarFallback>
+                                </Avatar>
+                                <div>
+                                    <p className="font-semibold">{userFullName}</p>
+                                    <p className="text-xs text-muted-foreground">{reservation.user?.email || 'No email'}</p>
+                                </div>
+                            </CardHeader>
+                            <CardContent className="space-y-3 pt-0 flex-1">
+                                <Separator />
+                                <div className="grid grid-cols-2 gap-x-4 gap-y-3 text-sm pt-2">
+                                    <div className="flex items-center gap-2">
+                                        <Hash className="h-4 w-4 text-muted-foreground"/>
+                                        <span className="font-medium">{reservation.slotId}</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <Car className="h-4 w-4 text-muted-foreground"/>
+                                        <span className="font-mono text-xs bg-muted px-1.5 py-0.5 rounded">{reservation.vehiclePlate}</span>
+                                    </div>
+                                    <div className="flex items-center gap-2 col-span-2">
+                                        <Calendar className="h-4 w-4 text-muted-foreground"/>
+                                        <span>{format(new Date(reservation.startTime), 'MMM d, yyyy')}</span>
+                                    </div>
+                                    <div className="flex items-center gap-2 col-span-2">
+                                        <Clock className="h-4 w-4 text-muted-foreground"/>
+                                        <span>{`${format(new Date(reservation.startTime), 'p')} - ${format(new Date(reservation.endTime), 'p')}`}</span>
+                                    </div>
+                                </div>
+                            </CardContent>
+                             <CardFooter className="justify-between items-center">
+                                <Badge variant={getStatusBadgeVariant(reservation.status)}>{reservation.status}</Badge>
+                                <Button variant="ghost" size="sm" onClick={() => router.push(`/owner/bookings/${reservation.id}`)}>
+                                    View
+                                    <ArrowRight className="ml-2 h-4 w-4" />
+                                </Button>
+                            </CardFooter>
+                        </Card>
+                    )
+                })}
               </div>
               {isClient && !isLoading && !isLoadingUsers && filteredReservations.length === 0 && (
-                <div className="text-center p-8 text-muted-foreground">
+                <div className="text-center p-8 text-muted-foreground col-span-full bg-card rounded-lg border">
                   No {filter !== 'all' ? filter.toLowerCase() : ''} bookings found.
                 </div>
               )}
             </TabsContent>
         </Tabs>
-      </CardContent>
-    </Card>
+      </div>
   );
 }

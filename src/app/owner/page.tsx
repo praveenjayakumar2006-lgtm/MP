@@ -27,10 +27,6 @@ function OwnerDashboard() {
         }
     }, [router]);
 
-    const handleTabChange = (value: string) => {
-        router.push(`/owner?view=${value}`);
-    };
-
     const renderHome = () => (
         <Card>
             <CardHeader className="flex-row items-center gap-4">
@@ -98,7 +94,7 @@ function OwnerDashboard() {
     );
 
     const renderReports = () => (
-         <Card className="border-0 shadow-none">
+         <Card>
             <CardHeader>
                 <CardTitle className="text-3xl">Violation Reports</CardTitle>
                 <CardDescription>
@@ -112,7 +108,7 @@ function OwnerDashboard() {
     );
 
     const renderFeedback = () => (
-        <Card className="border-0 shadow-none">
+        <Card>
             <CardHeader>
                 <CardTitle className="text-3xl">User Feedback</CardTitle>
                 <CardDescription>
@@ -125,9 +121,7 @@ function OwnerDashboard() {
         </Card>
     );
      const renderBookings = () => (
-        <Card className="border-0 shadow-none">
-            <BookingsTable />
-        </Card>
+        <BookingsTable />
     );
     
     const renderContent = () => {
@@ -155,8 +149,8 @@ function OwnerDashboard() {
 
 
     return (
-        <div className="flex flex-1 flex-col items-center justify-center bg-background p-4 md:p-6">
-            <div className="w-full max-w-6xl">
+        <div className="flex flex-1 flex-col bg-background p-4 md:p-6">
+            <div className="w-full max-w-7xl mx-auto">
                 {renderContent()}
             </div>
         </div>

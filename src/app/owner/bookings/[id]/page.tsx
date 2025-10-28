@@ -62,22 +62,20 @@ export default function BookingDetailPage() {
 
             if (reservationData.userId) {
                 const userDocRef = doc(firestore, 'users', reservationData.userId);
-                getDoc(userDocRef)
-                  .then(userDoc => {
-                    if (userDoc.exists()) {
-                        enrichedData.user = userDoc.data() as UserProfile;
-                    }
-                  })
-                  .catch(error => {
-                      const permissionError = new FirestorePermissionError({
-                          path: userDocRef.path,
-                          operation: 'get',
-                      });
-                      errorEmitter.emit('permission-error', permissionError);
-                  })
-                  .finally(() => {
-                    setReservation(enrichedData);
-                  });
+                try {
+                  const userDoc = await getDoc(userDocRef);
+                  if (userDoc.exists()) {
+                      enrichedData.user = userDoc.data() as UserProfile;
+                  }
+                } catch (error) {
+                    const permissionError = new FirestorePermissionError({
+                        path: userDocRef.path,
+                        operation: 'get',
+                    });
+                    errorEmitter.emit('permission-error', permissionError);
+                } finally {
+                  setReservation(enrichedData);
+                }
             } else {
                 setReservation(enrichedData);
             }
