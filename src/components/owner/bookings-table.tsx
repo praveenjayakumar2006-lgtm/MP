@@ -236,12 +236,8 @@ export function BookingsTable() {
                                     </div>
                                 </div>
                             </CardContent>
-                             <CardFooter className="justify-between items-center">
+                             <CardFooter className="justify-start items-center">
                                 <Badge variant={getStatusBadgeVariant(reservation.status)}>{reservation.status}</Badge>
-                                <Button variant="ghost" size="sm" onClick={() => router.push(`/owner/bookings/${reservation.id}`)}>
-                                    View
-                                    <ArrowRight className="ml-2 h-4 w-4" />
-                                </Button>
                             </CardFooter>
                         </Card>
                     )
