@@ -80,43 +80,7 @@ export function ReportsTable() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {isLoading && renderSkeletons()}
-        {!isLoading && violations && violations.map((violation) => (
-            <Card key={violation.id}>
-                <CardHeader className="p-0">
-                    {violation.imageUrl ? (
-                        <Image 
-                            src={violation.imageUrl} 
-                            alt={`Violation at ${violation.slotNumber}`}
-                            width={400}
-                            height={300}
-                            className="object-cover rounded-t-lg aspect-[4/3]"
-                        />
-                    ) : (
-                        <div className="h-40 w-full bg-muted flex items-center justify-center rounded-t-lg">
-                            <p className="text-muted-foreground text-sm">No Image</p>
-                        </div>
-                    )}
-                </CardHeader>
-                <CardContent className="p-4 space-y-2">
-                    <CardTitle className="text-lg">Slot: {formatSlotId(violation.slotNumber)}</CardTitle>
-                    <div>
-                        <p className="text-sm font-medium text-foreground">
-                            Plate: <span className="font-mono bg-muted px-2 py-1 rounded-md">{formatLicensePlate(violation.licensePlate)}</span>
-                        </p>
-                    </div>
-                     <div>
-                        <Badge variant={violation.violationType === 'overstaying' ? 'destructive' : 'secondary'}>
-                            {violation.violationType === 'overstaying' ? 'Overstaying' : 'Unauthorized'}
-                        </Badge>
-                    </div>
-                </CardContent>
-                <CardFooter className="p-4 pt-0">
-                    <p className="text-xs text-muted-foreground">
-                        {violation.createdAt ? format(violation.createdAt.toDate(), 'PPP p') : 'N/A'}
-                    </p>
-                </CardFooter>
-            </Card>
-        ))}
+        
          {!isLoading && (!violations || violations.length === 0) && (
             <div className="col-span-full text-center p-8 text-muted-foreground bg-card rounded-lg">
                 No violation reports found.
