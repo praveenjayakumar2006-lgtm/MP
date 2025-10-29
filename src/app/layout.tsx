@@ -79,7 +79,7 @@ function AppContent({ children }: { children: React.ReactNode }) {
     }
   }
   
-  return (
+  const content = (
     <>
       {showHeader && <AppHeader />}
       <main className="flex flex-1 flex-col">
@@ -87,6 +87,8 @@ function AppContent({ children }: { children: React.ReactNode }) {
       </main>
     </>
   );
+  
+  return showHeader ? <ReservationsProvider>{content}</ReservationsProvider> : content;
 }
 
 export default function RootLayout({
@@ -102,12 +104,10 @@ export default function RootLayout({
       </head>
       <body className={`${inter.variable} font-sans antialiased`}>
         <FirebaseClientProvider>
-          <ReservationsProvider>
             <div className="flex min-h-screen w-full flex-col bg-muted">
               <AppContent>{children}</AppContent>
             </div>
             <Toaster />
-          </ReservationsProvider>
         </FirebaseClientProvider>
       </body>
     </html>
