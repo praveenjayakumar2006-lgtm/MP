@@ -10,45 +10,44 @@ service cloud.firestore {
     function isOwner(userId) {
       return request.auth.uid == userId;
     }
-
+    
     match /users/{userId} {
       allow read, update, delete: if isSignedIn() && isOwner(userId);
-      allow create: if isSignedIn() && isOwner(userId) && request.resource.data.id == userId;
-      allow list: if false;
+      allow create: if isSignedIn() && request.resource.data.id == userId;
     }
-
+    
     match /parkingSlots/{parkingSlotId} {
       allow read: if true;
-      allow write: if false;
+      allow write: if false; // Should be managed by a backend process
     }
-
+    
     match /reservations/{reservationId} {
-      // A user can get their own reservation
       allow get: if isSignedIn() && resource.data.userId == request.auth.uid;
-      // An owner/admin can list all reservations
-      allow list: if isSignedIn(); 
-      // A user can create a reservation for themselves
-      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
-      // A user can update/delete their own reservation
       allow update, delete: if isSignedIn() && resource.data.userId == request.auth.uid;
     }
-
+    
     match /violations/{violationId} {
-      // Any authenticated user can read/list violations (for owner dashboard)
-      allow read, list: if isSignedIn();
-      // Any authenticated user can create a violation report
-      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
-      // Violations are immutable once created
-      allow update, delete: if false;
+        allow get: if isSignedIn();
     }
 
     match /feedback/{feedbackId} {
-      // Any authenticated user can read/list feedback (for owner dashboard)
-      allow read, list: if isSignedIn();
-      // Any authenticated user can submit feedback
+      allow get: if isSignedIn();
+    }
+    
+    // Authenticated users can create their own records
+    match /reservations/{reservationId} {
+       allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+       allow list: if isSignedIn(); // Allow owner to list all
+    }
+
+    match /violations/{violationId} {
       allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
-      // Feedback is immutable once created
-      allow update, delete: if false;
+      allow list: if isSignedIn(); // Allow owner to list all
+    }
+
+    match /feedback/{feedbackId} {
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow list: if isSignedIn(); // Allow owner to list all
     }
   }
 }
