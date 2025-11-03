@@ -4,13 +4,13 @@ import { format } from 'date-fns';
 import { useState, useEffect } from 'react';
 import type { Reservation } from '@/lib/types';
 import { Skeleton } from '../ui/skeleton';
-import { useFirebase, useCollection, useMemoFirebase } from '@/firebase';
+import { useFirebase, useCollection, useMemoFirebase, useUser } from '@/firebase';
 import { collection, query, orderBy } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useRouter } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
-import { Car, Calendar, Clock, Hash, User } from 'lucide-react';
+import { Car, Calendar, Clock, Hash, User as UserIcon, Loader2 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Separator } from '../ui/separator';
 
@@ -40,15 +40,24 @@ const formatSlotId = (slotId: string | null) => {
 
 export function BookingsTable() {
   const { firestore } = useFirebase();
+  const { user, isUserLoading } = useUser();
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const { toast } = useToast();
   const [filter, setFilter] = useState<Status | 'all'>('all');
   const router = useRouter();
+  const [isReady, setIsReady] = useState(false);
+
+  useEffect(() => {
+    const role = localStorage.getItem('role');
+    if (!isUserLoading && role === 'owner') {
+      setIsReady(true);
+    }
+  }, [isUserLoading, user]);
 
   const reservationsQuery = useMemoFirebase(() => {
-    if (!firestore) return null;
+    if (!firestore || !isReady) return null;
     return query(collection(firestore, 'reservations'), orderBy('createdAt', 'desc'));
-  }, [firestore]);
+  }, [firestore, isReady]);
 
   const { data: reservationsData, isLoading, error: collectionError } = useCollection<Reservation>(reservationsQuery);
 
@@ -70,14 +79,13 @@ export function BookingsTable() {
         return { ...res, status, startTime, endTime };
       });
       setReservations(allReservations);
-    } else if (!isLoading) {
+    } else if (!isLoading && isReady) {
         setReservations([]);
     }
-  }, [reservationsData, isLoading]);
+  }, [reservationsData, isLoading, isReady]);
 
 
-  const isDataLoading = isLoading;
-  const isClient = typeof window !== 'undefined';
+  const isDataLoading = isLoading || !isReady;
 
 
   const filteredReservations = reservations?.filter((res) => {
@@ -163,49 +171,51 @@ export function BookingsTable() {
               </TabsList>
             </div>
             <TabsContent value={filter} className="mt-8">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {(!isClient || isDataLoading) && renderSkeletons()}
-                {isClient && !isDataLoading && filteredReservations && filteredReservations.map((reservation) => {
-                    return (
-                        <Card key={reservation.id} className="flex flex-col text-sm p-3">
-                           <CardHeader className="p-1 flex-row justify-between items-center space-y-0">
-                                <div className="flex items-center gap-2">
-                                    <Hash className="h-3.5 w-3.5 text-muted-foreground"/>
-                                    <span className="font-medium">{formatSlotId(reservation.slotId)}</span>
-                                </div>
-                                <span className="font-mono bg-muted px-1.5 py-0.5 rounded">{formatLicensePlate(reservation.vehiclePlate)}</span>
-                            </CardHeader>
-                            <CardContent className="space-y-2 p-1 pt-2 flex-1 flex flex-col">
-                                <Separator />
-                                <div className="flex justify-between items-center flex-1 py-0.5">
-                                  <div className="space-y-1.5">
-                                      <div className="flex items-center gap-2 text-base">
-                                          <Calendar className="h-3.5 w-3.5 text-muted-foreground"/>
-                                          <span>{format(new Date(reservation.startTime), 'MMM d, yyyy')}</span>
-                                      </div>
-                                      <div className="flex items-center gap-2 text-base">
-                                          <Clock className="h-3.5 w-3.5 text-muted-foreground"/>
-                                          <span>{`${format(new Date(reservation.startTime), 'p')} - ${format(new Date(reservation.endTime), 'p')}`}</span>
-                                      </div>
+              {isDataLoading && <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">{renderSkeletons()}</div>}
+              {!isDataLoading && (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {filteredReservations && filteredReservations.map((reservation) => {
+                      return (
+                          <Card key={reservation.id} className="flex flex-col text-sm p-3">
+                            <CardHeader className="p-1 flex-row justify-between items-center space-y-0">
+                                  <div className="flex items-center gap-2">
+                                      <Hash className="h-3.5 w-3.5 text-muted-foreground"/>
+                                      <span className="font-medium">{formatSlotId(reservation.slotId)}</span>
                                   </div>
-                                  <Badge variant={getStatusBadgeVariant(reservation.status)}>{reservation.status}</Badge>
-                                </div>
-                                 <Separator />
-                                 <div className="flex items-center gap-2 text-xs pt-1.5 text-muted-foreground">
-                                    <User className="h-3.5 w-3.5" />
-                                    <span className="truncate">User ID: {reservation.userId}</span>
-                                 </div>
-                            </CardContent>
-                             <CardFooter className="p-1 pt-2 justify-between items-center">
-                               <Button size="sm" variant="outline" onClick={() => router.push(`/owner/bookings/${reservation.id}`)}>
-                                  View Details
-                               </Button>
-                            </CardFooter>
-                        </Card>
-                    )
-                })}
-              </div>
-              {isClient && !isDataLoading && (!filteredReservations || filteredReservations.length === 0) && (
+                                  <span className="font-mono bg-muted px-1.5 py-0.5 rounded">{formatLicensePlate(reservation.vehiclePlate)}</span>
+                              </CardHeader>
+                              <CardContent className="space-y-2 p-1 pt-2 flex-1 flex flex-col">
+                                  <Separator />
+                                  <div className="flex justify-between items-center flex-1 py-0.5">
+                                    <div className="space-y-1.5">
+                                        <div className="flex items-center gap-2 text-base">
+                                            <Calendar className="h-3.5 w-3.5 text-muted-foreground"/>
+                                            <span>{format(new Date(reservation.startTime), 'MMM d, yyyy')}</span>
+                                        </div>
+                                        <div className="flex items-center gap-2 text-base">
+                                            <Clock className="h-3.5 w-3.5 text-muted-foreground"/>
+                                            <span>{`${format(new Date(reservation.startTime), 'p')} - ${format(new Date(reservation.endTime), 'p')}`}</span>
+                                        </div>
+                                    </div>
+                                    <Badge variant={getStatusBadgeVariant(reservation.status)}>{reservation.status}</Badge>
+                                  </div>
+                                  <Separator />
+                                  <div className="flex items-center gap-2 text-xs pt-1.5 text-muted-foreground">
+                                      <UserIcon className="h-3.5 w-3.5" />
+                                      <span className="truncate">User ID: {reservation.userId}</span>
+                                  </div>
+                              </CardContent>
+                              <CardFooter className="p-1 pt-2 justify-between items-center">
+                                <Button size="sm" variant="outline" onClick={() => router.push(`/owner/bookings/${reservation.id}`)}>
+                                    View Details
+                                </Button>
+                              </CardFooter>
+                          </Card>
+                      )
+                  })}
+                </div>
+              )}
+              {!isDataLoading && (!filteredReservations || filteredReservations.length === 0) && (
                 <Card className="mt-6">
                   <CardContent className="pt-6 text-center text-muted-foreground">
                     No {filter !== 'all' ? filter.toLowerCase() : ''} bookings found.

@@ -7,7 +7,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { useCollection, useFirebase, useMemoFirebase } from '@/firebase';
+import { useCollection, useFirebase, useMemoFirebase, useUser } from '@/firebase';
 import { collection, query, orderBy } from 'firebase/firestore';
 import { format } from 'date-fns';
 import { Skeleton } from '../ui/skeleton';
@@ -49,14 +49,25 @@ const formatSlotId = (slotId: string | null) => {
 
 export function ReportsTable() {
     const { firestore } = useFirebase();
+    const { user, isUserLoading } = useUser();
+    const [isReady, setIsReady] = useState(false);
+
+    useEffect(() => {
+        const role = localStorage.getItem('role');
+        if (!isUserLoading && role === 'owner') {
+            setIsReady(true);
+        }
+    }, [isUserLoading, user]);
 
     const violationsQuery = useMemoFirebase(() => {
-        if (!firestore) return null;
+        if (!firestore || !isReady) return null;
         return query(collection(firestore, 'violations'), orderBy('createdAt', 'desc'));
-    }, [firestore]);
+    }, [firestore, isReady]);
 
     const { data: violations, isLoading } = useCollection<Violation>(violationsQuery);
     
+    const isDataLoading = isLoading || !isReady;
+
     const renderSkeletons = () => (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {Array.from({ length: 3 }).map((_, i) => (
@@ -79,8 +90,8 @@ export function ReportsTable() {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {isLoading && renderSkeletons()}
-        {!isLoading && violations?.map((violation) => (
+        {isDataLoading && renderSkeletons()}
+        {!isDataLoading && violations?.map((violation) => (
              <Card key={violation.id}>
                 {violation.imageUrl && (
                     <CardHeader>
@@ -109,7 +120,7 @@ export function ReportsTable() {
                 </CardFooter>
             </Card>
         ))}
-         {!isLoading && (!violations || violations.length === 0) && (
+         {!isDataLoading && (!violations || violations.length === 0) && (
             <div className="col-span-full text-center p-8 text-muted-foreground bg-card rounded-lg">
                 No violation reports found.
             </div>

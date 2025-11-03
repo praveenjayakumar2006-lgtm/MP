@@ -70,7 +70,7 @@ export default function FeedbackPage() {
       const feedbackCollection = collection(firestore, 'feedback');
       await addDoc(feedbackCollection, {
         ...values,
-        userId: user.uid,
+        userId: user.uid, // Ensure userId is included for security rules
         createdAt: Timestamp.now(),
       });
       

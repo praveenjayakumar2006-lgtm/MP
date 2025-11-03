@@ -1,6 +1,5 @@
-
 'use client';
-import { useCollection, useFirebase, useMemoFirebase } from '@/firebase';
+import { useCollection, useFirebase, useMemoFirebase, useUser } from '@/firebase';
 import { collection, query, orderBy } from 'firebase/firestore';
 import { format } from 'date-fns';
 import { Skeleton } from '../ui/skeleton';
@@ -9,6 +8,7 @@ import { cn } from '@/lib/utils';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
+import { useEffect, useState } from 'react';
 
 type Feedback = {
     id: string;
@@ -21,13 +21,24 @@ type Feedback = {
 
 export function FeedbackTable() {
     const { firestore } = useFirebase();
+    const { user, isUserLoading } = useUser();
+    const [isReady, setIsReady] = useState(false);
+
+    useEffect(() => {
+        const role = localStorage.getItem('role');
+        if (!isUserLoading && role === 'owner') {
+            setIsReady(true);
+        }
+    }, [isUserLoading, user]);
 
     const feedbackQuery = useMemoFirebase(() => {
-        if (!firestore) return null;
+        if (!firestore || !isReady) return null;
         return query(collection(firestore, 'feedback'), orderBy('createdAt', 'desc'));
-    }, [firestore]);
+    }, [firestore, isReady]);
 
     const { data: feedbackData, isLoading } = useCollection<Feedback>(feedbackQuery);
+    
+    const isDataLoading = isLoading || !isReady;
 
     const renderSkeletons = () => (
     <div className="space-y-4">
@@ -54,8 +65,8 @@ export function FeedbackTable() {
 
   return (
     <div className="space-y-4">
-        {isLoading && renderSkeletons()}
-        {!isLoading && feedbackData?.map((feedback) => (
+        {isDataLoading && renderSkeletons()}
+        {!isDataLoading && feedbackData?.map((feedback) => (
             <Card key={feedback.id} className="w-full">
                 <CardHeader className="flex flex-row items-start gap-4 space-y-0">
                     <Avatar className="h-12 w-12">
@@ -94,7 +105,7 @@ export function FeedbackTable() {
                 </CardFooter>
             </Card>
         ))}
-         {!isLoading && (!feedbackData || feedbackData.length === 0) && (
+         {!isDataLoading && (!feedbackData || feedbackData.length === 0) && (
             <Card className="w-full">
                 <CardContent className="pt-6">
                     <p className="text-center text-muted-foreground">

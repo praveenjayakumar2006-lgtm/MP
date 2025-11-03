@@ -51,7 +51,7 @@ function ViolationResultContent() {
         violationType,
         licensePlate,
         imageUrl: imageUrl,
-        userId: user.uid,
+        userId: user.uid, // Ensure userId is included for security rules
         createdAt: Timestamp.now(),
       });
       setSubmissionStatus('confirmed');

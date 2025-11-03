@@ -3,7 +3,7 @@
 import React, { createContext, useState, ReactNode, useEffect } from 'react';
 import type { Reservation } from '@/lib/types';
 import { useCollection, useFirebase, useUser, useMemoFirebase } from '@/firebase';
-import { collection, Timestamp, query, doc, where, addDoc, deleteDoc } from 'firebase/firestore';
+import { collection, Timestamp, query, where, addDoc, deleteDoc, doc } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 
 interface ReservationsContextType {
