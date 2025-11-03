@@ -63,6 +63,14 @@ export function BookingsTable() {
   const { data: reservationsData, isLoading, error: collectionError } = useCollection<Reservation>(reservationsQuery);
 
   useEffect(() => {
+    if (collectionError) {
+      console.error("Error fetching bookings:", collectionError);
+      toast({
+        variant: "destructive",
+        title: "Error fetching bookings",
+        description: "Could not fetch user bookings. Please try again later.",
+      });
+    }
     if (reservationsData) {
       const now = new Date();
       const allReservations: Reservation[] = reservationsData.map(res => {
@@ -83,7 +91,7 @@ export function BookingsTable() {
     } else if (!isLoading && isReady) {
         setReservations([]);
     }
-  }, [reservationsData, isLoading, isReady]);
+  }, [reservationsData, isLoading, isReady, collectionError, toast]);
 
 
   const isDataLoading = isLoading || !isReady;

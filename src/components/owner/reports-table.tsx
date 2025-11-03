@@ -16,6 +16,7 @@ import { Badge } from '../ui/badge';
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '../ui/card';
+import { useToast } from '@/hooks/use-toast';
 
 type Violation = {
     id: string;
@@ -52,6 +53,7 @@ export function ReportsTable() {
     const { firestore } = useFirebase();
     const { user, isUserLoading } = useUser();
     const [isReady, setIsReady] = useState(false);
+    const { toast } = useToast();
 
     useEffect(() => {
         const role = localStorage.getItem('role');
@@ -65,8 +67,19 @@ export function ReportsTable() {
         return query(collection(firestore, 'violations'), orderBy('createdAt', 'desc'));
     }, [firestore, isReady]);
 
-    const { data: violations, isLoading } = useCollection<Violation>(violationsQuery);
+    const { data: violations, isLoading, error } = useCollection<Violation>(violationsQuery);
     
+    useEffect(() => {
+      if (error) {
+        console.error("Error fetching violations:", error);
+        toast({
+          variant: "destructive",
+          title: "Error fetching reports",
+          description: "Could not fetch violation reports. Please try again later.",
+        });
+      }
+    }, [error, toast]);
+
     const isDataLoading = isLoading || !isReady;
 
     const renderSkeletons = () => (

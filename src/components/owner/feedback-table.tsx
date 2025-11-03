@@ -10,6 +10,7 @@ import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { useEffect, useState } from 'react';
+import { useToast } from '@/hooks/use-toast';
 
 type Feedback = {
     id: string;
@@ -24,6 +25,7 @@ export function FeedbackTable() {
     const { firestore } = useFirebase();
     const { user, isUserLoading } = useUser();
     const [isReady, setIsReady] = useState(false);
+    const { toast } = useToast();
 
     useEffect(() => {
         const role = localStorage.getItem('role');
@@ -37,7 +39,18 @@ export function FeedbackTable() {
         return query(collection(firestore, 'feedback'), orderBy('createdAt', 'desc'));
     }, [firestore, isReady]);
 
-    const { data: feedbackData, isLoading } = useCollection<Feedback>(feedbackQuery);
+    const { data: feedbackData, isLoading, error } = useCollection<Feedback>(feedbackQuery);
+    
+    useEffect(() => {
+      if (error) {
+        console.error("Error fetching feedback:", error);
+        toast({
+          variant: "destructive",
+          title: "Error fetching feedback",
+          description: "Could not fetch user feedback. Please try again later.",
+        });
+      }
+    }, [error, toast]);
     
     const isDataLoading = isLoading || !isReady;
 
