@@ -2,7 +2,7 @@
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
-import { useDoc, useFirebase, useMemoFirebase, FirestorePermissionError, errorEmitter } from '@/firebase';
+import { useDoc, useFirebase, useMemoFirebase } from '@/firebase';
 import { doc, getDoc, FirestoreError } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -49,9 +49,12 @@ export default function BookingDetailPage() {
     return doc(firestore, 'reservations', id);
   }, [firestore, id]);
 
-  const { data: reservationData, isLoading: isReservationLoading } = useDoc<Reservation>(reservationRef);
+  const { data: reservationData, isLoading: isReservationLoading, error } = useDoc<Reservation>(reservationRef);
   
   useEffect(() => {
+    if (error) {
+        console.error("Error fetching booking details:", error);
+    }
     const fetchFullDetails = async () => {
         if (reservationData && firestore) {
             let enrichedData: EnrichedReservation = {
@@ -67,12 +70,8 @@ export default function BookingDetailPage() {
                   if (userDoc.exists()) {
                       enrichedData.user = userDoc.data() as UserProfile;
                   }
-                } catch (error) {
-                    const permissionError = new FirestorePermissionError({
-                        path: userDocRef.path,
-                        operation: 'get',
-                    });
-                    errorEmitter.emit('permission-error', permissionError);
+                } catch (userError) {
+                    console.error("Could not fetch user profile for booking:", userError)
                 } finally {
                   setReservation(enrichedData);
                 }
@@ -84,7 +83,7 @@ export default function BookingDetailPage() {
     }
 
     fetchFullDetails();
-  }, [reservationData, isReservationLoading, firestore])
+  }, [reservationData, isReservationLoading, firestore, error])
 
 
   if (isLoading || !reservation) {
