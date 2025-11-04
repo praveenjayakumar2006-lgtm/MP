@@ -69,15 +69,15 @@ export function ReportsTable() {
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {Array.from({ length: 3 }).map((_, i) => (
         <Card key={`skel-${i}`}>
-            <CardHeader>
-                <Skeleton className="h-40 w-full" />
-            </CardHeader>
-            <CardContent className="space-y-2">
-                <Skeleton className="h-6 w-24" />
-                <Skeleton className="h-6 w-32" />
-                <Skeleton className="h-6 w-24" />
+            <CardContent className="p-4 space-y-4">
+                 <Skeleton className="h-40 w-full rounded-lg" />
+                 <div className="space-y-2">
+                    <Skeleton className="h-6 w-24" />
+                    <Skeleton className="h-6 w-32" />
+                    <Skeleton className="h-6 w-24" />
+                 </div>
             </CardContent>
-            <CardFooter>
+            <CardFooter className="p-4 pt-0">
                 <Skeleton className="h-4 w-40" />
             </CardFooter>
         </Card>
@@ -90,27 +90,29 @@ export function ReportsTable() {
         {isLoading && renderSkeletons()}
         {!isLoading && violations?.map((violation, index) => (
              <Card key={index}>
-                {violation.imageUrl && (
-                    <CardHeader className="p-0">
-                        <Image
-                            src={violation.imageUrl}
-                            alt={`Violation at ${violation.slotNumber}`}
-                            width={400}
-                            height={225}
-                            className="rounded-t-lg object-cover aspect-video"
-                        />
-                    </CardHeader>
-                )}
-                <CardContent className="space-y-2 pt-4">
-                    <Badge variant={violation.violationType === 'overstaying' ? 'destructive' : 'secondary'}>
-                        {violation.violationType.replace('_', ' ')}
-                    </Badge>
-                    <CardTitle className="text-xl">{formatLicensePlate(violation.licensePlate)}</CardTitle>
-                    <p className="text-muted-foreground">
-                        Slot: <span className="font-semibold text-foreground">{formatSlotId(violation.slotNumber)}</span>
-                    </p>
+                <CardContent className="p-4 space-y-4">
+                     {violation.imageUrl && (
+                        <div className="overflow-hidden rounded-lg">
+                            <Image
+                                src={violation.imageUrl}
+                                alt={`Violation at ${violation.slotNumber}`}
+                                width={400}
+                                height={225}
+                                className="object-cover aspect-video"
+                            />
+                        </div>
+                    )}
+                    <div className="space-y-2">
+                        <Badge variant={violation.violationType === 'overstaying' ? 'destructive' : 'secondary'}>
+                            {violation.violationType.replace('_', ' ')}
+                        </Badge>
+                        <CardTitle className="text-xl">{formatLicensePlate(violation.licensePlate)}</CardTitle>
+                        <p className="text-muted-foreground">
+                            Slot: <span className="font-semibold text-foreground">{formatSlotId(violation.slotNumber)}</span>
+                        </p>
+                    </div>
                 </CardContent>
-                 <CardFooter>
+                 <CardFooter className="p-4 pt-0">
                     <p className="text-xs text-muted-foreground">
                        Reported on {violation.createdAt ? format(new Date(violation.createdAt), 'PPP p') : 'N/A'}
                     </p>
