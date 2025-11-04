@@ -91,7 +91,7 @@ export function ReportsTable() {
         {!isLoading && violations?.map((violation, index) => (
              <Card key={index}>
                 {violation.imageUrl && (
-                    <CardHeader>
+                    <CardHeader className="p-0">
                         <Image
                             src={violation.imageUrl}
                             alt={`Violation at ${violation.slotNumber}`}
