@@ -12,7 +12,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import { useUser } from '@/firebase';
 import { useToast } from '@/hooks/use-toast';
-import { saveViolationToFile } from './actions';
+import { saveViolationToFile } from '../actions';
 
 
 function ViolationResultContent() {
