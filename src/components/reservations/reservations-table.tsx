@@ -210,7 +210,15 @@ export function ReservationsTable() {
   const filteredReservations = userReservations?.filter((res) => {
     if (filter === 'all') return true;
     return res.status === filter;
-  }).sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime());
+  }).sort((a, b) => {
+    if (filter === 'all') {
+      const statusOrder: Record<Status, number> = { 'Upcoming': 1, 'Active': 2, 'Completed': 3 };
+      if (statusOrder[a.status] !== statusOrder[b.status]) {
+        return statusOrder[a.status] - statusOrder[b.status];
+      }
+    }
+    return new Date(a.startTime).getTime() - new Date(b.startTime).getTime();
+  });
   
   const renderSkeletons = () => (
     Array.from({ length: 3 }).map((_, i) => (
