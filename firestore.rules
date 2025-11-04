@@ -11,8 +11,15 @@ service cloud.firestore {
       return request.auth.uid == userId;
     }
     
+    // New function to check for owner custom claim
+    function isAppOwner() {
+      return request.auth.token.owner == true;
+    }
+
     match /users/{userId} {
-      allow read, update, delete: if isSignedIn() && isOwner(userId);
+      // Owner can read any user profile, user can only read/write their own.
+      allow read: if isAppOwner() || (isSignedIn() && isOwner(userId));
+      allow update, delete: if isSignedIn() && isOwner(userId);
       allow create: if isSignedIn() && request.resource.data.id == userId;
     }
     
@@ -22,32 +29,24 @@ service cloud.firestore {
     }
     
     match /reservations/{reservationId} {
-      allow get: if isSignedIn() && resource.data.userId == request.auth.uid;
+      // Owner can get any reservation, user can only get their own.
+      allow get: if isAppOwner() || (isSignedIn() && resource.data.userId == request.auth.uid);
+      // Owner can list all reservations.
+      allow list: if isAppOwner() || isSignedIn();
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
       allow update, delete: if isSignedIn() && resource.data.userId == request.auth.uid;
     }
     
     match /violations/{violationId} {
-        allow get: if isSignedIn();
+      // Owner can read and list all violations.
+      allow read, list: if isAppOwner() || isSignedIn();
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
     }
 
     match /feedback/{feedbackId} {
-      allow get: if isSignedIn();
-    }
-    
-    // Authenticated users can create their own records
-    match /reservations/{reservationId} {
-       allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
-       allow list: if isSignedIn(); // Allow owner to list all
-    }
-
-    match /violations/{violationId} {
+      // Owner can read and list all feedback.
+      allow read, list: if isAppOwner() || isSignedIn();
       allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
-      allow list: if isSignedIn(); // Allow owner to list all
-    }
-
-    match /feedback/{feedbackId} {
-      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
-      allow list: if isSignedIn(); // Allow owner to list all
     }
   }
 }
