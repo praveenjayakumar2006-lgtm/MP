@@ -84,7 +84,7 @@ async function FeedbackList() {
 
 export default function OwnerFeedbackPage() {
     return (
-        <div className="w-full max-w-2xl mx-auto py-8">
+        <div className="w-full max-w-lg mx-auto py-8">
             <div className="mb-8 text-center">
                 <div className="inline-flex items-center gap-2">
                     <MessageSquare className="h-8 w-8 text-primary" />
