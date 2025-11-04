@@ -210,7 +210,7 @@ export function ReservationsTable() {
   const filteredReservations = userReservations?.filter((res) => {
     if (filter === 'all') return true;
     return res.status === filter;
-  }).sort((a, b) => new Date(b.startTime).getTime() - new Date(a.startTime).getTime());
+  }).sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime());
   
   const renderSkeletons = () => (
     Array.from({ length: 3 }).map((_, i) => (
