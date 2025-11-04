@@ -10,7 +10,6 @@ import { Loader2, FileText, MessageSquare, LayoutDashboard, CalendarCheck, Shiel
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useUser } from "@/firebase";
-import { setUserClaims } from "@/ai/flows/user-claims";
 import { useToast } from "@/hooks/use-toast";
 import { signOut } from "firebase/auth";
 
@@ -33,33 +32,6 @@ function OwnerDashboard() {
         }
     }, [router]);
 
-    const handleSetOwnerClaim = async () => {
-        if (!user) {
-            toast({
-                variant: 'destructive',
-                title: 'Not Logged In',
-                description: 'You must be logged in to perform this action.',
-            });
-            return;
-        }
-
-        startTransition(async () => {
-            const result = await setUserClaims({ uid: user.uid, role: 'owner' });
-            if (result.success) {
-                toast({
-                    title: 'Permissions Updated',
-                    description: 'You have been granted owner privileges. Please sign out and sign back in to see the changes.',
-                });
-            } else {
-                toast({
-                    variant: 'destructive',
-                    title: 'Failed to Update Permissions',
-                    description: result.message,
-                });
-            }
-        });
-    };
-
     const handleSignOut = async () => {
         if (!auth) return;
         await signOut(auth);
@@ -79,7 +51,7 @@ function OwnerDashboard() {
                 </div>
             </CardHeader>
             <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
                      <Card className="hover:bg-accent/50 transition-colors">
                         <CardHeader className="pb-4">
                            <div className="flex items-center gap-4">
@@ -126,25 +98,6 @@ function OwnerDashboard() {
                              <Link href="/owner/feedback">
                                 <Button variant="outline" size="sm">View Feedback</Button>
                             </Link>
-                        </CardContent>
-                    </Card>
-                    <Card className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
-                        <CardHeader className="pb-4">
-                            <div className="flex items-center gap-4">
-                                <ShieldCheck className="h-8 w-8 text-blue-500" />
-                                <CardTitle className="text-xl">Set Permissions</CardTitle>
-                            </div>
-                        </CardHeader>
-                        <CardContent>
-                             <p className="text-sm text-muted-foreground mb-4">
-                                Grant yourself owner permissions to view all app data. You will need to sign out and back in.
-                            </p>
-                            <Button variant="default" size="sm" onClick={handleSetOwnerClaim} disabled={isTransitioning}>
-                                {isTransitioning ? <><Loader2 className="mr-2 h-4 w-4 animate-spin"/> Applying...</> : 'Apply Permissions'}
-                            </Button>
-                            <p className="text-xs text-muted-foreground mt-4">
-                                After applying, please <Button variant="link" size="sm" className="p-0 h-auto text-xs" onClick={handleSignOut}>sign out and sign back in</Button> as owner.
-                            </p>
                         </CardContent>
                     </Card>
                 </div>
