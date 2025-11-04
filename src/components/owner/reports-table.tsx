@@ -1,15 +1,6 @@
 
 'use client';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import { useCollection, useFirebase, useMemoFirebase, useUser } from '@/firebase';
-import { collection, query, orderBy } from 'firebase/firestore';
+
 import { format } from 'date-fns';
 import { Skeleton } from '../ui/skeleton';
 import { Badge } from '../ui/badge';
@@ -17,13 +8,14 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '../ui/card';
 import { useToast } from '@/hooks/use-toast';
+import { getViolations } from '@/app/violations/actions';
 
 type Violation = {
-    id: string;
+    id?: string;
     slotNumber: string;
-    violationType: 'overstaying' | 'unauthorized_parking';
+    violationType: string;
     licensePlate: string;
-    createdAt: { toDate: () => Date };
+    createdAt: string;
     imageUrl?: string;
 };
 
@@ -50,37 +42,28 @@ const formatSlotId = (slotId: string | null) => {
 
 
 export function ReportsTable() {
-    const { firestore } = useFirebase();
-    const { user, isUserLoading } = useUser();
-    const [isReady, setIsReady] = useState(false);
+    const [violations, setViolations] = useState<Violation[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
     const { toast } = useToast();
 
     useEffect(() => {
-        const role = localStorage.getItem('role');
-        if (!isUserLoading && role === 'owner') {
-            setIsReady(true);
-        }
-    }, [isUserLoading, user]);
+        const fetchViolations = async () => {
+            setIsLoading(true);
+            const result = await getViolations();
+            if (result.success) {
+                setViolations(result.data || []);
+            } else {
+                toast({
+                    variant: "destructive",
+                    title: "Error fetching reports",
+                    description: "Could not fetch violation reports. Please try again later.",
+                });
+            }
+            setIsLoading(false);
+        };
 
-    const violationsQuery = useMemoFirebase(() => {
-        if (!firestore || !isReady) return null;
-        return query(collection(firestore, 'violations'), orderBy('createdAt', 'desc'));
-    }, [firestore, isReady]);
-
-    const { data: violations, isLoading, error } = useCollection<Violation>(violationsQuery);
-    
-    useEffect(() => {
-      if (error) {
-        console.error("Error fetching violations:", error);
-        toast({
-          variant: "destructive",
-          title: "Error fetching reports",
-          description: "Could not fetch violation reports. Please try again later.",
-        });
-      }
-    }, [error, toast]);
-
-    const isDataLoading = isLoading || !isReady;
+        fetchViolations();
+    }, [toast]);
 
     const renderSkeletons = () => (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -104,9 +87,9 @@ export function ReportsTable() {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {isDataLoading && renderSkeletons()}
-        {!isDataLoading && violations?.map((violation) => (
-             <Card key={violation.id}>
+        {isLoading && renderSkeletons()}
+        {!isLoading && violations?.map((violation, index) => (
+             <Card key={index}>
                 {violation.imageUrl && (
                     <CardHeader>
                         <Image
@@ -129,12 +112,12 @@ export function ReportsTable() {
                 </CardContent>
                  <CardFooter>
                     <p className="text-xs text-muted-foreground">
-                       Reported on {violation.createdAt ? format(violation.createdAt.toDate(), 'PPP p') : 'N/A'}
+                       Reported on {violation.createdAt ? format(new Date(violation.createdAt), 'PPP p') : 'N/A'}
                     </p>
                 </CardFooter>
             </Card>
         ))}
-         {!isDataLoading && (!violations || violations.length === 0) && (
+         {!isLoading && (!violations || violations.length === 0) && (
             <div className="col-span-full text-center p-8 text-muted-foreground bg-card rounded-lg">
                 No violation reports found.
             </div>
