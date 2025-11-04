@@ -1,3 +1,4 @@
+
 'use client';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { format } from 'date-fns';
@@ -50,7 +51,15 @@ export function BookingsTable() {
   const filteredReservations = reservations?.filter((res) => {
     if (filter === 'all') return true;
     return res.status === filter;
-  }).sort((a, b) => new Date(b.startTime).getTime() - new Date(a.startTime).getTime());
+  }).sort((a, b) => {
+    if (filter === 'all') {
+      const statusOrder: Record<Status, number> = { 'Upcoming': 1, 'Active': 2, 'Completed': 3 };
+      if (statusOrder[a.status] !== statusOrder[b.status]) {
+        return statusOrder[a.status] - statusOrder[b.status];
+      }
+    }
+    return new Date(a.startTime).getTime() - new Date(b.startTime).getTime();
+  });
 
 
   const renderSkeletons = () =>
