@@ -1,6 +1,4 @@
 
-'use server';
-
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Star, MessageSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
