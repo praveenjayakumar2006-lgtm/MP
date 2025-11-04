@@ -48,5 +48,15 @@
     "id": "res_1762274255173_u9vrvhn",
     "createdAt": "2025-11-04T16:37:35.173Z",
     "status": "Upcoming"
+  },
+  {
+    "slotId": "C2",
+    "vehiclePlate": "TN72FB0001",
+    "startTime": "2025-11-25T23:30:00.000Z",
+    "endTime": "2025-11-26T10:30:00.000Z",
+    "userId": "FdRc247TysYMl7l8afM5izCmqOt2",
+    "id": "res_1762274550184_ojzqkt2",
+    "createdAt": "2025-11-04T16:42:30.184Z",
+    "status": "Upcoming"
   }
 ]

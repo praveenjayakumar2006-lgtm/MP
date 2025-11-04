@@ -1,6 +1,6 @@
 'use client';
 
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Star, MessageSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -8,6 +8,7 @@ import { format } from "date-fns";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getFeedback } from "@/app/feedback/actions";
 import { useEffect, useState } from "react";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 
 type Feedback = {
@@ -132,15 +133,17 @@ function FeedbackList() {
 
 export default function OwnerFeedbackPage() {
     return (
-        <div className="w-full max-w-md mx-auto py-8">
-            <div className="mb-8 text-center">
+        <div className="w-full max-w-md mx-auto py-8 flex flex-col h-full">
+            <div className="mb-8 text-center flex-shrink-0">
                 <div className="inline-flex items-center gap-2">
                     <MessageSquare className="h-8 w-8 text-primary" />
                     <h1 className="text-3xl font-bold">User Feedback</h1>
                 </div>
                 <p className="text-muted-foreground mt-2">All feedback submitted by users.</p>
             </div>
-            <FeedbackList />
+            <ScrollArea className="flex-1 pr-4">
+                <FeedbackList />
+            </ScrollArea>
         </div>
     );
 }
