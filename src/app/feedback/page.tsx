@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useForm } from 'react-hook-form';
@@ -7,10 +6,7 @@ import * as z from 'zod';
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
-  CardHeader,
-  CardTitle,
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
@@ -27,9 +23,8 @@ import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { useRouter } from 'next/navigation';
-import { useFirebase, useUser } from '@/firebase';
-import { collection, Timestamp, addDoc } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
+import { saveFeedbackToFile } from './actions';
 
 const feedbackSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters.'),
@@ -43,8 +38,6 @@ type FeedbackFormValues = z.infer<typeof feedbackSchema>;
 export default function FeedbackPage() {
   const router = useRouter();
   const [hoverRating, setHoverRating] = useState(0);
-  const { firestore } = useFirebase();
-  const { user } = useUser();
   const { toast } = useToast();
 
   const form = useForm<FeedbackFormValues>({
@@ -58,32 +51,23 @@ export default function FeedbackPage() {
   });
 
   async function onSubmit(values: FeedbackFormValues) {
-    if (!firestore || !user) {
-      toast({
-        variant: 'destructive',
-        title: 'Authentication Error',
-        description: 'You must be logged in to submit feedback.',
-      });
-      return;
-    }
+    const feedbackData: [string, string, number, string] = [
+        values.name,
+        values.email,
+        values.rating,
+        values.feedback
+    ];
 
-    try {
-      const feedbackCollection = collection(firestore, 'feedback');
-      await addDoc(feedbackCollection, {
-        ...values,
-        userId: user.uid, // Ensure userId is included for security rules
-        createdAt: Timestamp.now(),
-      });
-      
+    const result = await saveFeedbackToFile(feedbackData);
+
+    if (result.success) {
       toast({
         title: 'Feedback Submitted',
         description: 'Thank you for your feedback!',
       });
-
       router.push('/feedback/success');
-
-    } catch (error) {
-      console.error("Error submitting feedback: ", error);
+    } else {
+      console.error("Error submitting feedback: ", result.message);
       toast({
         variant: 'destructive',
         title: 'Submission Error',
