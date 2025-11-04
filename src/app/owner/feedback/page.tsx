@@ -6,9 +6,8 @@ import { Star, MessageSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { format } from "date-fns";
-import { useCollection } from "@/firebase";
+import { useCollection, useFirestore, useMemoFirebase } from "@/firebase";
 import { collection } from "firebase/firestore";
-import { useFirebase } from "@/firebase";
 import { Skeleton } from "@/components/ui/skeleton";
 
 
@@ -25,10 +24,12 @@ type Feedback = {
 };
 
 function FeedbackList() {
-    const { firestore } = useFirebase();
-    const { data: feedbackData, isLoading, error } = useCollection<Feedback>(
-        firestore ? collection(firestore, 'feedback') : null
-    );
+    const firestore = useFirestore();
+    const feedbackQuery = useMemoFirebase(() => {
+        if (!firestore) return null;
+        return collection(firestore, 'feedback');
+    }, [firestore]);
+    const { data: feedbackData, isLoading, error } = useCollection<Feedback>(feedbackQuery);
 
     if (isLoading) {
         return (
@@ -110,7 +111,7 @@ function FeedbackList() {
                     </CardContent>
                     <CardFooter>
                         <p className="text-xs text-muted-foreground">
-                            Submitted on {format(new Date(feedback.createdAt.seconds * 1000), 'PPP p')}
+                            Submitted on {feedback.createdAt ? format(new Date(feedback.createdAt.seconds * 1000), 'PPP p') : 'N/A'}
                         </p>
                     </CardFooter>
                 </Card>

@@ -12,7 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Car, Calendar, Clock, Hash, User as UserIcon, Loader2 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Separator } from '../ui/separator';
-import { useCollection, useFirebase } from '@/firebase';
+import { useCollection, useFirebase, useFirestore, useMemoFirebase } from '@/firebase';
 import { collection } from 'firebase/firestore';
 
 
@@ -42,10 +42,14 @@ const formatSlotId = (slotId: string | null) => {
 
 export function BookingsTable() {
   const { toast } = useToast();
-  const { firestore } = useFirebase();
-  const { data: reservations, isLoading } = useCollection<Reservation>(
-    firestore ? collection(firestore, 'reservations') : null
-  );
+  const firestore = useFirestore();
+
+  const reservationsQuery = useMemoFirebase(() => {
+    if (!firestore) return null;
+    return collection(firestore, 'reservations');
+  }, [firestore]);
+
+  const { data: reservations, isLoading } = useCollection<Reservation>(reservationsQuery);
 
   const [displayReservations, setDisplayReservations] = useState<Reservation[]>([]);
   const [filter, setFilter] = useState<Status | 'all'>('all');
@@ -56,8 +60,8 @@ export function BookingsTable() {
     if (reservations) {
         const now = new Date();
         const allReservations: Reservation[] = reservations.map(res => {
-            const startTime = new Date(res.startTime);
-            const endTime = new Date(res.endTime);
+            const startTime = res.startTime.toDate ? res.startTime.toDate() : new Date(res.startTime);
+            const endTime = res.endTime.toDate ? res.endTime.toDate() : new Date(res.endTime);
             let status: Status;
 
             if (now > endTime) {

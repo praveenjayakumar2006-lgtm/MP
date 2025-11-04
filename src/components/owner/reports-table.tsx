@@ -8,7 +8,7 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '../ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { useCollection, useFirebase } from '@/firebase';
+import { useCollection, useFirebase, useFirestore, useMemoFirebase } from '@/firebase';
 import { collection } from 'firebase/firestore';
 
 
@@ -47,10 +47,13 @@ const formatSlotId = (slotId: string | null) => {
 
 
 export function ReportsTable() {
-    const { firestore } = useFirebase();
-    const { data: violations, isLoading } = useCollection<Violation>(
-        firestore ? collection(firestore, 'violations') : null
-    );
+    const firestore = useFirestore();
+    const violationsQuery = useMemoFirebase(() => {
+        if (!firestore) return null;
+        return collection(firestore, 'violations');
+    }, [firestore]);
+
+    const { data: violations, isLoading } = useCollection<Violation>(violationsQuery);
 
     const sortedViolations = violations?.sort((a,b) => b.createdAt.seconds - a.createdAt.seconds);
 
