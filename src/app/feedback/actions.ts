@@ -1,3 +1,4 @@
+
 'use server';
 
 import fs from 'fs/promises';
@@ -38,7 +39,7 @@ export async function saveFeedback(feedback: Omit<Feedback, 'id' | 'createdAt'>)
   const allFeedback = await readFeedbackFile();
   const newFeedback: Feedback = {
     ...feedback,
-    id: `feedback_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
+    id: `feedback_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`,
     createdAt: new Date().toISOString(),
   };
   allFeedback.push(newFeedback);
