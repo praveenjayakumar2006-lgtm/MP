@@ -29,8 +29,10 @@ export const ReservationsProvider: React.FC<{ children: ReactNode }> = ({ childr
     setIsClient(true);
   }, []);
 
-  const fetchReservations = useCallback(async () => {
-    setIsLoading(true);
+  const fetchReservations = useCallback(async (isInitialLoad = false) => {
+    if (isInitialLoad) {
+      setIsLoading(true);
+    }
     const result = await getReservationsFromFile();
     if (result.success && result.data) {
       setReservations(result.data);
@@ -38,12 +40,14 @@ export const ReservationsProvider: React.FC<{ children: ReactNode }> = ({ childr
       setReservations([]);
       console.error("Failed to fetch reservations:", result.message);
     }
-    setIsLoading(false);
+    if (isInitialLoad) {
+      setIsLoading(false);
+    }
   }, []);
   
   useEffect(() => {
     if(isClient) {
-      fetchReservations();
+      fetchReservations(true);
     }
   }, [isClient, fetchReservations]);
 
