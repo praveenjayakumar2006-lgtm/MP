@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useForm } from 'react-hook-form';
@@ -70,7 +71,7 @@ export default function FeedbackPage() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-2xl">
+    <div className="w-full max-w-2xl mx-auto flex-1 flex flex-col justify-center py-8">
       <div className="mb-8 text-center">
         <h1 className="text-3xl font-semibold">Submit Feedback</h1>
         <p className="text-muted-foreground">We'd love to hear what you think.</p>
@@ -79,7 +80,7 @@ export default function FeedbackPage() {
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <CardContent className="pt-6 space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
                   name="name"
