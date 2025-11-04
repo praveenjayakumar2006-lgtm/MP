@@ -25,6 +25,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import { useFirebase } from '@/firebase';
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
+import { saveUserToFile } from '../users/actions';
 
 const signupSchema = z.object({
   fullName: z.string().min(2, 'Full name must be at least 2 characters.'),
@@ -38,7 +39,7 @@ type SignupFormValues = z.infer<typeof signupSchema>;
 export default function SignupPage() {
   const { toast } = useToast();
   const router = useRouter();
-  const { auth, firestore } = useFirebase();
+  const { auth } = useFirebase();
 
   const form = useForm<SignupFormValues>({
     resolver: zodResolver(signupSchema),
@@ -66,6 +67,12 @@ export default function SignupPage() {
       if (user) {
         await updateProfile(user, {
           displayName: values.fullName,
+        });
+
+        await saveUserToFile({
+          id: user.uid,
+          name: values.fullName,
+          email: values.email,
         });
       }
 

@@ -5,13 +5,20 @@ import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ArrowLeft, Calendar, Car, Clock, Hash } from 'lucide-react';
+import { ArrowLeft, Calendar, Car, Clock, Hash, Mail, User as UserIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
 import type { Reservation } from '@/lib/types';
 import { Separator } from '@/components/ui/separator';
 import { getReservationsFromFile } from '@/app/reservations/actions';
+import { getUsersFromFile } from '@/app/users/actions';
 import { useToast } from '@/hooks/use-toast';
+
+type User = {
+    id: string;
+    name: string;
+    email: string;
+}
 
 function DetailItem({ icon: Icon, label, value }: { icon: React.ElementType, label: string, value: React.ReactNode }) {
     return (
@@ -31,17 +38,26 @@ export default function BookingDetailPage() {
   const { id } = params;
   const { toast } = useToast();
   const [reservation, setReservation] = useState<Reservation | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchReservationDetails = useCallback(async () => {
     if (typeof id !== 'string') return;
     setIsLoading(true);
-    const result = await getReservationsFromFile();
+    
+    const [reservationsResult, usersResult] = await Promise.all([
+        getReservationsFromFile(),
+        getUsersFromFile()
+    ]);
 
-    if (result.success && result.data) {
-        const found = result.data.find(res => res.id === id);
-        if (found) {
-            setReservation(found);
+    if (reservationsResult.success && reservationsResult.data) {
+        const foundReservation = reservationsResult.data.find(res => res.id === id);
+        if (foundReservation) {
+            setReservation(foundReservation);
+            if (usersResult.success && usersResult.data) {
+                const foundUser = usersResult.data.find(u => u.id === foundReservation.userId);
+                setUser(foundUser || null);
+            }
         } else {
             toast({ variant: 'destructive', title: 'Error', description: 'Booking not found.' });
             router.replace('/owner?view=bookings');
@@ -83,9 +99,6 @@ export default function BookingDetailPage() {
     )
   }
 
-  // Since we don't have user profiles in files, we can't display user details like name/email.
-  // We will just show the user ID.
-
   return (
     <div className="w-full max-w-sm mx-auto mt-6">
         <Button onClick={() => router.back()} variant="outline" size="sm" className="mb-4">
@@ -96,7 +109,7 @@ export default function BookingDetailPage() {
             <CardHeader className="pb-4">
                 <CardTitle className="text-xl">Booking Details</CardTitle>
                 <CardDescription>
-                    ID: <span className="font-mono text-primary bg-primary/10 text-xs px-1 rounded-sm">{reservation.id}</span>
+                    {user ? `${user.name} (${user.email})` : 'User details not found'}
                 </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4 pt-0">
