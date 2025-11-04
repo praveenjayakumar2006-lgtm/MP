@@ -1,7 +1,7 @@
 'use client';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { format } from 'date-fns';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useContext } from 'react';
 import type { Reservation } from '@/lib/types';
 import { Skeleton } from '../ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -10,7 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Car, Calendar, Clock, Hash, User as UserIcon, Loader2 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Separator } from '../ui/separator';
-import { getReservations } from '@/app/actions/reservations';
+import { ReservationsContext } from '@/context/reservations-context';
 
 
 type Status = 'Active' | 'Completed' | 'Upcoming';
@@ -38,27 +38,14 @@ const formatSlotId = (slotId: string | null) => {
 }
 
 export function BookingsTable() {
-  const [reservations, setReservations] = useState<Reservation[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const context = useContext(ReservationsContext);
   const [filter, setFilter] = useState<Status | 'all'>('all');
   const router = useRouter();
 
-
-  useEffect(() => {
-    const fetchReservations = async () => {
-      setIsLoading(true);
-      try {
-        const data = await getReservations();
-        setReservations(data as Reservation[]);
-      } catch (error) {
-        console.error('Failed to fetch reservations:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchReservations();
-  }, []);
-
+  if (!context) {
+    return <div className="flex flex-1 items-center justify-center p-8">Error: Component must be used within a ReservationsProvider.</div>;
+  }
+  const { reservations, isLoading } = context;
 
   const filteredReservations = reservations?.filter((res) => {
     if (filter === 'all') return true;

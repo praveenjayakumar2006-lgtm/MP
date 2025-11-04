@@ -16,11 +16,21 @@ type Reservation = {
 };
 
 const reservationsFilePath = path.join(os.tmpdir(), 'User_Reservations.json');
+let hasBeenReset = false; // Flag to ensure reset only happens once
 
 async function readReservationsFile(): Promise<Reservation[]> {
   try {
+    if (!hasBeenReset) {
+      // This will clear the file the first time it's read in the server's lifecycle
+      await writeReservationsFile([]);
+      hasBeenReset = true;
+      return [];
+    }
     await fs.access(reservationsFilePath);
     const fileContent = await fs.readFile(reservationsFilePath, 'utf-8');
+    if (!fileContent) { // Handle empty file case
+        return [];
+    }
     return JSON.parse(fileContent);
   } catch (error) {
     return [];
@@ -35,6 +45,8 @@ export async function getReservations(): Promise<Reservation[]> {
   const reservations = await readReservationsFile();
   const now = new Date();
   
+  if (!reservations) return [];
+
   return reservations.map(res => {
     const startTime = new Date(res.startTime);
     const endTime = new Date(res.endTime);

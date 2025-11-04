@@ -23,14 +23,23 @@ export const ReservationsProvider: React.FC<{ children: ReactNode }> = ({ childr
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isClient, setIsClient] = useState(false);
+  const [role, setRole] = useState<string | null>(null);
 
   useEffect(() => {
     setIsClient(true);
+    const userRole = localStorage.getItem('role');
+    setRole(userRole);
   }, []);
 
   const fetchReservations = useCallback(async () => {
     try {
-      const fetchedReservations = await getReservations();
+      let fetchedReservations = await getReservations();
+      
+      // The owner sees all reservations, a regular user only sees their own.
+      if (role && role !== 'owner' && user) {
+        fetchedReservations = fetchedReservations.filter(res => res.userId === user.uid);
+      }
+      
       setReservations(fetchedReservations as Reservation[]);
     } catch (error) {
       console.error("Error fetching reservations: ", error);
@@ -44,7 +53,7 @@ export const ReservationsProvider: React.FC<{ children: ReactNode }> = ({ childr
         setIsLoading(false);
       }
     }
-  }, [toast, isLoading]);
+  }, [toast, isLoading, user, role]);
 
   useEffect(() => {
     if (isClient) {
@@ -67,6 +76,19 @@ export const ReservationsProvider: React.FC<{ children: ReactNode }> = ({ childr
         description: 'You must be logged in to make a reservation.',
       });
       return;
+    }
+    
+    // Find if there's an existing reservation for the same slot and time
+    const existingReservation = reservations.find(
+      (r) => r.slotId === reservation.slotId
+    );
+
+    if (existingReservation && existingReservation.userId === user.uid) {
+       try {
+        await deleteReservation(existingReservation.id);
+      } catch (error) {
+         console.error("Error deleting existing reservation: ", error);
+      }
     }
     
     try {
