@@ -5,7 +5,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState, Suspense } from "react";
 import { ReportsTable } from "@/components/owner/reports-table";
-import { FeedbackTable } from "@/components/owner/feedback-table";
 import { BookingsTable } from "@/components/owner/bookings-table";
 import { Loader2, FileText, MessageSquare, LayoutDashboard, CalendarCheck } from "lucide-react";
 import Link from "next/link";
@@ -83,7 +82,7 @@ function OwnerDashboard() {
                              <p className="text-sm text-muted-foreground mb-4">
                                 Read valuable feedback to improve your service.
                             </p>
-                             <Link href="/owner?view=feedback">
+                             <Link href="/owner/feedback">
                                 <Button variant="outline" size="sm">View Feedback</Button>
                             </Link>
                         </CardContent>
@@ -107,19 +106,6 @@ function OwnerDashboard() {
         </Card>
     );
 
-    const renderFeedback = () => (
-        <Card>
-            <CardHeader>
-                <CardTitle className="text-3xl">User Feedback</CardTitle>
-                <CardDescription>
-                    All feedback submitted by users.
-                </CardDescription>
-            </CardHeader>
-            <CardContent>
-                <FeedbackTable />
-            </CardContent>
-        </Card>
-    );
      const renderBookings = () => (
         <BookingsTable />
     );
@@ -139,8 +125,6 @@ function OwnerDashboard() {
                 return renderBookings();
             case 'reports':
                 return renderReports();
-            case 'feedback':
-                return renderFeedback();
             case 'home':
             default:
                 return renderHome();

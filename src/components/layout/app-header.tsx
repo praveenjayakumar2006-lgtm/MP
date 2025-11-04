@@ -83,10 +83,13 @@ export function AppHeader() {
 
   const NavLink = ({ href, children, className }: { href: string, children: React.ReactNode, className?: string }) => {
     const isActive = href === '/booking' ? pathname.startsWith('/booking') || pathname.startsWith('/select-spot') : pathname.startsWith(href);
+    const isOwnerActive = href.includes('?view=') ? pathname === href.split('?')[0] && new URLSearchParams(window.location.search).get('view') === new URLSearchParams(href.split('?')[1]).get('view') : pathname.startsWith(href);
+    const finalIsActive = role === 'owner' ? isOwnerActive : isActive;
+
     return (
       <Link
         href={href}
-        className={cn(className, isActive ? "text-primary-foreground font-semibold" : "text-primary-foreground/80", "transition-colors hover:text-primary-foreground")}
+        className={cn(className, finalIsActive ? "text-primary-foreground font-semibold" : "text-primary-foreground/80", "transition-colors hover:text-primary-foreground")}
       >
         {children}
       </Link>
@@ -103,7 +106,7 @@ export function AppHeader() {
     { href: '/owner?view=home', label: 'Home'},
     { href: '/owner?view=bookings', label: 'Bookings' },
     { href: '/owner?view=reports', label: 'Violation Reports' },
-    { href: '/owner?view=feedback', label: 'User Feedback' },
+    { href: '/owner/feedback', label: 'User Feedback' },
   ];
 
   return (
