@@ -25,7 +25,7 @@ import { Input } from '@/components/ui/input';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 import { useUser } from '@/firebase';
-import { saveFeedback } from '@/app/actions/feedback';
+import { saveFeedback } from '@/app/feedback/actions';
 
 
 const feedbackSchema = z.object({

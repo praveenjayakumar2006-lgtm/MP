@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { format } from "date-fns";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getFeedback } from "@/app/actions/feedback";
+import { getFeedback } from "@/app/feedback/actions";
 import { useEffect, useState } from "react";
 
 
