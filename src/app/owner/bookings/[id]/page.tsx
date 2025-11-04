@@ -60,7 +60,7 @@ export default function BookingDetailPage() {
 
   if (isLoading || !reservation) {
     return (
-        <div className="w-full max-w-sm mx-auto">
+        <div className="w-full max-w-sm mx-auto mt-6">
             <Button onClick={() => router.back()} variant="outline" size="sm" className="mb-4">
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 Back
@@ -96,7 +96,7 @@ export default function BookingDetailPage() {
   // We will just show the user ID.
 
   return (
-    <div className="w-full max-w-sm mx-auto">
+    <div className="w-full max-w-sm mx-auto mt-6">
         <Button onClick={() => router.back()} variant="outline" size="sm" className="mb-4">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back
