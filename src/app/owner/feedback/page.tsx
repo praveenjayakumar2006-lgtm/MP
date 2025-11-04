@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { getFeedback } from "@/app/feedback/actions";
-import { format } from "date-fns";
+import { format }s from "date-fns";
 
 type Feedback = {
   name: string;
@@ -33,19 +33,15 @@ async function FeedbackList() {
     const feedbackData: Feedback[] = result.data;
 
     return (
-        <div className="space-y-4">
+        <div className="w-full rounded-lg border bg-card text-card-foreground">
             {feedbackData.length === 0 ? (
-                 <Card className="w-full">
-                    <CardContent className="pt-6">
-                        <p className="text-center text-muted-foreground">
-                            No feedback has been submitted yet.
-                        </p>
-                    </CardContent>
-                </Card>
+                <div className="p-6 text-center text-muted-foreground">
+                    No feedback has been submitted yet.
+                </div>
             ) : (
                 feedbackData.map((feedback, index) => (
-                    <Card key={index} className="w-full">
-                        <CardHeader className="flex flex-row items-start gap-4 space-y-0">
+                    <div key={index} className={cn("p-6", index < feedbackData.length - 1 && "border-b")}>
+                        <div className="flex flex-row items-start gap-4 space-y-0 mb-4">
                             <Avatar className="h-12 w-12">
                                 <AvatarFallback>{feedback.name.charAt(0).toUpperCase()}</AvatarFallback>
                             </Avatar>
@@ -70,17 +66,14 @@ async function FeedbackList() {
                                 </div>
                                 <p className="text-sm text-muted-foreground">{feedback.email}</p>
                             </div>
-                        </CardHeader>
-                        <CardContent>
-                            <Separator className="my-4" />
-                            <p className="text-lg text-foreground whitespace-pre-wrap">{feedback.feedback}</p>
-                        </CardContent>
-                         <CardFooter>
-                            <p className="text-xs text-muted-foreground">
-                                Submitted on {format(new Date(feedback.createdAt), 'PPP p')}
-                            </p>
-                        </CardFooter>
-                    </Card>
+                        </div>
+
+                        <p className="text-foreground whitespace-pre-wrap mb-4">{feedback.feedback}</p>
+
+                        <p className="text-xs text-muted-foreground">
+                            Submitted on {format(new Date(feedback.createdAt), 'PPP p')}
+                        </p>
+                    </div>
                 ))
             )}
         </div>
