@@ -1,3 +1,4 @@
+
 'use server';
 
 import fs from 'fs/promises';
@@ -21,6 +22,9 @@ async function readViolationsFile(): Promise<Violation[]> {
   try {
     await fs.access(violationsFilePath);
     const fileContent = await fs.readFile(violationsFilePath, 'utf-8');
+    if (!fileContent) {
+        return [];
+    }
     return JSON.parse(fileContent);
   } catch (error) {
     return [];
@@ -39,7 +43,7 @@ export async function saveViolation(violation: Omit<Violation, 'id' | 'createdAt
   const allViolations = await readViolationsFile();
   const newViolation: Violation = {
     ...violation,
-    id: `violation_${Date.now()}`,
+    id: `violation_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
     createdAt: new Date().toISOString(),
   };
   allViolations.push(newViolation);
