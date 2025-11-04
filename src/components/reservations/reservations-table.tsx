@@ -11,7 +11,7 @@ import {
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { format, isSameDay } from 'date-fns';
-import { useState, useContext, useEffect } from 'react';
+import { useState, useContext, useEffect, useMemo } from 'react';
 import { Tabs, TabsList, TabsContent, TabsTrigger } from '@/components/ui/tabs';
 import type { Reservation } from '@/lib/types';
 import { Skeleton } from '../ui/skeleton';
@@ -68,39 +68,37 @@ export function ReservationsTable() {
   const context = useContext(ReservationsContext);
   const { user } = useUser();
   const [filter, setFilter] = useState<Status | 'all'>('all');
-  const [displayReservations, setDisplayReservations] = useState<Reservation[]>([]);
   const [reservationToCancel, setReservationToCancel] = useState<Reservation | null>(null);
   const { toast } = useToast();
   const router = useRouter();
   const isMobile = useIsMobile();
+  
+  const { reservations, removeReservation, isLoading, isClient } = context || {};
 
-  useEffect(() => {
-    if (context?.reservations) {
-      const now = new Date();
-      const allReservations = context.reservations
-        .map(res => {
-          const startTime = new Date(res.startTime);
-          const endTime = new Date(res.endTime);
-          let status: Status;
+  const displayReservations = useMemo(() => {
+    if (!reservations) return [];
+    
+    return reservations.map(res => {
+        const now = new Date();
+        const startTime = new Date(res.startTime);
+        const endTime = new Date(res.endTime);
+        let status: Status;
 
-          if (now > endTime) {
-            status = 'Completed';
-          } else if (now >= startTime && now < endTime) {
-              status = 'Active';
-          } else {
-            status = 'Upcoming';
-          }
-          return { ...res, status };
-        });
-      setDisplayReservations(allReservations);
-    }
-  }, [context?.reservations]);
+        if (now > endTime) {
+          status = 'Completed';
+        } else if (now >= startTime && now < endTime) {
+            status = 'Active';
+        } else {
+          status = 'Upcoming';
+        }
+        return { ...res, status };
+      });
+  }, [reservations]);
+
 
   if (!context) {
     return null; 
   }
-  
-  const { removeReservation, isLoading, isClient } = context;
 
 
   const getStatusVariant = (status: Status) => {
@@ -140,7 +138,7 @@ export function ReservationsTable() {
   };
   
   const confirmCancelReservation = () => {
-    if (!reservationToCancel) return;
+    if (!reservationToCancel || !removeReservation) return;
     removeReservation(reservationToCancel.id);
     toast({
       title: 'Reservation Cancelled',

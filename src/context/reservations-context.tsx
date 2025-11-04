@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { createContext, useState, ReactNode, useEffect, useCallback } from 'react';
@@ -23,23 +24,15 @@ export const ReservationsProvider: React.FC<{ children: ReactNode }> = ({ childr
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isClient, setIsClient] = useState(false);
-  const [role, setRole] = useState<string | null>(null);
 
   useEffect(() => {
     setIsClient(true);
-    const userRole = localStorage.getItem('role');
-    setRole(userRole);
   }, []);
 
   const fetchReservations = useCallback(async () => {
     try {
-      let fetchedReservations = await getReservations();
-      
-      // The owner sees all reservations, a regular user only sees their own.
-      if (role && role !== 'owner' && user) {
-        fetchedReservations = fetchedReservations.filter(res => res.userId === user.uid);
-      }
-      
+      // Always fetch all reservations. Filtering will be done in components.
+      const fetchedReservations = await getReservations();
       setReservations(fetchedReservations as Reservation[]);
     } catch (error) {
       console.error("Error fetching reservations: ", error);
@@ -53,7 +46,7 @@ export const ReservationsProvider: React.FC<{ children: ReactNode }> = ({ childr
         setIsLoading(false);
       }
     }
-  }, [toast, isLoading, user, role]);
+  }, [toast, isLoading]);
 
   useEffect(() => {
     if (isClient) {
@@ -78,12 +71,12 @@ export const ReservationsProvider: React.FC<{ children: ReactNode }> = ({ childr
       return;
     }
     
-    // Find if there's an existing reservation for the same slot and time
+    // Find if there's an existing reservation for the same slot and time by the same user
     const existingReservation = reservations.find(
-      (r) => r.slotId === reservation.slotId
+      (r) => r.slotId === reservation.slotId && r.userId === user.uid
     );
 
-    if (existingReservation && existingReservation.userId === user.uid) {
+    if (existingReservation) {
        try {
         await deleteReservation(existingReservation.id);
       } catch (error) {
