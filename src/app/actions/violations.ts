@@ -59,3 +59,16 @@ export async function saveViolation(violation: Omit<Violation, 'id' | 'createdAt
   await writeViolationsFile(allViolations);
   return newViolation;
 }
+
+export async function deleteViolation(violationId: string): Promise<{ success: boolean }> {
+    let allViolations = await readViolationsFile();
+    const initialLength = allViolations.length;
+    allViolations = allViolations.filter(v => v.id !== violationId);
+
+    if (allViolations.length < initialLength) {
+        await writeViolationsFile(allViolations);
+        return { success: true };
+    } else {
+        return { success: false };
+    }
+}

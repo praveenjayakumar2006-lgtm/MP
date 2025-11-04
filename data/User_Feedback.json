@@ -6,5 +6,21 @@
     "feedback": "i just love it",
     "id": "feedback_1762273355534_kcyeedg9va",
     "createdAt": "2025-11-04T16:22:35.534Z"
+  },
+  {
+    "name": "vaishali",
+    "email": "vaishu@gmail.com",
+    "rating": 5,
+    "feedback": "i too love it\n",
+    "id": "feedback_1762274756914_qey4cis3lnb",
+    "createdAt": "2025-11-04T16:45:56.914Z"
+  },
+  {
+    "name": "harsha",
+    "email": "harsha@gmail.com",
+    "rating": 3,
+    "feedback": "i dont lke it",
+    "id": "feedback_1762274815169_mbnq0ncwgfl",
+    "createdAt": "2025-11-04T16:46:55.169Z"
   }
 ]
