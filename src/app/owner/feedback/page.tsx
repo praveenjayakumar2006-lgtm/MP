@@ -90,7 +90,7 @@ async function FeedbackList() {
 
 export default function OwnerFeedbackPage() {
     return (
-        <div className="w-full max-w-3xl mx-auto py-8">
+        <div className="w-full max-w-2xl mx-auto py-8">
             <div className="mb-8 text-center">
                 <h1 className="text-3xl font-bold">User Feedback</h1>
                 <p className="text-muted-foreground mt-2">All feedback submitted by users.</p>
