@@ -1,20 +1,22 @@
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
-import { readFeedbackFromFile } from "@/app/feedback/actions";
+import { getFeedback } from "@/app/feedback/actions";
+import { format } from "date-fns";
 
 type Feedback = {
   name: string;
   email: string;
   rating: number;
   feedback: string;
+  createdAt: string;
 };
 
-async function FeedbackTable() {
-    const result = await readFeedbackFromFile();
+async function FeedbackList() {
+    const result = await getFeedback();
 
     if (!result.success || !result.data) {
         return (
@@ -27,13 +29,8 @@ async function FeedbackTable() {
             </Card>
         )
     }
-
-    const feedbackData: Feedback[] = result.data.map(item => ({
-        name: item[0],
-        email: item[1],
-        rating: item[2],
-        feedback: item[3]
-    }));
+    
+    const feedbackData: Feedback[] = result.data;
 
     return (
         <div className="space-y-4">
@@ -46,7 +43,7 @@ async function FeedbackTable() {
                     </CardContent>
                 </Card>
             ) : (
-                feedbackData.reverse().map((feedback, index) => (
+                feedbackData.map((feedback, index) => (
                     <Card key={index} className="w-full">
                         <CardHeader className="flex flex-row items-start gap-4 space-y-0">
                             <Avatar className="h-12 w-12">
@@ -78,6 +75,11 @@ async function FeedbackTable() {
                             <Separator className="my-4" />
                             <p className="text-lg text-foreground whitespace-pre-wrap">{feedback.feedback}</p>
                         </CardContent>
+                         <CardFooter>
+                            <p className="text-xs text-muted-foreground">
+                                Submitted on {format(new Date(feedback.createdAt), 'PPP p')}
+                            </p>
+                        </CardFooter>
                     </Card>
                 ))
             )}
@@ -93,7 +95,7 @@ export default function OwnerFeedbackPage() {
                 <h1 className="text-3xl font-bold">User Feedback</h1>
                 <p className="text-muted-foreground mt-2">All feedback submitted by users.</p>
             </div>
-            <FeedbackTable />
+            <FeedbackList />
         </div>
     );
 }

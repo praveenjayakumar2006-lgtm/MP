@@ -51,14 +51,7 @@ export default function FeedbackPage() {
   });
 
   async function onSubmit(values: FeedbackFormValues) {
-    const feedbackData: [string, string, number, string] = [
-        values.name,
-        values.email,
-        values.rating,
-        values.feedback
-    ];
-
-    const result = await saveFeedbackToFile(feedbackData);
+    const result = await saveFeedbackToFile(values);
 
     if (result.success) {
       toast({
