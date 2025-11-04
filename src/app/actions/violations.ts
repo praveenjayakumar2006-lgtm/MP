@@ -3,7 +3,6 @@
 
 import fs from 'fs/promises';
 import path from 'path';
-import os from 'os';
 
 type Violation = {
   id: string;
@@ -15,8 +14,17 @@ type Violation = {
   createdAt: string;
 };
 
+// Use a permanent location within the project
+const dataDir = path.join(process.cwd(), 'data');
+const violationsFilePath = path.join(dataDir, 'User_Violations.json');
 
-const violationsFilePath = path.join(os.tmpdir(), 'User_Violations.json');
+async function ensureDirectoryExists() {
+  try {
+    await fs.mkdir(dataDir, { recursive: true });
+  } catch (error) {
+    console.error("Error creating data directory:", error);
+  }
+}
 
 async function readViolationsFile(): Promise<Violation[]> {
   try {
@@ -32,6 +40,7 @@ async function readViolationsFile(): Promise<Violation[]> {
 }
 
 async function writeViolationsFile(data: Violation[]): Promise<void> {
+  await ensureDirectoryExists();
   await fs.writeFile(violationsFilePath, JSON.stringify(data, null, 2));
 }
 
@@ -43,7 +52,7 @@ export async function saveViolation(violation: Omit<Violation, 'id' | 'createdAt
   const allViolations = await readViolationsFile();
   const newViolation: Violation = {
     ...violation,
-    id: `violation_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
+    id: `violation_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`,
     createdAt: new Date().toISOString(),
   };
   allViolations.push(newViolation);

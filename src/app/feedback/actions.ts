@@ -3,7 +3,6 @@
 
 import fs from 'fs/promises';
 import path from 'path';
-import os from 'os';
 
 type Feedback = {
   id: string;
@@ -14,12 +13,25 @@ type Feedback = {
   createdAt: string;
 };
 
-const feedbackFilePath = path.join(os.tmpdir(), 'User_Feedback.json');
+// Use a permanent location within the project
+const dataDir = path.join(process.cwd(), 'data');
+const feedbackFilePath = path.join(dataDir, 'User_Feedback.json');
+
+async function ensureDirectoryExists() {
+  try {
+    await fs.mkdir(dataDir, { recursive: true });
+  } catch (error) {
+    console.error("Error creating data directory:", error);
+  }
+}
 
 async function readFeedbackFile(): Promise<Feedback[]> {
   try {
     await fs.access(feedbackFilePath);
     const fileContent = await fs.readFile(feedbackFilePath, 'utf-8');
+    if (!fileContent) {
+        return [];
+    }
     return JSON.parse(fileContent);
   } catch (error) {
     // If the file doesn't exist, return an empty array
@@ -28,6 +40,7 @@ async function readFeedbackFile(): Promise<Feedback[]> {
 }
 
 async function writeFeedbackFile(data: Feedback[]): Promise<void> {
+  await ensureDirectoryExists();
   await fs.writeFile(feedbackFilePath, JSON.stringify(data, null, 2));
 }
 

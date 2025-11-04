@@ -1,8 +1,8 @@
+
 'use server';
 
 import fs from 'fs/promises';
 import path from 'path';
-import os from 'os';
 
 type Reservation = {
     id: string;
@@ -15,17 +15,20 @@ type Reservation = {
     createdAt: string;
 };
 
-const reservationsFilePath = path.join(os.tmpdir(), 'User_Reservations.json');
-let hasBeenReset = false; // Flag to ensure reset only happens once
+// Use a permanent location within the project
+const dataDir = path.join(process.cwd(), 'data');
+const reservationsFilePath = path.join(dataDir, 'User_Reservations.json');
+
+async function ensureDirectoryExists() {
+  try {
+    await fs.mkdir(dataDir, { recursive: true });
+  } catch (error) {
+    console.error("Error creating data directory:", error);
+  }
+}
 
 async function readReservationsFile(): Promise<Reservation[]> {
   try {
-    if (!hasBeenReset) {
-      // This will clear the file the first time it's read in the server's lifecycle
-      await writeReservationsFile([]);
-      hasBeenReset = true;
-      return [];
-    }
     await fs.access(reservationsFilePath);
     const fileContent = await fs.readFile(reservationsFilePath, 'utf-8');
     if (!fileContent) { // Handle empty file case
@@ -33,11 +36,13 @@ async function readReservationsFile(): Promise<Reservation[]> {
     }
     return JSON.parse(fileContent);
   } catch (error) {
+    // If the file doesn't exist, return an empty array
     return [];
   }
 }
 
 async function writeReservationsFile(data: Reservation[]): Promise<void> {
+  await ensureDirectoryExists();
   await fs.writeFile(reservationsFilePath, JSON.stringify(data, null, 2));
 }
 
