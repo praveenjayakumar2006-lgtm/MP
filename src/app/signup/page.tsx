@@ -1,4 +1,3 @@
-
 'use client';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -25,7 +24,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import { useFirebase } from '@/firebase';
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
-import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { saveUserToFile } from '@/app/actions/users';
 
 const signupSchema = z.object({
   fullName: z.string().min(2, 'Full name must be at least 2 characters.'),
@@ -39,7 +38,7 @@ type SignupFormValues = z.infer<typeof signupSchema>;
 export default function SignupPage() {
   const { toast } = useToast();
   const router = useRouter();
-  const { auth, firestore } = useFirebase();
+  const { auth } = useFirebase();
 
   const form = useForm<SignupFormValues>({
     resolver: zodResolver(signupSchema),
@@ -52,7 +51,7 @@ export default function SignupPage() {
   });
 
   async function onSubmit(values: SignupFormValues) {
-    if (!auth || !firestore) {
+    if (!auth) {
        toast({
         variant: 'destructive',
         title: 'Firebase not initialized',
@@ -69,11 +68,10 @@ export default function SignupPage() {
           displayName: values.fullName,
         });
 
-        const userDocRef = doc(firestore, 'users', user.uid);
-        await setDoc(userDocRef, {
-            id: user.uid,
-            username: values.fullName,
-            email: values.email,
+        await saveUserToFile({
+          id: user.uid,
+          username: values.fullName,
+          email: values.email,
         });
       }
 

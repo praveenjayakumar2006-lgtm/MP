@@ -1,4 +1,3 @@
-
 'use client';
 
 import { Button } from '@/components/ui/button';
@@ -10,9 +9,9 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
-import { useFirebase, useUser } from '@/firebase';
+import { useUser } from '@/firebase';
 import { useToast } from '@/hooks/use-toast';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { saveViolation } from '@/app/actions/violations';
 
 
 function ViolationResultContent() {
@@ -24,7 +23,7 @@ function ViolationResultContent() {
 
   const [submissionStatus, setSubmissionStatus] = useState<'pending' | 'confirmed' | 'rejected'>('pending');
   const [imageUrl, setImageUrl] = useState<string | null>(null);
-  const { user, firestore } = useUser();
+  const { user } = useUser();
   const { toast } = useToast();
 
   useEffect(() => {
@@ -35,7 +34,7 @@ function ViolationResultContent() {
   }, []);
 
   const handleConfirm = async () => {
-    if (!user || !firestore || !slotNumber || !violationType || !licensePlate) {
+    if (!user || !slotNumber || !violationType || !licensePlate) {
        toast({
         variant: 'destructive',
         title: 'Error',
@@ -45,14 +44,12 @@ function ViolationResultContent() {
     }
     
     try {
-        const violationsCol = collection(firestore, 'violations');
-        await addDoc(violationsCol, {
+        await saveViolation({
             slotNumber,
             violationType,
             licensePlate,
             imageUrl: imageUrl || null,
             userId: user.uid,
-            createdAt: serverTimestamp(),
         });
         setSubmissionStatus('confirmed');
     } catch (error) {

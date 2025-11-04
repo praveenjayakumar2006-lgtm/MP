@@ -1,4 +1,3 @@
-
 'use client';
 
 import { format } from 'date-fns';
@@ -7,9 +6,7 @@ import { Badge } from '../ui/badge';
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '../ui/card';
-import { useToast } from '@/hooks/use-toast';
-import { useCollection, useFirebase, useFirestore, useMemoFirebase } from '@/firebase';
-import { collection } from 'firebase/firestore';
+import { getViolations } from '@/app/actions/violations';
 
 
 type Violation = {
@@ -17,10 +14,7 @@ type Violation = {
     slotNumber: string;
     violationType: string;
     licensePlate: string;
-    createdAt: {
-        seconds: number;
-        nanoseconds: number;
-    };
+    createdAt: string;
     imageUrl?: string;
 };
 
@@ -47,15 +41,25 @@ const formatSlotId = (slotId: string | null) => {
 
 
 export function ReportsTable() {
-    const firestore = useFirestore();
-    const violationsQuery = useMemoFirebase(() => {
-        if (!firestore) return null;
-        return collection(firestore, 'violations');
-    }, [firestore]);
+    const [violations, setViolations] = useState<Violation[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
 
-    const { data: violations, isLoading } = useCollection<Violation>(violationsQuery);
+    useEffect(() => {
+        const fetchViolations = async () => {
+            setIsLoading(true);
+            try {
+                const data = await getViolations();
+                setViolations(data);
+            } catch (error) {
+                console.error("Failed to fetch violations:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchViolations();
+    }, []);
 
-    const sortedViolations = violations?.sort((a,b) => b.createdAt.seconds - a.createdAt.seconds);
+    const sortedViolations = violations?.sort((a,b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
     const renderSkeletons = () => (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -106,7 +110,7 @@ export function ReportsTable() {
                 </CardContent>
                  <CardFooter className="p-4 pt-0">
                     <p className="text-xs text-muted-foreground">
-                       Reported on {violation.createdAt ? format(new Date(violation.createdAt.seconds * 1000), 'PPP p') : 'N/A'}
+                       Reported on {violation.createdAt ? format(new Date(violation.createdAt), 'PPP p') : 'N/A'}
                     </p>
                 </CardFooter>
             </Card>

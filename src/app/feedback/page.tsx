@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useForm } from 'react-hook-form';
@@ -25,8 +24,8 @@ import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
-import { useFirebase, useUser } from '@/firebase';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { useUser } from '@/firebase';
+import { saveFeedback } from '@/app/actions/feedback';
 
 
 const feedbackSchema = z.object({
@@ -42,7 +41,6 @@ export default function FeedbackPage() {
   const router = useRouter();
   const [hoverRating, setHoverRating] = useState(0);
   const { toast } = useToast();
-  const { firestore } = useFirebase();
   const { user } = useUser();
 
   const form = useForm<FeedbackFormValues>({
@@ -56,7 +54,7 @@ export default function FeedbackPage() {
   });
 
   async function onSubmit(values: FeedbackFormValues) {
-    if (!firestore || !user) {
+    if (!user) {
       toast({
         variant: 'destructive',
         title: 'Error',
@@ -66,12 +64,7 @@ export default function FeedbackPage() {
     }
     
     try {
-      const feedbackCol = collection(firestore, 'feedback');
-      await addDoc(feedbackCol, {
-        ...values,
-        userId: user.uid,
-        createdAt: serverTimestamp(),
-      });
+      await saveFeedback(values);
       
       toast({
         title: 'Feedback Submitted',

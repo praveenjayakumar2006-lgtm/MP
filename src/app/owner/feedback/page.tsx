@@ -1,4 +1,3 @@
-
 'use client';
 
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,9 +5,9 @@ import { Star, MessageSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { format } from "date-fns";
-import { useCollection, useFirestore, useMemoFirebase } from "@/firebase";
-import { collection } from "firebase/firestore";
 import { Skeleton } from "@/components/ui/skeleton";
+import { getFeedback } from "@/app/actions/feedback";
+import { useEffect, useState } from "react";
 
 
 type Feedback = {
@@ -17,19 +16,29 @@ type Feedback = {
   email: string;
   rating: number;
   feedback: string;
-  createdAt: {
-    seconds: number;
-    nanoseconds: number;
-  };
+  createdAt: string;
 };
 
 function FeedbackList() {
-    const firestore = useFirestore();
-    const feedbackQuery = useMemoFirebase(() => {
-        if (!firestore) return null;
-        return collection(firestore, 'feedback');
-    }, [firestore]);
-    const { data: feedbackData, isLoading, error } = useCollection<Feedback>(feedbackQuery);
+    const [feedbackData, setFeedbackData] = useState<Feedback[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        const fetchFeedback = async () => {
+            setIsLoading(true);
+            try {
+                const data = await getFeedback();
+                setFeedbackData(data);
+            } catch (err) {
+                console.error(err);
+                setError('Could not load feedback data.');
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchFeedback();
+    }, []);
 
     if (isLoading) {
         return (
@@ -61,7 +70,7 @@ function FeedbackList() {
              <Card>
                 <CardContent className="pt-6">
                     <p className="text-center text-destructive">
-                        Could not load feedback data.
+                        {error}
                     </p>
                 </CardContent>
             </Card>
@@ -76,7 +85,7 @@ function FeedbackList() {
         )
     }
 
-    const sortedFeedback = [...feedbackData].sort((a, b) => b.createdAt.seconds - a.createdAt.seconds);
+    const sortedFeedback = [...feedbackData].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
     return (
         <div className="space-y-4">
@@ -111,7 +120,7 @@ function FeedbackList() {
                     </CardContent>
                     <CardFooter>
                         <p className="text-xs text-muted-foreground">
-                            Submitted on {feedback.createdAt ? format(new Date(feedback.createdAt.seconds * 1000), 'PPP p') : 'N/A'}
+                            Submitted on {feedback.createdAt ? format(new Date(feedback.createdAt), 'PPP p') : 'N/A'}
                         </p>
                     </CardFooter>
                 </Card>

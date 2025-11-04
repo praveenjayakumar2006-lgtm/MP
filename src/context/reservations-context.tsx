@@ -1,11 +1,10 @@
-
 'use client';
 
 import React, { createContext, useState, ReactNode, useEffect, useCallback } from 'react';
 import type { Reservation } from '@/lib/types';
-import { useUser, useFirestore, useMemoFirebase } from '@/firebase';
+import { useUser } from '@/firebase';
 import { useToast } from '@/hooks/use-toast';
-import { collection, addDoc, serverTimestamp, deleteDoc, doc, onSnapshot, query, where } from 'firebase/firestore';
+import { getReservations, saveReservation, deleteReservation } from '@/app/actions/reservations';
 
 interface ReservationsContextType {
   reservations: Reservation[];
@@ -19,7 +18,6 @@ export const ReservationsContext = createContext<ReservationsContextType | undef
 
 export const ReservationsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const { user } = useUser();
-  const firestore = useFirestore();
   const { toast } = useToast();
   
   const [reservations, setReservations] = useState<Reservation[]>([]);
@@ -30,52 +28,39 @@ export const ReservationsProvider: React.FC<{ children: ReactNode }> = ({ childr
     setIsClient(true);
   }, []);
 
-  const reservationsQuery = useMemoFirebase(() => {
-    if (!firestore) return null;
-    return collection(firestore, 'reservations');
-  }, [firestore]);
-
+  const fetchReservations = useCallback(async () => {
+    try {
+      const fetchedReservations = await getReservations();
+      setReservations(fetchedReservations as Reservation[]);
+    } catch (error) {
+      console.error("Error fetching reservations: ", error);
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'Could not fetch reservation data.',
+      });
+    } finally {
+      if (isLoading) {
+        setIsLoading(false);
+      }
+    }
+  }, [toast, isLoading]);
 
   useEffect(() => {
-    if (!reservationsQuery) {
-        setIsLoading(false);
-        return;
-    };
+    if (isClient) {
+      fetchReservations(); // Initial fetch
 
-    setIsLoading(true);
+      const intervalId = setInterval(() => {
+        fetchReservations();
+      }, 1000); // Poll every 1 second
 
-    const unsubscribe = onSnapshot(reservationsQuery, (snapshot) => {
-        const fetchedReservations = snapshot.docs.map(doc => {
-            const data = doc.data();
-            return {
-                id: doc.id,
-                ...data,
-                // Make sure to convert Firestore Timestamps to JS Date objects
-                startTime: data.startTime.toDate(),
-                endTime: data.endTime.toDate(),
-                createdAt: data.createdAt?.toDate(),
-                updatedAt: data.updatedAt?.toDate(),
-            } as Reservation;
-        });
-        setReservations(fetchedReservations);
-        setIsLoading(false);
-    }, (error) => {
-        console.error("Error fetching reservations in real-time: ", error);
-        toast({
-            variant: 'destructive',
-            title: 'Error',
-            description: 'Could not fetch reservation data.',
-        });
-        setIsLoading(false);
-    });
-
-    return () => unsubscribe();
-
-  }, [reservationsQuery, toast]);
+      return () => clearInterval(intervalId); // Cleanup interval on unmount
+    }
+  }, [isClient, fetchReservations]);
 
 
   const addReservation = async (reservation: Omit<Reservation, 'id' | 'createdAt' | 'updatedAt' | 'userId' | 'status'>) => {
-    if (!user || !firestore) {
+    if (!user) {
       toast({
         variant: 'destructive',
         title: 'Authentication Error',
@@ -85,15 +70,11 @@ export const ReservationsProvider: React.FC<{ children: ReactNode }> = ({ childr
     }
     
     try {
-        const reservationsCol = collection(firestore, 'reservations');
-        await addDoc(reservationsCol, {
-            ...reservation,
-            userId: user.uid,
-            status: 'Upcoming',
-            createdAt: serverTimestamp(),
-            updatedAt: serverTimestamp(),
-        });
-        // Real-time listener will handle the local state update
+      await saveReservation({
+        ...reservation,
+        userId: user.uid,
+      });
+      await fetchReservations(); // Refetch after adding
     } catch (error) {
        console.error("Error adding reservation: ", error);
        toast({
@@ -105,12 +86,9 @@ export const ReservationsProvider: React.FC<{ children: ReactNode }> = ({ childr
   };
 
   const removeReservation = async (reservationId: string) => {
-    if (!firestore) return;
-
     try {
-        const reservationDoc = doc(firestore, 'reservations', reservationId);
-        await deleteDoc(reservationDoc);
-        // Real-time listener will handle the local state update
+      await deleteReservation(reservationId);
+      await fetchReservations(); // Refetch after deleting
     } catch (error) {
        console.error("Error deleting reservation: ", error);
       toast({

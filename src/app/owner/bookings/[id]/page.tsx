@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
@@ -11,8 +10,8 @@ import { format } from 'date-fns';
 import type { Reservation } from '@/lib/types';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
-import { useDoc, useFirebase } from '@/firebase';
-import { doc } from 'firebase/firestore';
+import { getReservations } from '@/app/actions/reservations';
+import { getUsers } from '@/app/actions/users';
 
 
 type User = {
@@ -38,32 +37,42 @@ export default function BookingDetailPage() {
   const params = useParams();
   const { id } = params;
   const { toast } = useToast();
-  const { firestore } = useFirebase();
-
-  const reservationRef = useMemoFirebase(() => {
-    if (!firestore || typeof id !== 'string') return null;
-    return doc(firestore, 'reservations', id);
-  }, [firestore, id]);
-
-  const { data: reservation, isLoading: isReservationLoading } = useDoc<Reservation>(reservationRef);
   
-  const userRef = useMemoFirebase(() => {
-    if (!firestore || !reservation?.userId) return null;
-    return doc(firestore, 'users', reservation.userId);
-  }, [firestore, reservation]);
-
-  const { data: user, isLoading: isUserLoading } = useDoc<User>(userRef);
+  const [reservation, setReservation] = useState<Reservation | null>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
 
-  useEffect(() => {
-    if (!isReservationLoading && !reservation) {
+  const fetchBookingDetails = useCallback(async () => {
+    if (typeof id !== 'string') return;
+    setIsLoading(true);
+    try {
+      const allReservations = await getReservations();
+      const currentReservation = allReservations.find(res => res.id === id);
+
+      if (currentReservation) {
+        setReservation(currentReservation as any);
+        const allUsers = await getUsers();
+        const bookingUser = allUsers.find(u => u.id === (currentReservation as any).userId);
+        setUser(bookingUser || null);
+      } else {
         toast({ variant: 'destructive', title: 'Error', description: 'Booking not found.' });
         router.replace('/owner?view=bookings');
+      }
+    } catch (error) {
+      console.error(error);
+      toast({ variant: 'destructive', title: 'Error', description: 'Failed to fetch booking details.' });
+    } finally {
+      setIsLoading(false);
     }
-  }, [isReservationLoading, reservation, router, toast]);
+  }, [id, router, toast]);
+
+  useEffect(() => {
+    fetchBookingDetails();
+  }, [fetchBookingDetails]);
 
 
-  if (isReservationLoading || isUserLoading || !reservation) {
+  if (isLoading || !reservation) {
     return (
         <div className="w-full max-w-sm mx-auto mt-6">
             <Button onClick={() => router.back()} variant="outline" size="sm" className="mb-4">
@@ -89,8 +98,8 @@ export default function BookingDetailPage() {
     )
   }
   
-  const startTime = reservation.startTime.toDate ? reservation.startTime.toDate() : new Date(reservation.startTime);
-  const endTime = reservation.endTime.toDate ? reservation.endTime.toDate() : new Date(reservation.endTime);
+  const startTime = new Date(reservation.startTime);
+  const endTime = new Date(reservation.endTime);
 
 
   return (

@@ -1,19 +1,16 @@
-
 'use client';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { format } from 'date-fns';
 import { useState, useEffect, useCallback } from 'react';
 import type { Reservation } from '@/lib/types';
 import { Skeleton } from '../ui/skeleton';
-import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useRouter } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
 import { Car, Calendar, Clock, Hash, User as UserIcon, Loader2 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Separator } from '../ui/separator';
-import { useCollection, useFirebase, useFirestore, useMemoFirebase } from '@/firebase';
-import { collection } from 'firebase/firestore';
+import { getReservations } from '@/app/actions/reservations';
 
 
 type Status = 'Active' | 'Completed' | 'Upcoming';
@@ -41,44 +38,29 @@ const formatSlotId = (slotId: string | null) => {
 }
 
 export function BookingsTable() {
-  const { toast } = useToast();
-  const firestore = useFirestore();
-
-  const reservationsQuery = useMemoFirebase(() => {
-    if (!firestore) return null;
-    return collection(firestore, 'reservations');
-  }, [firestore]);
-
-  const { data: reservations, isLoading } = useCollection<Reservation>(reservationsQuery);
-
-  const [displayReservations, setDisplayReservations] = useState<Reservation[]>([]);
+  const [reservations, setReservations] = useState<Reservation[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [filter, setFilter] = useState<Status | 'all'>('all');
   const router = useRouter();
 
 
   useEffect(() => {
-    if (reservations) {
-        const now = new Date();
-        const allReservations: Reservation[] = reservations.map(res => {
-            const startTime = res.startTime.toDate ? res.startTime.toDate() : new Date(res.startTime);
-            const endTime = res.endTime.toDate ? res.endTime.toDate() : new Date(res.endTime);
-            let status: Status;
-
-            if (now > endTime) {
-            status = 'Completed';
-            } else if (now >= startTime && now < endTime) {
-            status = 'Active';
-            } else {
-            status = 'Upcoming';
-            }
-            return { ...res, status, startTime, endTime };
-        });
-        setDisplayReservations(allReservations);
-    }
-  }, [reservations]);
+    const fetchReservations = async () => {
+      setIsLoading(true);
+      try {
+        const data = await getReservations();
+        setReservations(data as Reservation[]);
+      } catch (error) {
+        console.error('Failed to fetch reservations:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchReservations();
+  }, []);
 
 
-  const filteredReservations = displayReservations?.filter((res) => {
+  const filteredReservations = reservations?.filter((res) => {
     if (filter === 'all') return true;
     return res.status === filter;
   }).sort((a, b) => new Date(b.startTime).getTime() - new Date(a.startTime).getTime());
