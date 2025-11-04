@@ -1,4 +1,6 @@
 
+'use server';
+
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Star, MessageSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -84,7 +86,7 @@ async function FeedbackList() {
 
 export default function OwnerFeedbackPage() {
     return (
-        <div className="w-full max-w-lg mx-auto py-8">
+        <div className="w-full max-w-md mx-auto py-8">
             <div className="mb-8 text-center">
                 <div className="inline-flex items-center gap-2">
                     <MessageSquare className="h-8 w-8 text-primary" />
