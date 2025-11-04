@@ -9,6 +9,7 @@ import {
   FirestoreError,
   DocumentSnapshot,
 } from 'firebase/firestore';
+import { useMemoFirebase } from '../provider';
 
 /** Utility type to add an 'id' field to a given type T. */
 type WithId<T> = T & { id: string };
@@ -38,7 +39,7 @@ export interface UseDocResult<T> {
  * @returns {UseDocResult<T>} Object with data, isLoading, error.
  */
 export function useDoc<T = any>(
-  memoizedDocRef: (DocumentReference<DocumentData> & {__memo?: boolean}) | null | undefined,
+  memoizedDocRef: (DocumentReference<DocumentData>) | null | undefined,
 ): UseDocResult<T> {
   type StateDataType = WithId<T> | null;
 
@@ -79,10 +80,6 @@ export function useDoc<T = any>(
 
     return () => unsubscribe();
   }, [memoizedDocRef]); // Re-run if the memoizedDocRef changes.
-
-  if(memoizedDocRef && !memoizedDocRef.__memo) {
-    throw new Error('The document reference passed to useDoc was not memoized with useMemoFirebase. This will cause infinite re-renders.');
-  }
 
   return { data, isLoading, error };
 }

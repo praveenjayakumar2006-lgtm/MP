@@ -12,7 +12,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { format, isSameDay } from 'date-fns';
 import { useState, useContext, useEffect } from 'react';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Tabs, TabsList, TabsContent } from '@/components/ui/tabs';
 import type { Reservation } from '@/lib/types';
 import { Skeleton } from '../ui/skeleton';
 import { ReservationsContext } from '@/context/reservations-context';

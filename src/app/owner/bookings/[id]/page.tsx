@@ -2,9 +2,7 @@
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
-import { useDoc, useFirebase, useMemoFirebase } from '@/firebase';
-import { doc, getDoc, FirestoreError } from 'firebase/firestore';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ArrowLeft, Calendar, Car, Clock, Hash, Mail, User as UserIcon } from 'lucide-react';
@@ -13,16 +11,8 @@ import { format } from 'date-fns';
 import type { Reservation } from '@/lib/types';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
-
-type UserProfile = {
-  firstName: string;
-  lastName: string;
-  email: string;
-};
-
-type EnrichedReservation = Reservation & {
-  user?: UserProfile;
-};
+import { getReservationsFromFile } from '@/app/reservations/actions';
+import { useToast } from '@/hooks/use-toast';
 
 function DetailItem({ icon: Icon, label, value }: { icon: React.ElementType, label: string, value: React.ReactNode }) {
     return (
@@ -40,50 +30,32 @@ export default function BookingDetailPage() {
   const router = useRouter();
   const params = useParams();
   const { id } = params;
-  const { firestore } = useFirebase();
-  const [reservation, setReservation] = useState<EnrichedReservation | null>(null);
+  const { toast } = useToast();
+  const [reservation, setReservation] = useState<Reservation | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const reservationRef = useMemoFirebase(() => {
-    if (!firestore || typeof id !== 'string') return null;
-    return doc(firestore, 'reservations', id);
-  }, [firestore, id]);
+  const fetchReservationDetails = useCallback(async () => {
+    if (typeof id !== 'string') return;
+    setIsLoading(true);
+    const result = await getReservationsFromFile();
 
-  const { data: reservationData, isLoading: isReservationLoading, error } = useDoc<Reservation>(reservationRef);
-  
-  useEffect(() => {
-    if (error) {
-        console.error("Error fetching booking details:", error);
-    }
-    const fetchFullDetails = async () => {
-        if (reservationData && firestore) {
-            let enrichedData: EnrichedReservation = {
-                ...reservationData,
-                startTime: (reservationData.startTime as any).toDate(),
-                endTime: (reservationData.endTime as any).toDate(),
-            };
-
-            if (reservationData.userId) {
-                const userDocRef = doc(firestore, 'users', reservationData.userId);
-                try {
-                  const userDoc = await getDoc(userDocRef);
-                  if (userDoc.exists()) {
-                      enrichedData.user = userDoc.data() as UserProfile;
-                  }
-                } catch (userError) {
-                    console.error("Could not fetch user profile for booking:", userError)
-                } finally {
-                  setReservation(enrichedData);
-                }
-            } else {
-                setReservation(enrichedData);
-            }
+    if (result.success && result.data) {
+        const found = result.data.find(res => res.id === id);
+        if (found) {
+            setReservation(found);
+        } else {
+            toast({ variant: 'destructive', title: 'Error', description: 'Booking not found.' });
+            router.replace('/owner?view=bookings');
         }
-        setIsLoading(isReservationLoading);
+    } else {
+        toast({ variant: 'destructive', title: 'Error', description: 'Could not fetch booking details.' });
     }
+    setIsLoading(false);
+  }, [id, router, toast]);
 
-    fetchFullDetails();
-  }, [reservationData, isReservationLoading, firestore, error])
+  useEffect(() => {
+    fetchReservationDetails();
+  }, [fetchReservationDetails]);
 
 
   if (isLoading || !reservation) {
@@ -120,7 +92,8 @@ export default function BookingDetailPage() {
     )
   }
 
-  const userFullName = reservation.user ? `${reservation.user.firstName || ''} ${reservation.user.lastName || ''}`.trim() : 'Unknown User';
+  // Since we don't have user profiles in files, we can't display user details like name/email.
+  // We will just show the user ID.
 
   return (
     <div className="w-full max-w-md mx-auto">
@@ -143,23 +116,19 @@ export default function BookingDetailPage() {
                    <DetailItem icon={Calendar} label="Start Time" value={format(new Date(reservation.startTime), 'PPp')} />
                    <DetailItem icon={Clock} label="End Time" value={format(new Date(reservation.endTime), 'PPp')} />
                 </div>
-                {reservation.user && (
-                    <>
-                        <Separator />
+                <Separator />
+                <div>
+                    <h3 className="text-base font-semibold mb-3">User Information</h3>
+                      <div className="flex items-center gap-3">
+                        <Avatar className="h-10 w-10">
+                            <AvatarFallback><UserIcon /></AvatarFallback>
+                        </Avatar>
                         <div>
-                            <h3 className="text-base font-semibold mb-3">User Information</h3>
-                             <div className="flex items-center gap-3">
-                                <Avatar className="h-10 w-10">
-                                    <AvatarFallback>{userFullName.charAt(0).toUpperCase()}</AvatarFallback>
-                                </Avatar>
-                                <div>
-                                    <p className="font-semibold text-sm">{userFullName}</p>
-                                    <p className="text-xs text-muted-foreground">{reservation.user.email}</p>
-                                </div>
-                            </div>
+                            <p className="font-semibold text-sm">User ID</p>
+                            <p className="text-xs text-muted-foreground">{reservation.userId}</p>
                         </div>
-                    </>
-                )}
+                    </div>
+                </div>
             </CardContent>
         </Card>
     </div>

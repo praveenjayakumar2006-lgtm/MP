@@ -1,3 +1,4 @@
+
 'use client';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -22,9 +23,8 @@ import {
 } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
-import { useFirebase, setDocumentNonBlocking } from '@/firebase';
+import { useFirebase } from '@/firebase';
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
-import { doc, serverTimestamp } from 'firebase/firestore';
 
 const signupSchema = z.object({
   fullName: z.string().min(2, 'Full name must be at least 2 characters.'),
@@ -51,11 +51,11 @@ export default function SignupPage() {
   });
 
   async function onSubmit(values: SignupFormValues) {
-    if (!auth || !firestore) {
+    if (!auth) {
        toast({
         variant: 'destructive',
         title: 'Firebase not initialized',
-        description: 'Authentication or Firestore service is not available.',
+        description: 'Authentication service is not available.',
       });
       return;
     }
@@ -67,18 +67,6 @@ export default function SignupPage() {
         await updateProfile(user, {
           displayName: values.fullName,
         });
-
-        const userDocRef = doc(firestore, 'users', user.uid);
-        const [firstName, ...lastName] = values.fullName.split(' ');
-        
-        setDocumentNonBlocking(userDocRef, {
-          id: user.uid,
-          firstName: firstName,
-          lastName: lastName.join(' '),
-          email: values.email,
-          signUpDate: serverTimestamp(),
-          role: 'user', // Add role for new users
-        }, { merge: true });
       }
 
       toast({

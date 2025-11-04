@@ -1,11 +1,11 @@
 
 'use client';
 
-import React, { createContext, useState, ReactNode, useEffect } from 'react';
+import React, { createContext, useState, ReactNode, useEffect, useCallback } from 'react';
 import type { Reservation } from '@/lib/types';
-import { useCollection, useFirebase, useUser, useMemoFirebase } from '@/firebase';
-import { collection, Timestamp, query, where, addDoc, deleteDoc, doc } from 'firebase/firestore';
+import { useUser } from '@/firebase';
 import { useToast } from '@/hooks/use-toast';
+import { getReservationsFromFile, saveReservationToFile, deleteReservationFromFile } from '@/app/reservations/actions';
 
 interface ReservationsContextType {
   reservations: Reservation[];
@@ -18,58 +18,54 @@ interface ReservationsContextType {
 export const ReservationsContext = createContext<ReservationsContextType | undefined>(undefined);
 
 export const ReservationsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const { firestore } = useFirebase();
   const { user } = useUser();
   const { toast } = useToast();
-
-  const reservationsQuery = useMemoFirebase(() => {
-    if (firestore && user?.uid) {
-      return query(collection(firestore, 'reservations'), where('userId', '==', user.uid));
-    }
-    return null;
-  }, [firestore, user]);
-
-  const { data: reservationsData, isLoading, error } = useCollection<Reservation>(reservationsQuery);
   
   const [reservations, setReservations] = useState<Reservation[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
   }, []);
+
+  const fetchReservations = useCallback(async () => {
+    setIsLoading(true);
+    const result = await getReservationsFromFile();
+    if (result.success && result.data) {
+      setReservations(result.data);
+    } else {
+      setReservations([]);
+      console.error("Failed to fetch reservations:", result.message);
+    }
+    setIsLoading(false);
+  }, []);
   
   useEffect(() => {
-    if (reservationsData) {
-      const formattedReservations = reservationsData.map(r => ({
-        ...r,
-        startTime: (r.startTime as any).toDate(),
-        endTime: (r.endTime as any).toDate(),
-        createdAt: (r.createdAt as any)?.toDate(),
-        updatedAt: (r.updatedAt as any)?.toDate(),
-      }));
-      setReservations(formattedReservations);
-    } else if (!isLoading && user) {
-        setReservations([]);
+    if(isClient) {
+      fetchReservations();
     }
-  }, [reservationsData, user, isLoading]);
+  }, [isClient, fetchReservations]);
 
   const addReservation = async (reservation: Omit<Reservation, 'id' | 'createdAt' | 'updatedAt' | 'userId' | 'status'>) => {
-    if (!firestore || !user) return;
+    if (!user) {
+      toast({
+        variant: 'destructive',
+        title: 'Authentication Error',
+        description: 'You must be logged in to make a reservation.',
+      });
+      return;
+    }
     
-    const newReservation = {
+    const result = await saveReservationToFile({
       ...reservation,
       userId: user.uid,
-      status: 'Upcoming' as const,
-      createdAt: Timestamp.now(),
-      updatedAt: Timestamp.now(),
-      startTime: Timestamp.fromDate(reservation.startTime),
-      endTime: Timestamp.fromDate(reservation.endTime),
-    };
-    
-    try {
-      await addDoc(collection(firestore, 'reservations'), newReservation);
-    } catch(e) {
-      console.error("Error adding reservation: ", e);
+    });
+
+    if (result.success) {
+      fetchReservations(); // Refetch all reservations to update the state
+    } else {
+      console.error("Error adding reservation: ", result.message);
        toast({
         variant: 'destructive',
         title: 'Reservation Error',
@@ -79,12 +75,11 @@ export const ReservationsProvider: React.FC<{ children: ReactNode }> = ({ childr
   };
 
   const removeReservation = async (reservationId: string) => {
-    if (!firestore) return;
-    const reservationDocRef = doc(firestore, 'reservations', reservationId);
-    try {
-      await deleteDoc(reservationDocRef);
-    } catch(e) {
-      console.error("Error deleting reservation: ", e);
+    const result = await deleteReservationFromFile(reservationId);
+    if (result.success) {
+      fetchReservations(); // Refetch to update the list
+    } else {
+      console.error("Error deleting reservation: ", result.message);
       toast({
         variant: 'destructive',
         title: 'Cancellation Error',
@@ -93,12 +88,8 @@ export const ReservationsProvider: React.FC<{ children: ReactNode }> = ({ childr
     }
   };
 
-  if (error) {
-    console.error("Error fetching reservations:", error);
-  }
-
   return (
-    <ReservationsContext.Provider value={{ reservations, addReservation, removeReservation, isLoading: isLoading, isClient }}>
+    <ReservationsContext.Provider value={{ reservations, addReservation, removeReservation, isLoading, isClient }}>
       {children}
     </ReservationsContext.Provider>
   );

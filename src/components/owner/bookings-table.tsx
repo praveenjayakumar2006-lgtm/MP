@@ -2,11 +2,9 @@
 'use client';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { format } from 'date-fns';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import type { Reservation } from '@/lib/types';
 import { Skeleton } from '../ui/skeleton';
-import { useFirebase, useCollection, useMemoFirebase, useUser } from '@/firebase';
-import { collection, query, orderBy } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useRouter } from 'next/navigation';
@@ -14,6 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Car, Calendar, Clock, Hash, User as UserIcon, Loader2 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Separator } from '../ui/separator';
+import { getReservationsFromFile } from '@/app/reservations/actions';
 
 type Status = 'Active' | 'Completed' | 'Upcoming';
 
@@ -40,61 +39,46 @@ const formatSlotId = (slotId: string | null) => {
 }
 
 export function BookingsTable() {
-  const { firestore } = useFirebase();
-  const { user, isUserLoading } = useUser();
-  const [reservations, setReservations] = useState<Reservation[]>([]);
   const { toast } = useToast();
+  const [reservations, setReservations] = useState<Reservation[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [filter, setFilter] = useState<Status | 'all'>('all');
   const router = useRouter();
-  const [isReady, setIsReady] = useState(false);
 
-  useEffect(() => {
-    const role = localStorage.getItem('role');
-    if (!isUserLoading && role === 'owner') {
-      setIsReady(true);
-    }
-  }, [isUserLoading, user]);
+  const fetchReservations = useCallback(async () => {
+    setIsLoading(true);
+    const result = await getReservationsFromFile();
+    if (result.success && result.data) {
+        const now = new Date();
+        const allReservations: Reservation[] = result.data.map(res => {
+            const startTime = new Date(res.startTime);
+            const endTime = new Date(res.endTime);
+            let status: Status;
 
-  const reservationsQuery = useMemoFirebase(() => {
-    if (!firestore || !isReady) return null;
-    return query(collection(firestore, 'reservations'), orderBy('createdAt', 'desc'));
-  }, [firestore, isReady]);
-
-  const { data: reservationsData, isLoading, error: collectionError } = useCollection<Reservation>(reservationsQuery);
-
-  useEffect(() => {
-    if (collectionError) {
-      console.error("Error fetching bookings:", collectionError);
-      toast({
-        variant: "destructive",
-        title: "Error fetching bookings",
-        description: "Could not fetch user bookings. Please try again later.",
-      });
-    }
-    if (reservationsData) {
-      const now = new Date();
-      const allReservations: Reservation[] = reservationsData.map(res => {
-        const startTime = (res.startTime as any).toDate();
-        const endTime = (res.endTime as any).toDate();
-        let status: Status;
-
-        if (now > endTime) {
-          status = 'Completed';
-        } else if (now >= startTime && now < endTime) {
-          status = 'Active';
-        } else {
-          status = 'Upcoming';
-        }
-        return { ...res, status, startTime, endTime };
-      });
-      setReservations(allReservations);
-    } else if (!isLoading && isReady) {
+            if (now > endTime) {
+            status = 'Completed';
+            } else if (now >= startTime && now < endTime) {
+            status = 'Active';
+            } else {
+            status = 'Upcoming';
+            }
+            return { ...res, status, startTime, endTime };
+        });
+        setReservations(allReservations);
+    } else {
         setReservations([]);
+        toast({
+            variant: "destructive",
+            title: "Error fetching bookings",
+            description: "Could not fetch user bookings. Please try again later.",
+        });
     }
-  }, [reservationsData, isLoading, isReady, collectionError, toast]);
+    setIsLoading(false);
+  }, [toast]);
 
-
-  const isDataLoading = isLoading || !isReady;
+  useEffect(() => {
+    fetchReservations();
+  }, [fetchReservations]);
 
 
   const filteredReservations = reservations?.filter((res) => {
@@ -180,8 +164,8 @@ export function BookingsTable() {
               </TabsList>
             </div>
             <TabsContent value={filter} className="mt-8">
-              {isDataLoading && <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">{renderSkeletons()}</div>}
-              {!isDataLoading && (
+              {isLoading && <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">{renderSkeletons()}</div>}
+              {!isLoading && (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {filteredReservations && filteredReservations.map((reservation) => {
                       return (
@@ -224,7 +208,7 @@ export function BookingsTable() {
                   })}
                 </div>
               )}
-              {!isDataLoading && (!filteredReservations || filteredReservations.length === 0) && (
+              {!isLoading && (!filteredReservations || filteredReservations.length === 0) && (
                 <Card className="mt-6">
                   <CardContent className="pt-6 text-center text-muted-foreground">
                     No {filter !== 'all' ? filter.toLowerCase() : ''} bookings found.
