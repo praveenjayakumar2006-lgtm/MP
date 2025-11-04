@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { getFeedback } from "@/app/feedback/actions";
-import { format }s from "date-fns";
+import { format } from "date-fns";
 
 type Feedback = {
   name: string;
