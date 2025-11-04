@@ -193,10 +193,6 @@ export function BookingsTable() {
                                     <Badge variant={getStatusBadgeVariant(reservation.status)}>{reservation.status}</Badge>
                                   </div>
                                   <Separator />
-                                  <div className="flex items-center gap-2 text-xs pt-1.5 text-muted-foreground">
-                                      <UserIcon className="h-3.5 w-3.5" />
-                                      <span className="truncate">User ID: {reservation.userId}</span>
-                                  </div>
                               </CardContent>
                               <CardFooter className="p-1 pt-2 justify-between items-center">
                                 <Button size="sm" variant="outline" onClick={() => router.push(`/owner/bookings/${reservation.id}`)}>
