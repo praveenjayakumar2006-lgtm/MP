@@ -10,13 +10,14 @@ import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
 import type { Reservation } from '@/lib/types';
 import { Separator } from '@/components/ui/separator';
-import { getReservationsFromFile } from '@/app/reservations/actions';
-import { getUsersFromFile } from '@/app/users/actions';
 import { useToast } from '@/hooks/use-toast';
+import { useDoc, useFirebase } from '@/firebase';
+import { doc } from 'firebase/firestore';
+
 
 type User = {
     id: string;
-    name: string;
+    username: string;
     email: string;
 }
 
@@ -37,43 +38,32 @@ export default function BookingDetailPage() {
   const params = useParams();
   const { id } = params;
   const { toast } = useToast();
-  const [reservation, setReservation] = useState<Reservation | null>(null);
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const { firestore } = useFirebase();
 
-  const fetchReservationDetails = useCallback(async () => {
-    if (typeof id !== 'string') return;
-    setIsLoading(true);
-    
-    const [reservationsResult, usersResult] = await Promise.all([
-        getReservationsFromFile(),
-        getUsersFromFile()
-    ]);
+  const reservationRef = useMemoFirebase(() => {
+    if (!firestore || typeof id !== 'string') return null;
+    return doc(firestore, 'reservations', id);
+  }, [firestore, id]);
 
-    if (reservationsResult.success && reservationsResult.data) {
-        const foundReservation = reservationsResult.data.find(res => res.id === id);
-        if (foundReservation) {
-            setReservation(foundReservation);
-            if (usersResult.success && usersResult.data) {
-                const foundUser = usersResult.data.find(u => u.id === foundReservation.userId);
-                setUser(foundUser || null);
-            }
-        } else {
-            toast({ variant: 'destructive', title: 'Error', description: 'Booking not found.' });
-            router.replace('/owner?view=bookings');
-        }
-    } else {
-        toast({ variant: 'destructive', title: 'Error', description: 'Could not fetch booking details.' });
-    }
-    setIsLoading(false);
-  }, [id, router, toast]);
+  const { data: reservation, isLoading: isReservationLoading } = useDoc<Reservation>(reservationRef);
+  
+  const userRef = useMemoFirebase(() => {
+    if (!firestore || !reservation?.userId) return null;
+    return doc(firestore, 'users', reservation.userId);
+  }, [firestore, reservation]);
+
+  const { data: user, isLoading: isUserLoading } = useDoc<User>(userRef);
+
 
   useEffect(() => {
-    fetchReservationDetails();
-  }, [fetchReservationDetails]);
+    if (!isReservationLoading && !reservation) {
+        toast({ variant: 'destructive', title: 'Error', description: 'Booking not found.' });
+        router.replace('/owner?view=bookings');
+    }
+  }, [isReservationLoading, reservation, router, toast]);
 
 
-  if (isLoading || !reservation) {
+  if (isReservationLoading || isUserLoading || !reservation) {
     return (
         <div className="w-full max-w-sm mx-auto mt-6">
             <Button onClick={() => router.back()} variant="outline" size="sm" className="mb-4">
@@ -98,6 +88,10 @@ export default function BookingDetailPage() {
         </div>
     )
   }
+  
+  const startTime = reservation.startTime.toDate ? reservation.startTime.toDate() : new Date(reservation.startTime);
+  const endTime = reservation.endTime.toDate ? reservation.endTime.toDate() : new Date(reservation.endTime);
+
 
   return (
     <div className="w-full max-w-sm mx-auto mt-6">
@@ -109,7 +103,7 @@ export default function BookingDetailPage() {
             <CardHeader className="pb-4">
                 <CardTitle className="text-xl">Booking Details</CardTitle>
                 <CardDescription>
-                    {user ? `${user.name} (${user.email})` : 'User details not found'}
+                    {user ? `${user.username} (${user.email})` : 'User details not found'}
                 </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4 pt-0">
@@ -117,8 +111,8 @@ export default function BookingDetailPage() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4 pt-2">
                    <DetailItem icon={Hash} label="Slot ID" value={reservation.slotId} />
                    <DetailItem icon={Car} label="Vehicle Plate" value={reservation.vehiclePlate} />
-                   <DetailItem icon={Calendar} label="Start Time" value={format(new Date(reservation.startTime), 'PPp')} />
-                   <DetailItem icon={Clock} label="End Time" value={format(new Date(reservation.endTime), 'PPp')} />
+                   <DetailItem icon={Calendar} label="Start Time" value={format(startTime, 'PPp')} />
+                   <DetailItem icon={Clock} label="End Time" value={format(endTime, 'PPp')} />
                 </div>
             </CardContent>
         </Card>

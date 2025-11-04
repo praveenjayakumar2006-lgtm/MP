@@ -12,7 +12,9 @@ import { Badge } from '@/components/ui/badge';
 import { Car, Calendar, Clock, Hash, User as UserIcon, Loader2 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Separator } from '../ui/separator';
-import { getReservationsFromFile } from '@/app/reservations/actions';
+import { useCollection, useFirebase } from '@/firebase';
+import { collection } from 'firebase/firestore';
+
 
 type Status = 'Active' | 'Completed' | 'Upcoming';
 
@@ -40,17 +42,20 @@ const formatSlotId = (slotId: string | null) => {
 
 export function BookingsTable() {
   const { toast } = useToast();
-  const [reservations, setReservations] = useState<Reservation[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { firestore } = useFirebase();
+  const { data: reservations, isLoading } = useCollection<Reservation>(
+    firestore ? collection(firestore, 'reservations') : null
+  );
+
+  const [displayReservations, setDisplayReservations] = useState<Reservation[]>([]);
   const [filter, setFilter] = useState<Status | 'all'>('all');
   const router = useRouter();
 
-  const fetchReservations = useCallback(async () => {
-    setIsLoading(true);
-    const result = await getReservationsFromFile();
-    if (result.success && result.data) {
+
+  useEffect(() => {
+    if (reservations) {
         const now = new Date();
-        const allReservations: Reservation[] = result.data.map(res => {
+        const allReservations: Reservation[] = reservations.map(res => {
             const startTime = new Date(res.startTime);
             const endTime = new Date(res.endTime);
             let status: Status;
@@ -64,24 +69,12 @@ export function BookingsTable() {
             }
             return { ...res, status, startTime, endTime };
         });
-        setReservations(allReservations);
-    } else {
-        setReservations([]);
-        toast({
-            variant: "destructive",
-            title: "Error fetching bookings",
-            description: "Could not fetch user bookings. Please try again later.",
-        });
+        setDisplayReservations(allReservations);
     }
-    setIsLoading(false);
-  }, [toast]);
-
-  useEffect(() => {
-    fetchReservations();
-  }, [fetchReservations]);
+  }, [reservations]);
 
 
-  const filteredReservations = reservations?.filter((res) => {
+  const filteredReservations = displayReservations?.filter((res) => {
     if (filter === 'all') return true;
     return res.status === filter;
   }).sort((a, b) => new Date(b.startTime).getTime() - new Date(a.startTime).getTime());

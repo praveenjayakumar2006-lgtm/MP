@@ -10,9 +10,9 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
-import { useUser } from '@/firebase';
+import { useFirebase, useUser } from '@/firebase';
 import { useToast } from '@/hooks/use-toast';
-import { saveViolationToFile } from '../actions';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
 
 function ViolationResultContent() {
@@ -24,7 +24,7 @@ function ViolationResultContent() {
 
   const [submissionStatus, setSubmissionStatus] = useState<'pending' | 'confirmed' | 'rejected'>('pending');
   const [imageUrl, setImageUrl] = useState<string | null>(null);
-  const { user } = useUser();
+  const { user, firestore } = useUser();
   const { toast } = useToast();
 
   useEffect(() => {
@@ -35,7 +35,7 @@ function ViolationResultContent() {
   }, []);
 
   const handleConfirm = async () => {
-    if (!user || !slotNumber || !violationType || !licensePlate) {
+    if (!user || !firestore || !slotNumber || !violationType || !licensePlate) {
        toast({
         variant: 'destructive',
         title: 'Error',
@@ -44,18 +44,19 @@ function ViolationResultContent() {
       return;
     }
     
-    const result = await saveViolationToFile({
-        slotNumber,
-        violationType,
-        licensePlate,
-        imageUrl: imageUrl,
-        userId: user.uid,
-    });
-
-    if (result.success) {
-      setSubmissionStatus('confirmed');
-    } else {
-      console.error("Error submitting violation: ", result.message);
+    try {
+        const violationsCol = collection(firestore, 'violations');
+        await addDoc(violationsCol, {
+            slotNumber,
+            violationType,
+            licensePlate,
+            imageUrl: imageUrl || null,
+            userId: user.uid,
+            createdAt: serverTimestamp(),
+        });
+        setSubmissionStatus('confirmed');
+    } catch (error) {
+      console.error("Error submitting violation: ", error);
       toast({
         variant: 'destructive',
         title: 'Submission Error',

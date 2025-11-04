@@ -1,23 +1,61 @@
 
+'use client';
+
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Star, MessageSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { getFeedback } from "@/app/feedback/actions";
 import { format } from "date-fns";
+import { useCollection } from "@/firebase";
+import { collection } from "firebase/firestore";
+import { useFirebase } from "@/firebase";
+import { Skeleton } from "@/components/ui/skeleton";
+
 
 type Feedback = {
+  id: string;
   name: string;
   email: string;
   rating: number;
   feedback: string;
-  createdAt: string;
+  createdAt: {
+    seconds: number;
+    nanoseconds: number;
+  };
 };
 
-async function FeedbackList() {
-    const result = await getFeedback();
+function FeedbackList() {
+    const { firestore } = useFirebase();
+    const { data: feedbackData, isLoading, error } = useCollection<Feedback>(
+        firestore ? collection(firestore, 'feedback') : null
+    );
 
-    if (!result.success || !result.data) {
+    if (isLoading) {
+        return (
+            <div className="space-y-4">
+                {Array.from({ length: 3 }).map((_, i) => (
+                    <Card key={i}>
+                        <CardHeader className="flex-row items-start gap-4 space-y-0">
+                            <Skeleton className="h-12 w-12 rounded-full" />
+                            <div className="flex-1 space-y-2">
+                                <Skeleton className="h-4 w-32" />
+                                <Skeleton className="h-3 w-48" />
+                            </div>
+                        </CardHeader>
+                        <CardContent>
+                            <Skeleton className="h-4 w-full" />
+                            <Skeleton className="h-4 w-3/4 mt-2" />
+                        </CardContent>
+                        <CardFooter>
+                            <Skeleton className="h-3 w-40" />
+                        </CardFooter>
+                    </Card>
+                ))}
+            </div>
+        )
+    }
+
+    if (error) {
         return (
              <Card>
                 <CardContent className="pt-6">
@@ -29,9 +67,7 @@ async function FeedbackList() {
         )
     }
     
-    const feedbackData: Feedback[] = result.data;
-
-    if (feedbackData.length === 0) {
+    if (!feedbackData || feedbackData.length === 0) {
         return (
             <div className="w-full rounded-lg border bg-card text-card-foreground p-6 text-center text-muted-foreground">
                 No feedback has been submitted yet.
@@ -39,10 +75,12 @@ async function FeedbackList() {
         )
     }
 
+    const sortedFeedback = [...feedbackData].sort((a, b) => b.createdAt.seconds - a.createdAt.seconds);
+
     return (
         <div className="space-y-4">
-            {feedbackData.map((feedback, index) => (
-                <Card key={index}>
+            {sortedFeedback.map((feedback) => (
+                <Card key={feedback.id}>
                     <CardHeader className="flex-row items-start gap-4 space-y-0">
                         <Avatar className="h-12 w-12 border">
                             <AvatarFallback>{feedback.name.charAt(0).toUpperCase()}</AvatarFallback>
@@ -72,7 +110,7 @@ async function FeedbackList() {
                     </CardContent>
                     <CardFooter>
                         <p className="text-xs text-muted-foreground">
-                            Submitted on {format(new Date(feedback.createdAt), 'PPP p')}
+                            Submitted on {format(new Date(feedback.createdAt.seconds * 1000), 'PPP p')}
                         </p>
                     </CardFooter>
                 </Card>

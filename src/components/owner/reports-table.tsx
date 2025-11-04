@@ -8,14 +8,19 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '../ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { getViolations } from '@/app/violations/actions';
+import { useCollection, useFirebase } from '@/firebase';
+import { collection } from 'firebase/firestore';
+
 
 type Violation = {
-    id?: string;
+    id: string;
     slotNumber: string;
     violationType: string;
     licensePlate: string;
-    createdAt: string;
+    createdAt: {
+        seconds: number;
+        nanoseconds: number;
+    };
     imageUrl?: string;
 };
 
@@ -42,28 +47,12 @@ const formatSlotId = (slotId: string | null) => {
 
 
 export function ReportsTable() {
-    const [violations, setViolations] = useState<Violation[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const { toast } = useToast();
+    const { firestore } = useFirebase();
+    const { data: violations, isLoading } = useCollection<Violation>(
+        firestore ? collection(firestore, 'violations') : null
+    );
 
-    useEffect(() => {
-        const fetchViolations = async () => {
-            setIsLoading(true);
-            const result = await getViolations();
-            if (result.success) {
-                setViolations(result.data || []);
-            } else {
-                toast({
-                    variant: "destructive",
-                    title: "Error fetching reports",
-                    description: "Could not fetch violation reports. Please try again later.",
-                });
-            }
-            setIsLoading(false);
-        };
-
-        fetchViolations();
-    }, [toast]);
+    const sortedViolations = violations?.sort((a,b) => b.createdAt.seconds - a.createdAt.seconds);
 
     const renderSkeletons = () => (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -88,8 +77,8 @@ export function ReportsTable() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {isLoading && renderSkeletons()}
-        {!isLoading && violations?.map((violation, index) => (
-             <Card key={index}>
+        {!isLoading && sortedViolations?.map((violation) => (
+             <Card key={violation.id}>
                 <CardContent className="p-4 space-y-4">
                      {violation.imageUrl && (
                         <div className="overflow-hidden rounded-lg">
@@ -114,7 +103,7 @@ export function ReportsTable() {
                 </CardContent>
                  <CardFooter className="p-4 pt-0">
                     <p className="text-xs text-muted-foreground">
-                       Reported on {violation.createdAt ? format(new Date(violation.createdAt), 'PPP p') : 'N/A'}
+                       Reported on {violation.createdAt ? format(new Date(violation.createdAt.seconds * 1000), 'PPP p') : 'N/A'}
                     </p>
                 </CardFooter>
             </Card>

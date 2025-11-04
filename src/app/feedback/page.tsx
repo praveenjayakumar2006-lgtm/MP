@@ -25,7 +25,9 @@ import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
-import { saveFeedbackToFile } from './actions';
+import { useFirebase, useUser } from '@/firebase';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+
 
 const feedbackSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters.'),
@@ -40,6 +42,8 @@ export default function FeedbackPage() {
   const router = useRouter();
   const [hoverRating, setHoverRating] = useState(0);
   const { toast } = useToast();
+  const { firestore } = useFirebase();
+  const { user } = useUser();
 
   const form = useForm<FeedbackFormValues>({
     resolver: zodResolver(feedbackSchema),
@@ -52,16 +56,31 @@ export default function FeedbackPage() {
   });
 
   async function onSubmit(values: FeedbackFormValues) {
-    const result = await saveFeedbackToFile(values);
-
-    if (result.success) {
+    if (!firestore || !user) {
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'You must be logged in to submit feedback.',
+      });
+      return;
+    }
+    
+    try {
+      const feedbackCol = collection(firestore, 'feedback');
+      await addDoc(feedbackCol, {
+        ...values,
+        userId: user.uid,
+        createdAt: serverTimestamp(),
+      });
+      
       toast({
         title: 'Feedback Submitted',
         description: 'Thank you for your feedback!',
       });
       router.push('/feedback/success');
-    } else {
-      console.error("Error submitting feedback: ", result.message);
+
+    } catch (error) {
+      console.error('Error submitting feedback: ', error);
       toast({
         variant: 'destructive',
         title: 'Submission Error',
