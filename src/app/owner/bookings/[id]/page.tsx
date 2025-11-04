@@ -5,11 +5,10 @@ import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ArrowLeft, Calendar, Car, Clock, Hash, Mail, User as UserIcon } from 'lucide-react';
+import { ArrowLeft, Calendar, Car, Clock, Hash } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
 import type { Reservation } from '@/lib/types';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { getReservationsFromFile } from '@/app/reservations/actions';
 import { useToast } from '@/hooks/use-toast';
@@ -78,14 +77,6 @@ export default function BookingDetailPage() {
                         <Skeleton className="h-10 w-full" />
                         <Skeleton className="h-10 w-full" />
                     </div>
-                     <Skeleton className="h-px w-full" />
-                     <div className="flex items-center gap-4">
-                        <Skeleton className="h-10 w-10 rounded-full" />
-                        <div className="space-y-2">
-                             <Skeleton className="h-5 w-28" />
-                             <Skeleton className="h-4 w-40" />
-                        </div>
-                     </div>
                 </CardContent>
             </Card>
         </div>
@@ -115,19 +106,6 @@ export default function BookingDetailPage() {
                    <DetailItem icon={Car} label="Vehicle Plate" value={reservation.vehiclePlate} />
                    <DetailItem icon={Calendar} label="Start Time" value={format(new Date(reservation.startTime), 'PPp')} />
                    <DetailItem icon={Clock} label="End Time" value={format(new Date(reservation.endTime), 'PPp')} />
-                </div>
-                <Separator />
-                <div>
-                    <h3 className="text-base font-semibold mb-3">User Information</h3>
-                      <div className="flex items-center gap-3">
-                        <Avatar className="h-10 w-10">
-                            <AvatarFallback><UserIcon /></AvatarFallback>
-                        </Avatar>
-                        <div>
-                            <p className="font-semibold text-sm">User ID</p>
-                            <p className="text-xs text-muted-foreground">{reservation.userId}</p>
-                        </div>
-                    </div>
                 </div>
             </CardContent>
         </Card>
