@@ -47,7 +47,13 @@ export const ReservationsProvider: React.FC<{ children: ReactNode }> = ({ childr
   
   useEffect(() => {
     if(isClient) {
-      fetchReservations(true);
+      fetchReservations(true); // Initial fetch
+
+      const intervalId = setInterval(() => {
+        fetchReservations(); // Poll for updates every second
+      }, 1000);
+
+      return () => clearInterval(intervalId); // Cleanup on unmount
     }
   }, [isClient, fetchReservations]);
 
