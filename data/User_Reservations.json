@@ -1,27 +1,5 @@
 [
   {
-    "slotId": "B8",
-    "vehiclePlate": "TN72FB1234",
-    "startTime": "2025-11-25T22:00:00.000Z",
-    "endTime": "2025-11-26T03:00:00.000Z",
-    "userId": "LRPuR03RlPgNID1f0d675EDXqdQ2",
-    "userName": "Vaishuuu",
-    "id": "res_1762316690579_ng56ycy",
-    "createdAt": "2025-11-05T04:24:50.579Z",
-    "status": "Upcoming"
-  },
-  {
-    "slotId": "B5",
-    "vehiclePlate": "TN72FB1234",
-    "startTime": "2025-11-25T22:00:00.000Z",
-    "endTime": "2025-11-26T03:00:00.000Z",
-    "userId": "LRPuR03RlPgNID1f0d675EDXqdQ2",
-    "userName": "Vaishuuu",
-    "id": "res_1762316694776_m6nzr8g",
-    "createdAt": "2025-11-05T04:24:54.776Z",
-    "status": "Upcoming"
-  },
-  {
     "slotId": "C4",
     "vehiclePlate": "TN72FB1234",
     "startTime": "2025-11-05T21:30:00.000Z",
@@ -31,6 +9,18 @@
     "email": "727723euec110@skcet.ac.in",
     "id": "res_1762317573038_36xgoby",
     "createdAt": "2025-11-05T04:39:33.038Z",
+    "status": "Upcoming"
+  },
+  {
+    "slotId": "B2",
+    "vehiclePlate": "TN72FB1234",
+    "startTime": "2025-11-25T22:00:00.000Z",
+    "endTime": "2025-11-26T03:00:00.000Z",
+    "userId": "LRPuR03RlPgNID1f0d675EDXqdQ2",
+    "userName": "Vaishuuu",
+    "email": "vaishu@gmail.com",
+    "id": "res_1762317664398_97idnsr",
+    "createdAt": "2025-11-05T04:41:04.398Z",
     "status": "Upcoming"
   }
 ]

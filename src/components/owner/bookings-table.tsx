@@ -12,6 +12,8 @@ import { Car, Calendar, Clock, Hash, User as UserIcon, Loader2 } from 'lucide-re
 import { Button } from '../ui/button';
 import { Separator } from '../ui/separator';
 import { ReservationsContext } from '@/context/reservations-context';
+import type { VariantProps } from 'class-variance-authority';
+import { badgeVariants } from '@/components/ui/badge';
 
 
 type Status = 'Active' | 'Completed' | 'Upcoming';
@@ -56,7 +58,7 @@ export function BookingsTable() {
     const statusA = statusOrder[a.status];
     const statusB = statusOrder[b.status];
 
-    if (statusA !== statusB) {
+    if (filter === 'all' && statusA !== statusB) {
         return statusA - statusB;
     }
     
@@ -91,14 +93,14 @@ export function BookingsTable() {
       </Card>
     ));
 
-  const getStatusBadgeVariant = (status: Status) => {
+  const getStatusBadgeVariant = (status: Status): VariantProps<typeof badgeVariants>["variant"] => {
     switch (status) {
       case 'Active':
-        return 'default';
+        return 'active';
       case 'Completed':
-        return 'secondary';
+        return 'completed';
       case 'Upcoming':
-        return 'outline';
+        return 'upcoming';
       default:
         return 'default';
     }
