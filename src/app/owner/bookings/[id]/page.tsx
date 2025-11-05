@@ -1,19 +1,28 @@
-
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState, useCallback } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ArrowLeft, Calendar, Car, Clock, Hash, Mail, User as UserIcon, Info, Badge as BadgeIcon } from 'lucide-react';
+import { ArrowLeft, Calendar, Car, Clock, Hash, Mail, User as UserIcon, Info, Badge as BadgeIcon, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
 import type { Reservation } from '@/lib/types';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
-import { getReservations } from '@/app/actions/reservations';
+import { getReservations, deleteReservation } from '@/app/actions/reservations';
 import { getUsers } from '@/app/actions/users';
 import { Badge } from '@/components/ui/badge';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 
 type User = {
@@ -42,6 +51,7 @@ export default function BookingDetailPage() {
   
   const [reservation, setReservation] = useState<Reservation | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
 
   const fetchBookingDetails = useCallback(async () => {
@@ -69,14 +79,34 @@ export default function BookingDetailPage() {
     fetchBookingDetails();
   }, [fetchBookingDetails]);
 
+  const handleDelete = async () => {
+    if (!reservation) return;
+
+    const result = await deleteReservation(reservation.id);
+    if (result.success) {
+      toast({
+        title: 'Booking Deleted',
+        description: `The booking for slot ${reservation.slotId} has been deleted.`,
+      });
+      router.replace('/owner?view=bookings');
+    } else {
+      toast({
+        variant: 'destructive',
+        title: 'Deletion Failed',
+        description: 'Could not delete the booking. Please try again.',
+      });
+    }
+    setIsDeleteDialogOpen(false);
+  };
+
   const getStatusBadgeVariant = (status: Reservation['status']) => {
     switch (status) {
       case 'Active':
-        return 'default';
+        return 'active';
       case 'Completed':
-        return 'secondary';
+        return 'completed';
       case 'Upcoming':
-        return 'outline';
+        return 'upcoming';
       default:
         return 'default';
     }
@@ -139,7 +169,7 @@ export default function BookingDetailPage() {
                         icon={BadgeIcon}
                         label="Status"
                         value={
-                            <Badge variant={getStatusBadgeVariant(reservation.status)}>
+                             <Badge variant={getStatusBadgeVariant(reservation.status)}>
                                 {reservation.status}
                             </Badge>
                         }
@@ -147,7 +177,36 @@ export default function BookingDetailPage() {
                    <DetailItem icon={Info} label="Booked On" value={format(new Date(reservation.createdAt), 'PPp')} />
                 </div>
             </CardContent>
+             <CardFooter className="p-4 pt-2 border-t">
+                <Button variant="destructive" onClick={() => setIsDeleteDialogOpen(true)} className="w-full sm:w-auto ml-auto">
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Delete Booking
+                </Button>
+            </CardFooter>
         </Card>
+
+         <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+            <AlertDialogContent>
+            <AlertDialogHeader>
+                <AlertDialogTitle>Delete this booking?</AlertDialogTitle>
+                <AlertDialogDescription>
+                    Are you sure you want to permanently delete the booking for slot{' '}
+                    <span className="font-bold text-foreground">{reservation.slotId}</span> for vehicle{' '}
+                    <span className="font-bold text-foreground">{reservation.vehiclePlate}</span>?
+                    This action cannot be undone.
+                </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                onClick={handleDelete}
+                asChild
+                >
+                <Button variant="destructive">Delete Booking</Button>
+                </AlertDialogAction>
+            </AlertDialogFooter>
+            </AlertDialogContent>
+        </AlertDialog>
     </div>
   );
 }
