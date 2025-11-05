@@ -28,9 +28,9 @@ import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { saveUserToFile } from '@/app/actions/users';
 
 const signupSchema = z.object({
-  fullName: z.string().min(2, 'Full name must be at least 2 characters.'),
+  username: z.string().min(2, 'Full name must be at least 2 characters.'),
   email: z.string().email('Please enter a valid email address.'),
-  mobileNumber: z.string().min(10, 'Please enter a valid mobile number.'),
+  phone: z.string().min(10, 'Please enter a valid mobile number.'),
   password: z.string().min(6, 'Password must be at least 6 characters.'),
 });
 
@@ -44,9 +44,9 @@ export default function SignupPage() {
   const form = useForm<SignupFormValues>({
     resolver: zodResolver(signupSchema),
     defaultValues: {
-      fullName: '',
+      username: '',
       email: '',
-      mobileNumber: '',
+      phone: '',
       password: '',
     },
   });
@@ -66,14 +66,14 @@ export default function SignupPage() {
 
       if (user) {
         await updateProfile(user, {
-          displayName: values.fullName,
+          displayName: values.username,
         });
 
         await saveUserToFile({
           id: user.uid,
-          username: values.fullName,
+          username: values.username,
           email: values.email,
-          phone: values.mobileNumber,
+          phone: values.phone,
         });
       }
 
@@ -110,7 +110,7 @@ export default function SignupPage() {
           <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
             <FormField
               control={form.control}
-              name="fullName"
+              name="username"
               render={({ field }) => (
                 <FormItem className="grid gap-2">
                   <FormLabel>Full name</FormLabel>
@@ -140,7 +140,7 @@ export default function SignupPage() {
             />
             <FormField
               control={form.control}
-              name="mobileNumber"
+              name="phone"
               render={({ field }) => (
                 <FormItem className="grid gap-2">
                   <FormLabel>Mobile Number</FormLabel>
