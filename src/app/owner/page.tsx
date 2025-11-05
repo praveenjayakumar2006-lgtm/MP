@@ -44,7 +44,7 @@ function OwnerDashboard() {
     const renderHome = () => (
         <Card>
             <CardHeader>
-                <div>
+                <div className="text-left">
                     <CardTitle className="text-2xl">Welcome, Owner!</CardTitle>
                     <CardDescription>
                         This is your central dashboard for managing ParkEasy.
@@ -98,7 +98,7 @@ function OwnerDashboard() {
                             </p>
                              <Link href="/owner/feedback">
                                 <Button variant="outline" size="sm">View Feedback</Button>
-                            </Link>
+                             </Link>
                         </CardContent>
                     </Card>
                      <Card className="hover:bg-accent/50 transition-colors">
@@ -123,7 +123,7 @@ function OwnerDashboard() {
     );
 
     const renderReports = () => (
-         <Card>
+        <Card>
             <CardHeader className="text-center">
                 <div className="inline-flex items-center gap-2 justify-center">
                     <FileText className="h-8 w-8 text-primary" />
@@ -133,7 +133,7 @@ function OwnerDashboard() {
                     All violation reports submitted by users.
                 </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-4 md:p-6">
                 <ReportsTable />
             </CardContent>
         </Card>
@@ -141,9 +141,7 @@ function OwnerDashboard() {
 
      const renderBookings = () => (
         <Card>
-            <CardContent className="p-4 md:p-6">
-                <BookingsTable />
-            </CardContent>
+            <BookingsTable />
         </Card>
     );
     
