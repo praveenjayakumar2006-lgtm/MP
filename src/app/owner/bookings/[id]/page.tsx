@@ -1,10 +1,11 @@
+
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ArrowLeft, Calendar, Car, Clock, Hash, Mail, User as UserIcon } from 'lucide-react';
+import { ArrowLeft, Calendar, Car, Clock, Hash, Mail, User as UserIcon, Info, Badge as BadgeIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
 import type { Reservation } from '@/lib/types';
@@ -12,6 +13,7 @@ import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { getReservations } from '@/app/actions/reservations';
 import { getUsers } from '@/app/actions/users';
+import { Badge } from '@/components/ui/badge';
 
 
 type User = {
@@ -71,10 +73,23 @@ export default function BookingDetailPage() {
     fetchBookingDetails();
   }, [fetchBookingDetails]);
 
+  const getStatusBadgeVariant = (status: Reservation['status']) => {
+    switch (status) {
+      case 'Active':
+        return 'default';
+      case 'Completed':
+        return 'secondary';
+      case 'Upcoming':
+        return 'outline';
+      default:
+        return 'default';
+    }
+  };
+
 
   if (isLoading || !reservation) {
     return (
-        <div className="w-full max-w-sm mx-auto mt-6">
+        <div className="w-full max-w-lg mx-auto mt-6">
             <Button onClick={() => router.back()} variant="outline" size="sm" className="mb-4">
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 Back
@@ -91,6 +106,8 @@ export default function BookingDetailPage() {
                         <Skeleton className="h-10 w-full" />
                         <Skeleton className="h-10 w-full" />
                         <Skeleton className="h-10 w-full" />
+                         <Skeleton className="h-10 w-full" />
+                        <Skeleton className="h-10 w-full" />
                     </div>
                 </CardContent>
             </Card>
@@ -103,7 +120,7 @@ export default function BookingDetailPage() {
 
 
   return (
-    <div className="w-full max-w-sm mx-auto mt-6">
+    <div className="w-full max-w-lg mx-auto mt-6">
         <Button onClick={() => router.back()} variant="outline" size="sm" className="mb-4">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back
@@ -112,7 +129,7 @@ export default function BookingDetailPage() {
             <CardHeader className="pb-4">
                 <CardTitle className="text-xl">Booking Details</CardTitle>
                 <CardDescription>
-                    {user ? `${user.username} (${user.email})` : 'User details not found'}
+                    {reservation.userName ? `${reservation.userName} (${user?.email || 'email not found'})` : 'User details not found'}
                 </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4 pt-0">
@@ -122,6 +139,16 @@ export default function BookingDetailPage() {
                    <DetailItem icon={Car} label="Vehicle Plate" value={reservation.vehiclePlate} />
                    <DetailItem icon={Calendar} label="Start Time" value={format(startTime, 'PPp')} />
                    <DetailItem icon={Clock} label="End Time" value={format(endTime, 'PPp')} />
+                   <DetailItem
+                        icon={BadgeIcon}
+                        label="Status"
+                        value={
+                            <Badge variant={getStatusBadgeVariant(reservation.status)}>
+                                {reservation.status}
+                            </Badge>
+                        }
+                    />
+                   <DetailItem icon={Info} label="Booked On" value={format(new Date(reservation.createdAt), 'PPp')} />
                 </div>
             </CardContent>
         </Card>
