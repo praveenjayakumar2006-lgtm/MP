@@ -1,7 +1,7 @@
 
 'use client';
 
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Star, MessageSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -114,60 +114,58 @@ function FeedbackList() {
         )
     }
     
-    if (!feedbackData || feedbackData.length === 0) {
-        return (
-            <Card>
-                <CardContent className="pt-6">
-                    <p className="text-center text-muted-foreground">
-                        No feedback has been submitted yet.
-                    </p>
-                </CardContent>
-            </Card>
-        )
-    }
-
     const sortedFeedback = [...feedbackData].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
     return (
         <>
-            <div className="space-y-4">
-                {sortedFeedback.map((feedback) => (
-                    <Card key={feedback.id} className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => setFeedbackToDelete(feedback)}>
-                        <CardHeader className="flex-row items-start gap-4 space-y-0">
-                            <Avatar className="h-12 w-12 border">
-                                <AvatarFallback>{feedback.name.charAt(0).toUpperCase()}</AvatarFallback>
-                            </Avatar>
-                            <div className="flex-1">
-                                <div className="flex items-center justify-between">
-                                    <p className="font-semibold">{feedback.name}</p>
-                                    <div className="flex items-center gap-1">
-                                        {[1, 2, 3, 4, 5].map((star) => (
-                                            <Star
-                                                key={star}
-                                                className={cn(
-                                                    'h-4 w-4',
-                                                    feedback.rating >= star
-                                                        ? 'text-yellow-400 fill-yellow-400'
-                                                        : 'text-gray-300'
-                                                )}
-                                            />
-                                        ))}
+            {sortedFeedback.length > 0 ? (
+                <div className="space-y-4">
+                    {sortedFeedback.map((feedback) => (
+                        <Card key={feedback.id} className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => setFeedbackToDelete(feedback)}>
+                            <CardHeader className="flex-row items-start gap-4 space-y-0">
+                                <Avatar className="h-12 w-12 border">
+                                    <AvatarFallback>{feedback.name.charAt(0).toUpperCase()}</AvatarFallback>
+                                </Avatar>
+                                <div className="flex-1">
+                                    <div className="flex items-center justify-between">
+                                        <p className="font-semibold">{feedback.name}</p>
+                                        <div className="flex items-center gap-1">
+                                            {[1, 2, 3, 4, 5].map((star) => (
+                                                <Star
+                                                    key={star}
+                                                    className={cn(
+                                                        'h-4 w-4',
+                                                        feedback.rating >= star
+                                                            ? 'text-yellow-400 fill-yellow-400'
+                                                            : 'text-gray-300'
+                                                    )}
+                                                />
+                                            ))}
+                                        </div>
                                     </div>
+                                    <p className="text-sm text-muted-foreground">{feedback.email}</p>
                                 </div>
-                                <p className="text-sm text-muted-foreground">{feedback.email}</p>
-                            </div>
-                        </CardHeader>
-                        <CardContent>
-                            <p className="text-foreground whitespace-pre-wrap">{feedback.feedback}</p>
-                        </CardContent>
-                        <CardFooter>
-                            <p className="text-xs text-muted-foreground">
-                                Submitted on {feedback.createdAt ? format(new Date(feedback.createdAt), 'PPP p') : 'N/A'}
-                            </p>
-                        </CardFooter>
-                    </Card>
-                ))}
-            </div>
+                            </CardHeader>
+                            <CardContent>
+                                <p className="text-foreground whitespace-pre-wrap">{feedback.feedback}</p>
+                            </CardContent>
+                            <CardFooter>
+                                <p className="text-xs text-muted-foreground">
+                                    Submitted on {feedback.createdAt ? format(new Date(feedback.createdAt), 'PPP p') : 'N/A'}
+                                </p>
+                            </CardFooter>
+                        </Card>
+                    ))}
+                </div>
+            ) : (
+                <Card>
+                    <CardContent className="pt-6">
+                        <p className="text-center text-muted-foreground">
+                            No feedback has been submitted yet.
+                        </p>
+                    </CardContent>
+                </Card>
+            )}
 
             <AlertDialog open={!!feedbackToDelete} onOpenChange={(open) => !open && setFeedbackToDelete(null)}>
                 <AlertDialogContent>
@@ -197,15 +195,21 @@ function FeedbackList() {
 
 export default function OwnerFeedbackPage() {
     return (
-        <div className="w-full max-w-md mx-auto py-8">
-            <div className="mb-8 text-center">
-                <div className="inline-flex items-center gap-2">
-                    <MessageSquare className="h-8 w-8 text-primary" />
-                    <h1 className="text-3xl font-bold">User Feedback</h1>
-                </div>
-                <p className="text-muted-foreground mt-2">All feedback submitted by users.</p>
-            </div>
-            <FeedbackList />
+        <div className="w-full max-w-2xl mx-auto flex-1">
+             <Card>
+                <CardHeader className="text-center">
+                    <div className="inline-flex items-center gap-2 justify-center">
+                        <MessageSquare className="h-8 w-8 text-primary" />
+                        <CardTitle className="text-3xl">User Feedback</CardTitle>
+                    </div>
+                    <CardDescription>
+                        All feedback submitted by users.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <FeedbackList />
+                </CardContent>
+            </Card>
         </div>
     );
 }

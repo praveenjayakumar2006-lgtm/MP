@@ -125,14 +125,13 @@ function OwnerDashboard() {
     const renderReports = () => (
          <Card>
             <CardHeader className="text-center">
-                <div className="flex justify-center items-center gap-2">
-                    <FileText className="h-7 w-7 text-primary" />
+                <div className="inline-flex items-center gap-2 justify-center">
+                    <FileText className="h-8 w-8 text-primary" />
                     <CardTitle className="text-3xl">Violation Reports</CardTitle>
                 </div>
                 <CardDescription>
                     All violation reports submitted by users.
                 </CardDescription>
-                <Separator className="mt-2" />
             </CardHeader>
             <CardContent>
                 <ReportsTable />

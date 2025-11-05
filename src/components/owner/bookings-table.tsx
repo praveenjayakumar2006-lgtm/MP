@@ -134,15 +134,16 @@ export function BookingsTable() {
 
 
   return (
-    <div className="pt-6">
-        <div className="mb-6 text-center">
-            <div className="flex justify-center items-center gap-2">
-              <CalendarCheck className="h-8 w-8 text-primary" />
-              <h1 className="text-3xl font-bold tracking-tight">{getTitle()}</h1>
-            </div>
-            <p className="text-muted-foreground mt-2">{getDescription()}</p>
+    <>
+      <CardHeader className="text-center">
+        <div className="inline-flex items-center gap-2 justify-center">
+            <CalendarCheck className="h-8 w-8 text-primary" />
+            <CardTitle className="text-3xl">{getTitle()}</CardTitle>
         </div>
-         <Tabs value={filter} onValueChange={(value) => setFilter(value as any)} className="w-full">
+        <CardDescription>{getDescription()}</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <Tabs value={filter} onValueChange={(value) => setFilter(value as any)} className="w-full">
             <div className="flex items-center justify-center mb-6">
               <TabsList>
                 <TabsTrigger value="all">All</TabsTrigger>
@@ -203,6 +204,7 @@ export function BookingsTable() {
               )}
             </TabsContent>
         </Tabs>
-      </div>
+      </CardContent>
+      </>
   );
 }
