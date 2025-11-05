@@ -3,9 +3,33 @@
 
 import fs from 'fs/promises';
 import path from 'path';
-import type { User, Reservation, Feedback, Violation } from '@/lib/types';
 
-// Use a permanent location within the project
+// Define types directly in this file to avoid dependency issues
+type User = {
+  id: string;
+  username: string;
+  email: string;
+  phone?: string;
+};
+
+type Reservation = {
+  id: string;
+  userId: string;
+  // other reservation properties
+};
+
+type Feedback = {
+  id: string;
+  email: string;
+  // other feedback properties
+};
+
+type Violation = {
+  id: string;
+  userId: string;
+  // other violation properties
+};
+
 const dataDir = path.join(process.cwd(), 'data');
 const usersFilePath = path.join(dataDir, 'User_Data.json');
 const reservationsFilePath = path.join(dataDir, 'User_Reservations.json');
@@ -66,17 +90,17 @@ export async function deleteUser(userId: string): Promise<{ success: boolean }> 
     if (allUsers.length < initialUserLength) {
         await writeFile(usersFilePath, allUsers);
         
-        // Delete reservations
+        // Delete reservations associated with the user
         const allReservations = await readFile<Reservation>(reservationsFilePath);
         const filteredReservations = allReservations.filter(res => res.userId !== userId);
         await writeFile(reservationsFilePath, filteredReservations);
 
-        // Delete feedback (matching by email since no userId)
+        // Delete feedback associated with the user (matching by email)
         const allFeedback = await readFile<Feedback>(feedbackFilePath);
         const filteredFeedback = allFeedback.filter(f => f.email !== userToDelete.email);
         await writeFile(feedbackFilePath, filteredFeedback);
 
-        // Delete violations
+        // Delete violations associated with the user
         const allViolations = await readFile<Violation>(violationsFilePath);
         const filteredViolations = allViolations.filter(v => v.userId !== userId);
         await writeFile(violationsFilePath, filteredViolations);
