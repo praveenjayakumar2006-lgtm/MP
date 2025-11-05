@@ -41,7 +41,6 @@ export default function BookingDetailPage() {
   const { toast } = useToast();
   
   const [reservation, setReservation] = useState<Reservation | null>(null);
-  const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
 
@@ -54,9 +53,6 @@ export default function BookingDetailPage() {
 
       if (currentReservation) {
         setReservation(currentReservation as any);
-        const allUsers = await getUsers();
-        const bookingUser = allUsers.find(u => u.id === (currentReservation as any).userId);
-        setUser(bookingUser || null);
       } else {
         toast({ variant: 'destructive', title: 'Error', description: 'Booking not found.' });
         router.replace('/owner?view=bookings');
@@ -129,7 +125,7 @@ export default function BookingDetailPage() {
             <CardHeader className="pb-4">
                 <CardTitle className="text-xl">Booking Details</CardTitle>
                 <CardDescription>
-                    {reservation.userName ? `${reservation.userName} (${user?.email || 'email not found'})` : 'User details not found'}
+                    {reservation.userName ? `${reservation.userName} (${reservation.email})` : 'User details not found'}
                 </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4 pt-0">

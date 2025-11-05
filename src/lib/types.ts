@@ -14,7 +14,8 @@ export type ParkingSlot = {
 export type Reservation = {
   id: string;
   userId: string;
-  userName: string; // Added user's name
+  userName: string;
+  email: string; // Added user's email
   slotId: string;
   vehiclePlate: string;
   startTime: string; // Changed to string

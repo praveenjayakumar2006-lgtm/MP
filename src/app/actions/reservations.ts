@@ -8,6 +8,7 @@ type Reservation = {
     id: string;
     userId: string;
     userName: string;
+    email: string;
     slotId: string;
     vehiclePlate: string;
     startTime: string;

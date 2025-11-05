@@ -11,7 +11,7 @@ import { addHours, parseISO } from 'date-fns';
 
 interface ReservationsContextType {
   reservations: Reservation[];
-  addReservation: (reservation: Omit<Reservation, 'id' | 'createdAt' | 'updatedAt' | 'userId' | 'status' | 'userName'> & { startTime: Date, endTime: Date }) => void;
+  addReservation: (reservation: Omit<Reservation, 'id' | 'createdAt' | 'updatedAt' | 'userId' | 'status' | 'userName' | 'email'> & { startTime: Date, endTime: Date }) => void;
   removeReservation: (reservationId: string) => void;
   isLoading: boolean;
   isClient: boolean;
@@ -63,8 +63,8 @@ export const ReservationsProvider: React.FC<{ children: ReactNode }> = ({ childr
   }, [isClient, fetchReservations]);
 
 
-  const addReservation = async (reservation: Omit<Reservation, 'id' | 'createdAt' | 'updatedAt' | 'userId' | 'status' | 'userName'> & { startTime: Date, endTime: Date }) => {
-    if (!user || !user.displayName) {
+  const addReservation = async (reservation: Omit<Reservation, 'id' | 'createdAt' | 'updatedAt' | 'userId' | 'status' | 'userName' | 'email'> & { startTime: Date, endTime: Date }) => {
+    if (!user || !user.displayName || !user.email) {
       toast({
         variant: 'destructive',
         title: 'Authentication Error',
@@ -93,6 +93,7 @@ export const ReservationsProvider: React.FC<{ children: ReactNode }> = ({ childr
         endTime: reservation.endTime.toISOString(),
         userId: user.uid,
         userName: user.displayName,
+        email: user.email,
       });
       await fetchReservations(); // Refetch after adding
     } catch (error) {
