@@ -103,11 +103,10 @@ export function AppHeader() {
   ];
 
   const ownerNavItems = [
-    { href: '/owner?view=home', label: 'Home'},
-    { href: '/owner?view=bookings', label: 'Bookings' },
+    { href: '/owner?view=bookings', label: 'User Bookings' },
     { href: '/owner?view=reports', label: 'Violation Reports' },
     { href: '/owner/feedback', label: 'User Feedback' },
-    { href: '/owner/users', label: 'Users' },
+    { href: '/owner/users', label: 'Manage Users' },
   ];
 
   return (
@@ -275,3 +274,5 @@ export function AppHeader() {
     </header>
   );
 }
+
+    
