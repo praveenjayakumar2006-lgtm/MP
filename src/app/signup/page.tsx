@@ -66,11 +66,7 @@ export default function SignupPage() {
       const emailExists = appUsers.some(user => user.email === values.email);
 
       if (emailExists) {
-        toast({
-          variant: 'destructive',
-          title: 'Email already registered',
-          description: 'This email is already in use. Please try to log in.',
-        });
+        // The toast message is removed as requested.
         return;
       }
       
