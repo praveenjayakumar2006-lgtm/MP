@@ -68,7 +68,8 @@ export function UsersTable() {
         fetchUsers();
     }, [toast]);
     
-    const handleDeleteClick = (user: User) => {
+    const handleDeleteClick = (e: React.MouseEvent, user: User) => {
+        e.stopPropagation();
         setUserToDelete(user);
     };
 
@@ -104,14 +105,13 @@ export function UsersTable() {
                     <div className="flex-1 space-y-2">
                         <Skeleton className="h-5 w-32" />
                     </div>
+                     <Skeleton className="h-9 w-24 ml-auto" />
                 </CardHeader>
-                <CardContent className="space-y-3">
+                <Separator />
+                <CardContent className="space-y-3 pt-4">
                     <Skeleton className="h-4 w-full" />
                     <Skeleton className="h-4 w-3/4" />
                 </CardContent>
-                 <CardFooter className="p-4 pt-2 border-t">
-                    <Skeleton className="h-9 w-full sm:w-24 ml-auto" />
-                </CardFooter>
             </Card>
         ))
     );
@@ -131,22 +131,21 @@ export function UsersTable() {
                                 <div className="flex-1">
                                     <CardTitle className="text-base">{user.username}</CardTitle>
                                 </div>
-                            </CardHeader>
-                            <CardContent className="space-y-3 flex-1">
-                               <DetailItem icon={Mail} label="Email" value={user.email} />
-                               <DetailItem icon={Phone} label="Phone" value={user.phone || 'N/A'} />
-                            </CardContent>
-                            <CardFooter className="p-4 pt-2 border-t">
                                 <Button
                                     variant="destructive"
                                     size="sm"
                                     className="w-full sm:w-auto ml-auto"
-                                    onClick={() => handleDeleteClick(user)}
+                                    onClick={(e) => handleDeleteClick(e, user)}
                                 >
                                     <Trash2 className="mr-2 h-4 w-4" />
                                     Delete
                                 </Button>
-                            </CardFooter>
+                            </CardHeader>
+                            <Separator />
+                            <CardContent className="space-y-3 flex-1 pt-4">
+                               <DetailItem icon={Mail} label="Email" value={user.email} />
+                               <DetailItem icon={Phone} label="Phone" value={user.phone || 'N/A'} />
+                            </CardContent>
                         </Card>
                     ))
                 ) : (
