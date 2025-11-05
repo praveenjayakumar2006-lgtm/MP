@@ -116,9 +116,13 @@ function FeedbackList() {
     
     if (!feedbackData || feedbackData.length === 0) {
         return (
-            <div className="w-full rounded-lg border bg-card text-card-foreground p-6 text-center text-muted-foreground">
-                No feedback has been submitted yet.
-            </div>
+            <Card>
+                <CardContent className="pt-6">
+                    <p className="text-center text-muted-foreground">
+                        No feedback has been submitted yet.
+                    </p>
+                </CardContent>
+            </Card>
         )
     }
 
