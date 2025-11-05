@@ -84,19 +84,21 @@ export default function LoginPage() {
     }
 
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, values.email, values.password);
-      const user = userCredential.user;
-
       // Check if user exists in the User_Data.json file
       const appUsers = await getUsers();
-      const userExists = appUsers.some(appUser => appUser.id === user.uid);
+      const userExistsInJson = appUsers.some(appUser => appUser.email === values.email);
 
-      if (!userExists) {
-        // If user exists in Firebase but not in local JSON, redirect to signup
-        await auth.signOut();
-        router.replace('/signup');
+      if (!userExistsInJson) {
+         toast({
+          variant: 'destructive',
+          title: 'Login Incorrect',
+          description: 'Please try to sign up.',
+        });
         return;
       }
+
+      // If user exists in JSON, then try to sign in with Firebase
+      await signInWithEmailAndPassword(auth, values.email, values.password);
 
       toast({
         title: 'Login Successful',
@@ -104,10 +106,11 @@ export default function LoginPage() {
         duration: 2000,
       });
       localStorage.setItem('role', 'user');
+
     } catch (error: any) {
-      let description = 'There was a problem with your request.';
+      let description = 'Login incorrect. Please try to sign up.';
       if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
-        description = 'Invalid email or password. Please try again.';
+        description = 'Login incorrect. Please try to sign up.';
       } else if (error.code === 'auth/too-many-requests') {
         description = 'Access to this account has been temporarily disabled due to many failed login attempts. You can immediately restore it by resetting your password or you can try again later.'
       }
