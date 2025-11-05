@@ -28,7 +28,7 @@ function DetailItem({ icon: Icon, label, value }: { icon: React.ElementType, lab
             <Icon className="h-4 w-4 text-muted-foreground mt-0.5" />
             <div className="flex-1">
                 <p className="text-xs text-muted-foreground">{label}</p>
-                <p className="font-medium text-sm">{value}</p>
+                <div className="font-medium text-sm">{value}</div>
             </div>
         </div>
     )
