@@ -92,12 +92,9 @@ export default function LoginPage() {
       const userExists = appUsers.some(appUser => appUser.id === user.uid);
 
       if (!userExists) {
+        // If user exists in Firebase but not in local JSON, redirect to signup
         await auth.signOut();
-        toast({
-          variant: 'destructive',
-          title: 'Access Denied',
-          description: 'Your account is not active. Please sign up or contact an administrator.',
-        });
+        router.replace('/signup');
         return;
       }
 
@@ -106,7 +103,7 @@ export default function LoginPage() {
         description: 'Welcome back!',
         duration: 2000,
       });
-      localStorage.setItem('role', values.role);
+      localStorage.setItem('role', 'user');
     } catch (error: any) {
       let description = 'There was a problem with your request.';
       if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
@@ -116,7 +113,7 @@ export default function LoginPage() {
       }
       toast({
         variant: 'destructive',
-        title: 'Uh oh! Something went wrong.',
+        title: 'Login Failed',
         description: description,
       });
     }
