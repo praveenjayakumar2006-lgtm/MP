@@ -133,7 +133,7 @@ export function UsersTable() {
                                 </div>
                                 <Button
                                     variant="destructive"
-                                    className="w-auto ml-auto px-2 py-1 h-auto text-xs"
+                                    className="w-auto ml-auto px-2 py-1 h-auto text-sm"
                                     onClick={(e) => handleDeleteClick(e, user)}
                                 >
                                     <Trash2 className="mr-1.5 h-3.5 w-3.5" />
