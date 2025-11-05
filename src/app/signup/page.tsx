@@ -64,18 +64,16 @@ export default function SignupPage() {
       const userCredential = await createUserWithEmailAndPassword(auth, values.email, values.password);
       const user = userCredential.user;
 
-      if (user) {
-        await updateProfile(user, {
-          displayName: values.username,
-        });
+      await updateProfile(user, {
+        displayName: values.username,
+      });
 
-        await saveUserToFile({
-          id: user.uid,
-          username: values.username,
-          email: values.email,
-          phone: values.phone,
-        });
-      }
+      await saveUserToFile({
+        id: user.uid,
+        username: values.username,
+        email: values.email,
+        phone: values.phone,
+      });
 
       toast({
         title: 'Account Created!',
