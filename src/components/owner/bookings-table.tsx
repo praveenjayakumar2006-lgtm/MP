@@ -8,7 +8,7 @@ import { Skeleton } from '../ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useRouter } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
-import { Car, Calendar, Clock, Hash, User as UserIcon, Loader2 } from 'lucide-react';
+import { Car, Calendar, Clock, Hash, User as UserIcon, Loader2, CalendarCheck } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Separator } from '../ui/separator';
 import { ReservationsContext } from '@/context/reservations-context';
@@ -136,7 +136,10 @@ export function BookingsTable() {
   return (
     <div>
         <div className="mb-8 mt-8 text-center">
-            <h1 className="text-3xl font-bold tracking-tight">{getTitle()}</h1>
+            <div className="flex justify-center items-center gap-2">
+              <CalendarCheck className="h-8 w-8 text-primary" />
+              <h1 className="text-3xl font-bold tracking-tight">{getTitle()}</h1>
+            </div>
             <p className="text-muted-foreground mt-2">{getDescription()}</p>
         </div>
          <Tabs value={filter} onValueChange={(value) => setFilter(value as any)} className="w-full">
