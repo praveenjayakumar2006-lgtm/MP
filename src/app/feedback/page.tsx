@@ -44,13 +44,6 @@ export default function FeedbackPage() {
   const { toast } = useToast();
   const [user, setUser] = useState<User | null>(null);
 
-  useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-        setUser(JSON.parse(storedUser));
-    }
-  }, []);
-
   const form = useForm<FeedbackFormValues>({
     resolver: zodResolver(feedbackSchema),
     defaultValues: {
@@ -60,6 +53,20 @@ export default function FeedbackPage() {
       feedback: '',
     },
   });
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+        const parsedUser = JSON.parse(storedUser);
+        setUser(parsedUser);
+        form.reset({
+            name: parsedUser.username,
+            email: parsedUser.email,
+            rating: 0,
+            feedback: '',
+        });
+    }
+  }, [form]);
 
   async function onSubmit(values: FeedbackFormValues) {
     if (!user) {
@@ -72,7 +79,11 @@ export default function FeedbackPage() {
     }
     
     try {
-      await saveFeedback(values);
+      await saveFeedback({
+        ...values,
+        name: user.username,
+        email: user.email,
+      });
       router.push('/feedback/success');
 
     } catch (error) {
@@ -103,7 +114,7 @@ export default function FeedbackPage() {
                     <FormItem>
                       <FormLabel>Full Name</FormLabel>
                       <FormControl>
-                        <Input placeholder="John Doe" {...field} />
+                        <Input placeholder="John Doe" {...field} readOnly />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -120,6 +131,7 @@ export default function FeedbackPage() {
                           type="email"
                           placeholder="you@gmail.com"
                           {...field}
+                          readOnly
                         />
                       </FormControl>
                       <FormMessage />
