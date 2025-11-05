@@ -133,11 +133,10 @@ export function UsersTable() {
                                 </div>
                                 <Button
                                     variant="destructive"
-                                    size="sm"
-                                    className="w-full sm:w-auto ml-auto"
+                                    className="w-auto ml-auto px-2 py-1 h-auto text-xs"
                                     onClick={(e) => handleDeleteClick(e, user)}
                                 >
-                                    <Trash2 className="mr-2 h-4 w-4" />
+                                    <Trash2 className="mr-1.5 h-3.5 w-3.5" />
                                     Delete
                                 </Button>
                             </CardHeader>
