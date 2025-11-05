@@ -216,7 +216,7 @@ export function AppHeader() {
                     {(user || role === 'owner') && (
                       <div className="mb-4">
                         {user && user.username && (
-                            <p className="text-foreground text-xl font-medium mb-4 text-center underline underline-offset-8 decoration-primary decoration-4">{user.username}</p>
+                            <p className="text-blue-500 text-xl font-medium mb-4 text-center underline underline-offset-8 decoration-primary decoration-4">{user.username}</p>
                         )}
                         <Button
                           variant="destructive"
