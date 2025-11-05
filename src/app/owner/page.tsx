@@ -13,6 +13,7 @@ import { useUser } from "@/firebase";
 import { useToast } from "@/hooks/use-toast";
 import { signOut } from "firebase/auth";
 import { UsersTable } from "@/components/owner/users-table";
+import { Separator } from "@/components/ui/separator";
 
 function OwnerDashboard() {
     const router = useRouter();
@@ -124,10 +125,14 @@ function OwnerDashboard() {
     const renderReports = () => (
          <Card>
             <CardHeader className="text-center">
-                <CardTitle className="text-3xl">Violation Reports</CardTitle>
+                <div className="flex justify-center items-center gap-2">
+                    <FileText className="h-7 w-7 text-primary" />
+                    <CardTitle className="text-3xl">Violation Reports</CardTitle>
+                </div>
                 <CardDescription>
                     All violation reports submitted by users.
                 </CardDescription>
+                <Separator className="mt-2" />
             </CardHeader>
             <CardContent>
                 <ReportsTable />
