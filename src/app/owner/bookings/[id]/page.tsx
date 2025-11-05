@@ -119,7 +119,7 @@ export default function BookingDetailPage() {
 
   if (isLoading || !reservation) {
     return (
-        <div className="w-full max-w-md mx-auto mt-6">
+        <div className="w-full max-w-md mx-auto mt-6 px-4">
             <Button onClick={() => router.back()} variant="outline" size="sm" className="mb-4">
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 Back
@@ -153,7 +153,7 @@ export default function BookingDetailPage() {
 
 
   return (
-    <div className="w-full max-w-md mx-auto mt-6">
+    <div className="w-full max-w-md mx-auto mt-6 px-4">
         <Button onClick={() => router.back()} variant="outline" size="sm" className="mb-4">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back
