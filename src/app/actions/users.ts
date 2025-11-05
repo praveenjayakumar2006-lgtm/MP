@@ -3,12 +3,7 @@
 
 import fs from 'fs/promises';
 import path from 'path';
-
-type User = {
-  id: string;
-  username: string;
-  email: string;
-};
+import type { User } from '@/lib/types';
 
 // Use a permanent location within the project
 const dataDir = path.join(process.cwd(), 'data');
@@ -51,4 +46,17 @@ export async function saveUserToFile(user: User): Promise<void> {
     users.push(user);
     await writeUsersFile(users);
   }
+}
+
+export async function deleteUser(userId: string): Promise<{ success: boolean }> {
+    let allUsers = await readUsersFile();
+    const initialLength = allUsers.length;
+    allUsers = allUsers.filter(u => u.id !== userId);
+
+    if (allUsers.length < initialLength) {
+        await writeUsersFile(allUsers);
+        return { success: true };
+    } else {
+        return { success: false };
+    }
 }

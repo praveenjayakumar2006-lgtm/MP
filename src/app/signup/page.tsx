@@ -1,3 +1,4 @@
+
 'use client';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -72,6 +73,7 @@ export default function SignupPage() {
           id: user.uid,
           username: values.fullName,
           email: values.email,
+          phone: values.mobileNumber,
         });
       }
 

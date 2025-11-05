@@ -2,7 +2,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Car, Menu, ChevronDown, Mail, Phone, LogOut } from 'lucide-react';
+import { Car, Menu, ChevronDown, Mail, Phone, LogOut, Users } from 'lucide-react';
 import {
   Sheet,
   SheetContent,
@@ -107,6 +107,7 @@ export function AppHeader() {
     { href: '/owner?view=bookings', label: 'Bookings' },
     { href: '/owner?view=reports', label: 'Violation Reports' },
     { href: '/owner/feedback', label: 'User Feedback' },
+    { href: '/owner/users', label: 'Users' },
   ];
 
   return (

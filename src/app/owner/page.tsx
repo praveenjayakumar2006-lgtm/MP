@@ -6,12 +6,13 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState, Suspense, useTransition } from "react";
 import { ReportsTable } from "@/components/owner/reports-table";
 import { BookingsTable } from "@/components/owner/bookings-table";
-import { Loader2, FileText, MessageSquare, LayoutDashboard, CalendarCheck, ShieldCheck } from "lucide-react";
+import { Loader2, FileText, MessageSquare, LayoutDashboard, CalendarCheck, ShieldCheck, Users } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useUser } from "@/firebase";
 import { useToast } from "@/hooks/use-toast";
 import { signOut } from "firebase/auth";
+import { UsersTable } from "@/components/owner/users-table";
 
 function OwnerDashboard() {
     const router = useRouter();
@@ -97,6 +98,22 @@ function OwnerDashboard() {
                             </p>
                              <Link href="/owner/feedback">
                                 <Button variant="outline" size="sm">View Feedback</Button>
+                            </Link>
+                        </CardContent>
+                    </Card>
+                     <Card className="hover:bg-accent/50 transition-colors">
+                        <CardHeader className="pb-4">
+                           <div className="flex items-center gap-4">
+                             <Users className="h-8 w-8 text-purple-500" />
+                             <CardTitle className="text-xl">Manage Users</CardTitle>
+                           </div>
+                        </CardHeader>
+                        <CardContent>
+                            <p className="text-sm text-muted-foreground mb-4">
+                                View and manage registered user accounts.
+                            </p>
+                             <Link href="/owner/users">
+                                <Button variant="outline" size="sm">View Users</Button>
                             </Link>
                         </CardContent>
                     </Card>

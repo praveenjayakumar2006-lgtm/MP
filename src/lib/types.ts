@@ -15,7 +15,7 @@ export type Reservation = {
   id: string;
   userId: string;
   userName: string;
-  email: string; // Added user's email
+  email: string;
   slotId: string;
   vehiclePlate: string;
   startTime: string; // Changed to string
@@ -32,4 +32,11 @@ export type Violation = {
   violationType: ViolationType;
   timestamp: string;
   details: string;
+};
+
+export type User = {
+  id: string;
+  username: string;
+  email: string;
+  phone: string;
 };
