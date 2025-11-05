@@ -25,7 +25,7 @@ import {
 } from '@/components/ui/select';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Paperclip } from 'lucide-react';
+import { Paperclip, X } from 'lucide-react';
 
 const violationSchemaBase = z.object({
   slotNumber: z
@@ -93,7 +93,7 @@ export function ViolationChecker() {
   });
   
   const imageSource = violationForm.watch('imageSource');
-  const { setValue, clearErrors } = violationForm;
+  const { setValue, clearErrors, trigger } = violationForm;
 
   useEffect(() => {
     const slot = searchParams.get('slotNumber');
@@ -145,7 +145,7 @@ export function ViolationChecker() {
     if (file) {
       setSelectedFileName(file.name);
       violationForm.setValue('image', file);
-      clearErrors('image');
+      trigger('image'); // Manually trigger validation
       const imageDataUrl = await fileToDataUrl(file);
       sessionStorage.setItem('violationImage', imageDataUrl);
     } else {
@@ -153,6 +153,15 @@ export function ViolationChecker() {
         violationForm.setValue('image', null);
     }
   }
+
+  const handleRemoveImage = () => {
+    setSelectedFileName(null);
+    violationForm.setValue('image', null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+    sessionStorage.removeItem('violationImage');
+  };
 
   return (
     <div className="w-full flex flex-col items-center justify-center max-w-md mx-auto flex-1">
@@ -265,10 +274,15 @@ export function ViolationChecker() {
                         <FormLabel htmlFor="camera" className="font-normal cursor-pointer">Take Photo</FormLabel>
                       </FormItem>
                     </RadioGroup>
-                     {selectedFileName && imageSource === 'upload' && (
-                        <div className="text-sm text-muted-foreground flex items-center gap-2 pt-2">
-                            <Paperclip className="h-4 w-4" />
-                            <span>{selectedFileName}</span>
+                    {selectedFileName && imageSource === 'upload' && (
+                        <div className="text-sm text-muted-foreground flex items-center justify-between pt-2">
+                            <div className="flex items-center gap-2">
+                                <Paperclip className="h-4 w-4" />
+                                <span className="truncate">{selectedFileName}</span>
+                            </div>
+                            <Button variant="ghost" size="icon" className="h-6 w-6" onClick={handleRemoveImage}>
+                                <X className="h-4 w-4" />
+                            </Button>
                         </div>
                     )}
                     <FormMessage />
