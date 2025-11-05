@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
@@ -12,7 +13,7 @@ import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { getReservations, deleteReservation } from '@/app/actions/reservations';
 import { getUsers } from '@/app/actions/users';
-import { Badge } from '@/components/ui/badge';
+import { Badge, badgeVariants } from '@/components/ui/badge';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -23,6 +24,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import type { VariantProps } from 'class-variance-authority';
+import { cn } from '@/lib/utils';
 
 
 type User = {
@@ -99,7 +102,8 @@ export default function BookingDetailPage() {
     setIsDeleteDialogOpen(false);
   };
 
-  const getStatusBadgeVariant = (status: Reservation['status']) => {
+  const getStatusBadgeVariant = (status?: Reservation['status']): VariantProps<typeof badgeVariants>['variant'] => {
+    if (!status) return 'default';
     switch (status) {
       case 'Active':
         return 'active';
@@ -133,9 +137,12 @@ export default function BookingDetailPage() {
                         <Skeleton className="h-10 w-full" />
                         <Skeleton className="h-10 w-full" />
                          <Skeleton className="h-10 w-full" />
-                        <Skeleton className="h-10 w-full" />
+                         <Skeleton className="h-10 w-full" />
                     </div>
                 </CardContent>
+                 <CardFooter className="p-4 pt-2 border-t">
+                    <Skeleton className="h-9 w-full" />
+                </CardFooter>
             </Card>
         </div>
     )
@@ -153,14 +160,19 @@ export default function BookingDetailPage() {
         </Button>
         <Card>
             <CardHeader className="pb-4">
-                <div className="flex justify-between items-center">
+                <div className="flex justify-between items-start">
                     <CardTitle className="text-xl">Booking Details</CardTitle>
-                    <Badge variant={getStatusBadgeVariant(reservation.status)} className="text-sm">
+                    <Badge variant={getStatusBadgeVariant(reservation.status)} className="text-sm capitalize">
                         {reservation.status}
                     </Badge>
                 </div>
                 <CardDescription>
-                    {reservation.userName ? `${reservation.userName} (${reservation.email})` : 'User details not found'}
+                    {reservation.userName ? (
+                        <>
+                           <span className="font-semibold text-card-foreground">{reservation.userName}</span>
+                           <span> ({reservation.email})</span>
+                        </>
+                    ) : 'User details not found'}
                 </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4 pt-0">
