@@ -107,34 +107,38 @@ export function UsersTable() {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {isLoading && renderSkeletons()}
-                            {!isLoading && sortedUsers.map((user) => (
-                                <TableRow key={user.id}>
-                                    <TableCell className="font-medium">{user.username}</TableCell>
-                                    <TableCell>{user.email}</TableCell>
-                                    <TableCell>{user.phone}</TableCell>
-                                    <TableCell className="text-right">
-                                        <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-                                            onClick={() => handleDeleteClick(user)}
-                                        >
-                                            <Trash2 className="h-4 w-4 mr-2" />
-                                            Delete
-                                        </Button>
-                                    </TableCell>
-                                </TableRow>
-                            ))}
+                            {isLoading ? renderSkeletons() : (
+                                <>
+                                    {sortedUsers.length > 0 ? (
+                                        sortedUsers.map((user) => (
+                                            <TableRow key={user.id}>
+                                                <TableCell className="font-medium">{user.username}</TableCell>
+                                                <TableCell>{user.email}</TableCell>
+                                                <TableCell>{user.phone}</TableCell>
+                                                <TableCell className="text-right">
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                                                        onClick={() => handleDeleteClick(user)}
+                                                    >
+                                                        <Trash2 className="h-4 w-4 mr-2" />
+                                                        Delete
+                                                    </Button>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))
+                                    ) : (
+                                        <TableRow>
+                                            <TableCell colSpan={4} className="text-center text-muted-foreground p-8">
+                                                No registered users found.
+                                            </TableCell>
+                                        </TableRow>
+                                    )}
+                                </>
+                            )}
                         </TableBody>
                     </Table>
-                     {!isLoading && users.length === 0 && (
-                        <TableRow>
-                            <TableCell colSpan={4} className="text-center text-muted-foreground p-8">
-                                No registered users found.
-                            </TableCell>
-                        </TableRow>
-                    )}
                 </CardContent>
             </Card>
 
