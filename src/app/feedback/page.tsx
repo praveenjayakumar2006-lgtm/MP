@@ -73,11 +73,6 @@ export default function FeedbackPage() {
     
     try {
       await saveFeedback(values);
-      
-      toast({
-        title: 'Feedback Submitted',
-        description: 'Thank you for your feedback!',
-      });
       router.push('/feedback/success');
 
     } catch (error) {

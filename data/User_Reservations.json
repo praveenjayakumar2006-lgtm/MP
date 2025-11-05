@@ -1,1 +1,26 @@
-[]
+[
+  {
+    "slotId": "B2",
+    "vehiclePlate": "TN72FB1234",
+    "startTime": "2025-11-05T14:30:00.000Z",
+    "endTime": "2025-11-05T15:30:00.000Z",
+    "userId": "user_1762352506910",
+    "userName": "Mithun",
+    "email": "727723euec110@skcet.ac.in",
+    "id": "res_1762352566323_5h8r65e",
+    "createdAt": "2025-11-05T14:22:46.323Z",
+    "status": "Upcoming"
+  },
+  {
+    "slotId": "B6",
+    "vehiclePlate": "TN72FB1234",
+    "startTime": "2025-11-05T14:30:00.000Z",
+    "endTime": "2025-11-05T15:30:00.000Z",
+    "userId": "user_1762352506910",
+    "userName": "Mithun",
+    "email": "727723euec110@skcet.ac.in",
+    "id": "res_1762352692173_cazxq7z",
+    "createdAt": "2025-11-05T14:24:52.173Z",
+    "status": "Upcoming"
+  }
+]
