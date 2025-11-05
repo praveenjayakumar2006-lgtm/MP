@@ -22,7 +22,7 @@ export default function UsersPage() {
                 </CardDescription>
             </CardHeader>
             <Separator />
-            <CardContent className="p-0">
+            <CardContent className="p-4 md:p-6">
                 <UsersTable />
             </CardContent>
         </Card>

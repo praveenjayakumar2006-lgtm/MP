@@ -9,7 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { useEffect, useState, useMemo } from 'react';
 import type { User } from '@/lib/types';
 import { Skeleton } from '../ui/skeleton';
@@ -25,9 +25,23 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
-import { Trash2 } from 'lucide-react';
+import { Trash2, Mail, Phone, User as UserIcon } from 'lucide-react';
 import { deleteUser, getUsers } from '@/app/actions/users';
+import { Separator } from '../ui/separator';
+import { Avatar, AvatarFallback } from '../ui/avatar';
 
+
+function DetailItem({ icon: Icon, label, value }: { icon: React.ElementType, label: string, value: React.ReactNode }) {
+    return (
+        <div className="flex items-start gap-2.5">
+            <Icon className="h-4 w-4 text-muted-foreground mt-0.5" />
+            <div className="flex-1">
+                <div className="text-xs text-muted-foreground">{label}</div>
+                <div className="font-medium text-sm">{value}</div>
+            </div>
+        </div>
+    )
+}
 
 export function UsersTable() {
     const [users, setUsers] = useState<User[]>([]);
@@ -83,62 +97,64 @@ export function UsersTable() {
     [users]);
 
     const renderSkeletons = () => (
-        Array.from({ length: 5 }).map((_, i) => (
-            <TableRow key={`skel-${i}`}>
-                <TableCell><Skeleton className="h-5 w-32" /></TableCell>
-                <TableCell><Skeleton className="h-5 w-48" /></TableCell>
-                <TableCell><Skeleton className="h-5 w-24" /></TableCell>
-                <TableCell><Skeleton className="h-9 w-20" /></TableCell>
-            </TableRow>
+        Array.from({ length: 3 }).map((_, i) => (
+             <Card key={`skel-${i}`}>
+                <CardHeader className="flex-row items-center gap-4 space-y-0 pb-4">
+                    <Skeleton className="h-12 w-12 rounded-full" />
+                    <div className="flex-1 space-y-2">
+                        <Skeleton className="h-5 w-32" />
+                    </div>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-3/4" />
+                </CardContent>
+                 <CardFooter className="p-4 pt-2 border-t">
+                    <Skeleton className="h-9 w-full sm:w-24 ml-auto" />
+                </CardFooter>
+            </Card>
         ))
     );
 
     return (
         <>
-            <Card>
-                <CardContent className="p-0">
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Name</TableHead>
-                                <TableHead>Email</TableHead>
-                                <TableHead>Phone</TableHead>
-                                <TableHead className="text-right">Actions</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                             {isLoading ? (
-                                renderSkeletons()
-                             ) : sortedUsers.length > 0 ? (
-                                sortedUsers.map((user) => (
-                                    <TableRow key={user.id}>
-                                        <TableCell className="font-medium">{user.username}</TableCell>
-                                        <TableCell>{user.email}</TableCell>
-                                        <TableCell>{user.phone || 'N/A'}</TableCell>
-                                        <TableCell className="text-right">
-                                            <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-                                                onClick={() => handleDeleteClick(user)}
-                                            >
-                                                <Trash2 className="h-4 w-4 mr-2" />
-                                                Delete
-                                            </Button>
-                                        </TableCell>
-                                    </TableRow>
-                                ))
-                            ) : (
-                                <TableRow>
-                                    <TableCell colSpan={4} className="text-center text-muted-foreground p-8">
-                                        No registered users found.
-                                    </TableCell>
-                                </TableRow>
-                            )}
-                        </TableBody>
-                    </Table>
-                </CardContent>
-            </Card>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                 {isLoading ? (
+                    renderSkeletons()
+                 ) : sortedUsers.length > 0 ? (
+                    sortedUsers.map((user) => (
+                        <Card key={user.id} className="flex flex-col">
+                            <CardHeader className="flex-row items-center gap-4 space-y-0 pb-4">
+                                <Avatar className="h-12 w-12 border">
+                                    <AvatarFallback>{user.username.charAt(0).toUpperCase()}</AvatarFallback>
+                                </Avatar>
+                                <div className="flex-1">
+                                    <CardTitle className="text-base">{user.username}</CardTitle>
+                                </div>
+                            </CardHeader>
+                            <CardContent className="space-y-3 flex-1">
+                               <DetailItem icon={Mail} label="Email" value={user.email} />
+                               <DetailItem icon={Phone} label="Phone" value={user.phone || 'N/A'} />
+                            </CardContent>
+                            <CardFooter className="p-4 pt-2 border-t">
+                                <Button
+                                    variant="destructive"
+                                    size="sm"
+                                    className="w-full sm:w-auto ml-auto"
+                                    onClick={() => handleDeleteClick(user)}
+                                >
+                                    <Trash2 className="mr-2 h-4 w-4" />
+                                    Delete
+                                </Button>
+                            </CardFooter>
+                        </Card>
+                    ))
+                ) : (
+                     <div className="col-span-full text-center p-8 text-muted-foreground bg-card rounded-lg">
+                        No registered users found.
+                    </div>
+                )}
+            </div>
 
              <AlertDialog open={!!userToDelete} onOpenChange={(open) => !open && setUserToDelete(null)}>
                 <AlertDialogContent>
