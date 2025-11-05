@@ -160,9 +160,9 @@ function FeedbackList() {
             ) : (
                 <Card>
                     <CardContent className="pt-6">
-                        <p className="text-center text-muted-foreground">
+                        <div className="text-center p-8 text-muted-foreground">
                             No feedback has been submitted yet.
-                        </p>
+                        </div>
                     </CardContent>
                 </Card>
             )}
@@ -195,7 +195,7 @@ function FeedbackList() {
 
 export default function OwnerFeedbackPage() {
     return (
-        <div className="w-full max-w-2xl mx-auto flex-1">
+        <div className="w-full max-w-7xl mx-auto">
              <Card>
                 <CardHeader className="text-center">
                     <div className="inline-flex items-center gap-2 justify-center">
@@ -206,7 +206,7 @@ export default function OwnerFeedbackPage() {
                         All feedback submitted by users.
                     </CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="p-4 md:p-6">
                     <FeedbackList />
                 </CardContent>
             </Card>
