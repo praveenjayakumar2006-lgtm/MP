@@ -134,7 +134,7 @@ export function BookingsTable() {
 
 
   return (
-    <div>
+    <div className="pt-6">
         <div className="mb-6 text-center">
             <div className="flex justify-center items-center gap-2">
               <CalendarCheck className="h-8 w-8 text-primary" />
