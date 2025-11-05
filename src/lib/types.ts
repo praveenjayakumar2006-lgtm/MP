@@ -1,3 +1,4 @@
+
 export type ParkingSlotStatus = 'available' | 'occupied' | 'reserved';
 export type VehicleType = 'car' | 'bike';
 
@@ -13,6 +14,7 @@ export type ParkingSlot = {
 export type Reservation = {
   id: string;
   userId: string;
+  userName: string; // Added user's name
   slotId: string;
   vehiclePlate: string;
   startTime: string; // Changed to string

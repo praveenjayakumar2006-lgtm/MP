@@ -7,6 +7,7 @@ import path from 'path';
 type Reservation = {
     id: string;
     userId: string;
+    userName: string;
     slotId: string;
     vehiclePlate: string;
     startTime: string;

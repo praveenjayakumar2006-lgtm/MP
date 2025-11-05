@@ -117,7 +117,7 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
     const startDate = parseISO(bookingDetails.date);
     startDate.setHours(hour, minute);
 
-    const newReservation: Omit<Reservation, 'id' | 'createdAt' | 'updatedAt' | 'userId' | 'status'> = {
+    const newReservation = {
       slotId: selectedSlot.id,
       vehiclePlate: bookingDetails.vehiclePlate,
       startTime: startDate,

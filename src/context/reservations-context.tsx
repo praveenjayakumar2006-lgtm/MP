@@ -6,10 +6,12 @@ import type { Reservation } from '@/lib/types';
 import { useUser } from '@/firebase';
 import { useToast } from '@/hooks/use-toast';
 import { getReservations, saveReservation, deleteReservation } from '@/app/actions/reservations';
+import { addHours, parseISO } from 'date-fns';
+
 
 interface ReservationsContextType {
   reservations: Reservation[];
-  addReservation: (reservation: Omit<Reservation, 'id' | 'createdAt' | 'updatedAt' | 'userId' | 'status'>) => void;
+  addReservation: (reservation: Omit<Reservation, 'id' | 'createdAt' | 'updatedAt' | 'userId' | 'status' | 'userName'> & { startTime: Date, endTime: Date }) => void;
   removeReservation: (reservationId: string) => void;
   isLoading: boolean;
   isClient: boolean;
@@ -61,8 +63,8 @@ export const ReservationsProvider: React.FC<{ children: ReactNode }> = ({ childr
   }, [isClient, fetchReservations]);
 
 
-  const addReservation = async (reservation: Omit<Reservation, 'id' | 'createdAt' | 'updatedAt' | 'userId' | 'status'>) => {
-    if (!user) {
+  const addReservation = async (reservation: Omit<Reservation, 'id' | 'createdAt' | 'updatedAt' | 'userId' | 'status' | 'userName'> & { startTime: Date, endTime: Date }) => {
+    if (!user || !user.displayName) {
       toast({
         variant: 'destructive',
         title: 'Authentication Error',
@@ -87,7 +89,10 @@ export const ReservationsProvider: React.FC<{ children: ReactNode }> = ({ childr
     try {
       await saveReservation({
         ...reservation,
+        startTime: reservation.startTime.toISOString(),
+        endTime: reservation.endTime.toISOString(),
         userId: user.uid,
+        userName: user.displayName,
       });
       await fetchReservations(); // Refetch after adding
     } catch (error) {

@@ -52,13 +52,21 @@ export function BookingsTable() {
     if (filter === 'all') return true;
     return res.status === filter;
   }).sort((a, b) => {
-    if (filter === 'all') {
-      const statusOrder: Record<Status, number> = { 'Upcoming': 1, 'Active': 2, 'Completed': 3 };
-      if (statusOrder[a.status] !== statusOrder[b.status]) {
-        return statusOrder[a.status] - statusOrder[b.status];
-      }
+    const statusOrder: Record<Status, number> = { 'Active': 1, 'Upcoming': 2, 'Completed': 3 };
+    const statusA = statusOrder[a.status];
+    const statusB = statusOrder[b.status];
+
+    if (statusA !== statusB) {
+        return statusA - statusB;
     }
-    return new Date(a.startTime).getTime() - new Date(b.startTime).getTime();
+    
+    // For 'Active' and 'Upcoming', sort chronologically
+    if (a.status !== 'Completed') {
+        return new Date(a.startTime).getTime() - new Date(b.startTime).getTime();
+    }
+
+    // For 'Completed', sort reverse chronologically (most recent first)
+    return new Date(b.startTime).getTime() - new Date(a.startTime).getTime();
   });
 
 
@@ -153,6 +161,10 @@ export function BookingsTable() {
                                   <span className="font-mono bg-muted px-1.5 py-0.5 rounded">{formatLicensePlate(reservation.vehiclePlate)}</span>
                               </CardHeader>
                               <CardContent className="space-y-2 p-1 pt-2 flex-1 flex flex-col">
+                                  <div className="flex items-center gap-2 text-base">
+                                    <UserIcon className="h-3.5 w-3.5 text-muted-foreground" />
+                                    <span>{reservation.userName}</span>
+                                  </div>
                                   <Separator />
                                   <div className="flex justify-between items-center flex-1 py-0.5">
                                     <div className="space-y-1.5">
