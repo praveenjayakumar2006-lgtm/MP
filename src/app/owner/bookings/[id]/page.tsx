@@ -27,7 +27,7 @@ function DetailItem({ icon: Icon, label, value }: { icon: React.ElementType, lab
         <div className="flex items-start gap-2.5">
             <Icon className="h-4 w-4 text-muted-foreground mt-0.5" />
             <div className="flex-1">
-                <p className="text-xs text-muted-foreground">{label}</p>
+                <div className="text-xs text-muted-foreground">{label}</div>
                 <div className="font-medium text-sm">{value}</div>
             </div>
         </div>
@@ -85,7 +85,7 @@ export default function BookingDetailPage() {
 
   if (isLoading || !reservation) {
     return (
-        <div className="w-full max-w-lg mx-auto mt-6">
+        <div className="w-full max-w-md mx-auto mt-6">
             <Button onClick={() => router.back()} variant="outline" size="sm" className="mb-4">
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 Back
@@ -116,7 +116,7 @@ export default function BookingDetailPage() {
 
 
   return (
-    <div className="w-full max-w-lg mx-auto mt-6">
+    <div className="w-full max-w-md mx-auto mt-6">
         <Button onClick={() => router.back()} variant="outline" size="sm" className="mb-4">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back
