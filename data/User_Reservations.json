@@ -1,17 +1,5 @@
 [
   {
-    "slotId": "B2",
-    "vehiclePlate": "TN72FB1234",
-    "startTime": "2025-11-25T22:00:00.000Z",
-    "endTime": "2025-11-26T03:00:00.000Z",
-    "userId": "LRPuR03RlPgNID1f0d675EDXqdQ2",
-    "userName": "Vaishuuu",
-    "email": "vaishu@gmail.com",
-    "id": "res_1762317664398_97idnsr",
-    "createdAt": "2025-11-05T04:41:04.398Z",
-    "status": "Upcoming"
-  },
-  {
     "slotId": "B3",
     "vehiclePlate": "TN72FB1234",
     "startTime": "2025-11-05T21:30:00.000Z",
@@ -21,18 +9,6 @@
     "email": "727723euec110@skcet.ac.in",
     "id": "res_1762319051790_xljd3nz",
     "createdAt": "2025-11-05T05:04:11.790Z",
-    "status": "Upcoming"
-  },
-  {
-    "slotId": "B9",
-    "vehiclePlate": "TN72FB1234",
-    "startTime": "2025-11-25T21:30:00.000Z",
-    "endTime": "2025-11-26T03:30:00.000Z",
-    "userId": "23QINt5SrKPOVTm47POV3jMtuoq2",
-    "userName": "mithun",
-    "email": "727723euec142@skcet.ac.in",
-    "id": "res_1762320751338_sv2ptrw",
-    "createdAt": "2025-11-05T05:32:31.338Z",
     "status": "Upcoming"
   }
 ]
