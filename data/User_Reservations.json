@@ -22,5 +22,17 @@
     "id": "res_1762352692173_cazxq7z",
     "createdAt": "2025-11-05T14:24:52.173Z",
     "status": "Upcoming"
+  },
+  {
+    "slotId": "B4",
+    "vehiclePlate": "TN72FB1234",
+    "startTime": "2025-11-05T15:00:00.000Z",
+    "endTime": "2025-11-05T16:00:00.000Z",
+    "userId": "user_1762354030631",
+    "userName": "Vaishali",
+    "email": "vaishu@gmail.com",
+    "id": "res_1762354073333_n2mvxvw",
+    "createdAt": "2025-11-05T14:47:53.334Z",
+    "status": "Upcoming"
   }
 ]
