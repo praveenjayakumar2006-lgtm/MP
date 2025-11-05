@@ -59,3 +59,16 @@ export async function saveFeedback(feedback: Omit<Feedback, 'id' | 'createdAt'>)
   await writeFeedbackFile(allFeedback);
   return newFeedback;
 }
+
+export async function deleteFeedback(feedbackId: string): Promise<{ success: boolean }> {
+    let allFeedback = await readFeedbackFile();
+    const initialLength = allFeedback.length;
+    allFeedback = allFeedback.filter(f => f.id !== feedbackId);
+
+    if (allFeedback.length < initialLength) {
+        await writeFeedbackFile(allFeedback);
+        return { success: true };
+    } else {
+        return { success: false };
+    }
+}

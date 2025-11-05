@@ -1,42 +1,35 @@
 [
   {
-    "slotId": "C4",
+    "slotId": "B4",
     "vehiclePlate": "TN72FB1234",
     "startTime": "2025-11-11T22:30:00.000Z",
     "endTime": "2025-11-12T06:30:00.000Z",
     "userId": "FdRc247TysYMl7l8afM5izCmqOt2",
-    "id": "res_1762276802195_fm4z3wr",
-    "createdAt": "2025-11-04T17:20:02.195Z",
-    "status": "Upcoming"
-  },
-  {
-    "slotId": "C5",
-    "vehiclePlate": "TN72FB1234",
-    "startTime": "2025-11-11T22:30:00.000Z",
-    "endTime": "2025-11-12T06:30:00.000Z",
-    "userId": "FdRc247TysYMl7l8afM5izCmqOt2",
-    "id": "res_1762276805841_w35y1ef",
-    "createdAt": "2025-11-04T17:20:05.841Z",
+    "userName": "MITHUN R",
+    "id": "res_1762316595419_5zhi3b3",
+    "createdAt": "2025-11-05T04:23:15.419Z",
     "status": "Upcoming"
   },
   {
     "slotId": "B8",
     "vehiclePlate": "TN72FB1234",
-    "startTime": "2025-11-11T22:30:00.000Z",
-    "endTime": "2025-11-12T06:30:00.000Z",
-    "userId": "FdRc247TysYMl7l8afM5izCmqOt2",
-    "id": "res_1762276809477_cpe7cly",
-    "createdAt": "2025-11-04T17:20:09.477Z",
+    "startTime": "2025-11-25T22:00:00.000Z",
+    "endTime": "2025-11-26T03:00:00.000Z",
+    "userId": "LRPuR03RlPgNID1f0d675EDXqdQ2",
+    "userName": "Vaishuuu",
+    "id": "res_1762316690579_ng56ycy",
+    "createdAt": "2025-11-05T04:24:50.579Z",
     "status": "Upcoming"
   },
   {
     "slotId": "B5",
     "vehiclePlate": "TN72FB1234",
-    "startTime": "2025-11-11T22:30:00.000Z",
-    "endTime": "2025-11-12T06:30:00.000Z",
-    "userId": "FdRc247TysYMl7l8afM5izCmqOt2",
-    "id": "res_1762276832238_21vvc6n",
-    "createdAt": "2025-11-04T17:20:32.238Z",
+    "startTime": "2025-11-25T22:00:00.000Z",
+    "endTime": "2025-11-26T03:00:00.000Z",
+    "userId": "LRPuR03RlPgNID1f0d675EDXqdQ2",
+    "userName": "Vaishuuu",
+    "id": "res_1762316694776_m6nzr8g",
+    "createdAt": "2025-11-05T04:24:54.776Z",
     "status": "Upcoming"
   }
 ]
