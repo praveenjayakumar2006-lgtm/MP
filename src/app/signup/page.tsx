@@ -68,7 +68,7 @@ export default function SignupPage() {
       if (emailExists) {
         toast({
           variant: 'destructive',
-          title: 'Uh oh! Something went wrong.',
+          title: 'Email already registered',
           description: 'This email is already in use. Please try to log in.',
         });
         return;
@@ -98,8 +98,10 @@ export default function SignupPage() {
       
     } catch (error: any) {
        let description = 'There was a problem with your request.';
+       // This specific Firebase error is now handled by the local check,
+       // but we keep the generic error handler for other potential issues.
        if (error.code === 'auth/email-already-in-use') {
-        description = 'This email is already in use. Please try to log in.';
+        description = 'This email is already registered. Please log in.';
        }
       toast({
         variant: 'destructive',
