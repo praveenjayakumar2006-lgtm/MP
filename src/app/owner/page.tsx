@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState, Suspense, useTransition } from "react";
 import { ReportsTable } from "@/components/owner/reports-table";
 import { BookingsTable } from "@/components/owner/bookings-table";
-import { Loader2, FileText, MessageSquare, LayoutDashboard, CalendarCheck, ShieldCheck, Users } from "lucide-react";
+import { Loader2, FileText, MessageSquare, CalendarCheck, ShieldCheck, Users } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useUser } from "@/firebase";
@@ -141,7 +141,11 @@ function OwnerDashboard() {
     );
 
      const renderBookings = () => (
-        <BookingsTable />
+        <Card>
+            <CardContent className="p-4 md:p-6">
+                <BookingsTable />
+            </CardContent>
+        </Card>
     );
     
     const renderContent = () => {
