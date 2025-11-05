@@ -114,7 +114,7 @@ export default function FeedbackPage() {
                     <FormItem>
                       <FormLabel>Full Name</FormLabel>
                       <FormControl>
-                        <Input placeholder="John Doe" {...field} readOnly />
+                        <Input placeholder="John Doe" {...field} readOnly className="cursor-not-allowed" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -132,6 +132,7 @@ export default function FeedbackPage() {
                           placeholder="you@gmail.com"
                           {...field}
                           readOnly
+                          className="cursor-not-allowed"
                         />
                       </FormControl>
                       <FormMessage />
