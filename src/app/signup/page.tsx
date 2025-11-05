@@ -25,7 +25,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import { useFirebase } from '@/firebase';
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
-import { saveUserToFile } from '@/app/actions/users';
+import { saveUserToFile, getUsers } from '@/app/actions/users';
 
 const signupSchema = z.object({
   username: z.string().min(2, 'Full name must be at least 2 characters.'),
@@ -61,6 +61,19 @@ export default function SignupPage() {
       return;
     }
     try {
+      // First, check if user already exists in the local JSON file
+      const appUsers = await getUsers();
+      const emailExists = appUsers.some(user => user.email === values.email);
+
+      if (emailExists) {
+        toast({
+          variant: 'destructive',
+          title: 'Uh oh! Something went wrong.',
+          description: 'This email is already in use. Please try to log in.',
+        });
+        return;
+      }
+      
       const userCredential = await createUserWithEmailAndPassword(auth, values.email, values.password);
       const user = userCredential.user;
 
@@ -75,17 +88,18 @@ export default function SignupPage() {
         phone: values.phone,
       });
 
+      localStorage.setItem('role', 'user');
+
       toast({
         title: 'Account Created!',
         description: "You've been successfully signed up.",
         duration: 2000,
       });
-      localStorage.setItem('role', 'user');
       
     } catch (error: any) {
        let description = 'There was a problem with your request.';
        if (error.code === 'auth/email-already-in-use') {
-        description = 'This email is already in use. Please try another one.';
+        description = 'This email is already in use. Please try to log in.';
        }
       toast({
         variant: 'destructive',
