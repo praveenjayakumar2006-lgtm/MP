@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -27,6 +28,7 @@ import { useFirebase } from '@/firebase';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { useState } from 'react';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { getUsers } from '@/app/actions/users';
 
 const loginSchema = z.object({
   email: z.string().email('Please enter a valid email address.'),
@@ -70,26 +72,41 @@ export default function LoginPage() {
           description: 'Welcome back, Owner!',
           duration: 2000,
         });
-        return; // <-- Explicitly return here
+        return; 
       } else {
          toast({
           variant: 'destructive',
           title: 'Owner Login Failed',
           description: 'Invalid credentials for owner.',
         });
-        return; // <-- And return here as well
+        return; 
       }
     }
 
     try {
-      await signInWithEmailAndPassword(auth, values.email, values.password);
+      const userCredential = await signInWithEmailAndPassword(auth, values.email, values.password);
+      const user = userCredential.user;
+
+      // Check if user exists in the User_Data.json file
+      const appUsers = await getUsers();
+      const userExists = appUsers.some(appUser => appUser.id === user.uid);
+
+      if (!userExists) {
+        await auth.signOut();
+        toast({
+          variant: 'destructive',
+          title: 'Access Denied',
+          description: 'Your account is not active. Please sign up or contact an administrator.',
+        });
+        return;
+      }
+
       toast({
         title: 'Login Successful',
         description: 'Welcome back!',
         duration: 2000,
       });
       localStorage.setItem('role', values.role);
-      // The onAuthStateChanged listener in the layout will handle the redirect
     } catch (error: any) {
       let description = 'There was a problem with your request.';
       if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
