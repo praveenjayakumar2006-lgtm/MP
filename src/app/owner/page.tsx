@@ -42,8 +42,7 @@ function OwnerDashboard() {
 
     const renderHome = () => (
         <Card>
-            <CardHeader className="flex-row items-center gap-4">
-                <LayoutDashboard className="h-10 w-10 text-primary" />
+            <CardHeader>
                 <div>
                     <CardTitle className="text-2xl">Welcome, Owner!</CardTitle>
                     <CardDescription>
