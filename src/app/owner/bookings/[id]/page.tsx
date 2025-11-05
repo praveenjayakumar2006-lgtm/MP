@@ -153,7 +153,12 @@ export default function BookingDetailPage() {
         </Button>
         <Card>
             <CardHeader className="pb-4">
-                <CardTitle className="text-xl">Booking Details</CardTitle>
+                <div className="flex justify-between items-center">
+                    <CardTitle className="text-xl">Booking Details</CardTitle>
+                    <Badge variant={getStatusBadgeVariant(reservation.status)} className="text-sm">
+                        {reservation.status}
+                    </Badge>
+                </div>
                 <CardDescription>
                     {reservation.userName ? `${reservation.userName} (${reservation.email})` : 'User details not found'}
                 </CardDescription>
@@ -165,15 +170,6 @@ export default function BookingDetailPage() {
                    <DetailItem icon={Car} label="Vehicle Plate" value={reservation.vehiclePlate} />
                    <DetailItem icon={Calendar} label="Start Time" value={format(startTime, 'PPp')} />
                    <DetailItem icon={Clock} label="End Time" value={format(endTime, 'PPp')} />
-                   <DetailItem
-                        icon={BadgeIcon}
-                        label="Status"
-                        value={
-                             <Badge variant={getStatusBadgeVariant(reservation.status)}>
-                                {reservation.status}
-                            </Badge>
-                        }
-                    />
                    <DetailItem icon={Info} label="Booked On" value={format(new Date(reservation.createdAt), 'PPp')} />
                 </div>
             </CardContent>
