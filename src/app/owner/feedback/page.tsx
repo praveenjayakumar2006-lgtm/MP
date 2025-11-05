@@ -22,6 +22,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { Separator } from "@/components/ui/separator";
 
 
 type Feedback = {
@@ -195,21 +196,24 @@ function FeedbackList() {
 
 export default function OwnerFeedbackPage() {
     return (
-        <div className="w-full max-w-7xl mx-auto">
-             <Card>
-                <CardHeader className="text-center">
-                    <div className="inline-flex items-center gap-2 justify-center">
-                        <MessageSquare className="h-8 w-8 text-primary" />
-                        <CardTitle className="text-3xl">User Feedback</CardTitle>
-                    </div>
-                    <CardDescription>
-                        All feedback submitted by users.
-                    </CardDescription>
-                </CardHeader>
-                <CardContent className="p-4 md:p-6">
-                    <FeedbackList />
-                </CardContent>
-            </Card>
+        <div className="flex flex-1 flex-col bg-muted p-4 md:p-6">
+            <div className="w-full max-w-7xl mx-auto">
+                 <Card>
+                    <CardHeader className="text-center">
+                        <div className="inline-flex items-center gap-2 justify-center">
+                            <MessageSquare className="h-8 w-8 text-primary" />
+                            <CardTitle className="text-3xl">User Feedback</CardTitle>
+                        </div>
+                        <CardDescription>
+                            All feedback submitted by users.
+                        </CardDescription>
+                    </CardHeader>
+                    <Separator />
+                    <CardContent className="p-4 md:p-6">
+                        <FeedbackList />
+                    </CardContent>
+                </Card>
+            </div>
         </div>
     );
 }

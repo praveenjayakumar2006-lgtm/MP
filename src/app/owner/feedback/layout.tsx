@@ -7,7 +7,7 @@ export default function OwnerFeedbackLayout({
   children: React.ReactNode;
 }) {
   return (
-     <div className="flex flex-1 flex-col bg-background p-4 md:p-6">
+     <div className="flex flex-1 flex-col">
         {children}
     </div>
   );

@@ -123,7 +123,7 @@ function OwnerDashboard() {
     );
 
     const renderReports = () => (
-        <Card>
+        <Card className="bg-background">
             <CardHeader className="text-center">
                 <div className="inline-flex items-center gap-2 justify-center">
                     <FileText className="h-8 w-8 text-primary" />
@@ -133,6 +133,7 @@ function OwnerDashboard() {
                     All violation reports submitted by users.
                 </CardDescription>
             </CardHeader>
+             <Separator className="my-4" />
             <CardContent className="p-4 md:p-6">
                 <ReportsTable />
             </CardContent>
@@ -168,7 +169,7 @@ function OwnerDashboard() {
 
 
     return (
-        <div className="flex flex-1 flex-col bg-background p-4 md:p-6">
+        <div className="flex flex-1 flex-col bg-muted p-4 md:p-6">
             <div className="w-full max-w-7xl mx-auto">
                 {renderContent()}
             </div>
