@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Button } from '@/components/ui/button';
@@ -9,9 +10,9 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
-import { useUser } from '@/firebase';
 import { useToast } from '@/hooks/use-toast';
 import { saveViolation } from '@/app/actions/violations';
+import { User } from '@/lib/types';
 
 
 function ViolationResultContent() {
@@ -23,13 +24,17 @@ function ViolationResultContent() {
 
   const [submissionStatus, setSubmissionStatus] = useState<'pending' | 'confirmed' | 'rejected'>('pending');
   const [imageUrl, setImageUrl] = useState<string | null>(null);
-  const { user } = useUser();
+  const [user, setUser] = useState<User | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
     const storedImage = sessionStorage.getItem('violationImage');
     if (storedImage) {
       setImageUrl(storedImage);
+    }
+    const storedUser = localStorage.getItem('user');
+    if(storedUser) {
+        setUser(JSON.parse(storedUser));
     }
   }, []);
 
@@ -49,7 +54,7 @@ function ViolationResultContent() {
             violationType,
             licensePlate,
             imageUrl: imageUrl || null,
-            userId: user.uid,
+            userId: user.id,
         });
         setSubmissionStatus('confirmed');
     } catch (error) {

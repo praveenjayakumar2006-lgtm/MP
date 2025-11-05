@@ -13,7 +13,7 @@ import { Badge } from '@/components/ui/badge';
 import { format, isSameDay } from 'date-fns';
 import { useState, useContext, useEffect, useMemo } from 'react';
 import { Tabs, TabsList, TabsContent, TabsTrigger } from '@/components/ui/tabs';
-import type { Reservation } from '@/lib/types';
+import type { Reservation, User } from '@/lib/types';
 import { Skeleton } from '../ui/skeleton';
 import { ReservationsContext } from '@/context/reservations-context';
 import { Button } from '../ui/button';
@@ -38,7 +38,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { useUser } from '@/firebase';
 
 type Status = 'Active' | 'Completed' | 'Upcoming';
 
@@ -66,7 +65,7 @@ const StatusIcon = ({ status }: { status: Status }) => {
 
 export function ReservationsTable() {
   const context = useContext(ReservationsContext);
-  const { user } = useUser();
+  const [user, setUser] = useState<User | null>(null);
   const [filter, setFilter] = useState<Status | 'all'>('all');
   const [reservationToCancel, setReservationToCancel] = useState<Reservation | null>(null);
   const { toast } = useToast();
@@ -74,6 +73,13 @@ export function ReservationsTable() {
   const isMobile = useIsMobile();
   
   const { reservations, removeReservation, isLoading, isClient } = context || {};
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+        setUser(JSON.parse(storedUser));
+    }
+  }, []);
 
   const displayReservations = useMemo(() => {
     if (!reservations) return [];
@@ -149,7 +155,7 @@ export function ReservationsTable() {
   };
 
   const handleRowClick = (reservation: Reservation) => {
-    if (reservation.userId !== user?.uid) return;
+    if (!user || reservation.userId !== user.id) return;
 
     if (reservation.status === 'Completed') {
       toast({
@@ -203,7 +209,7 @@ export function ReservationsTable() {
     return plate;
   }
 
-  const userReservations = displayReservations?.filter(res => res.userId === user?.uid);
+  const userReservations = displayReservations?.filter(res => res.userId === user?.id);
 
   const filteredReservations = userReservations?.filter((res) => {
     if (filter === 'all') return true;

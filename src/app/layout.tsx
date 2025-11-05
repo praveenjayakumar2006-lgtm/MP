@@ -10,7 +10,7 @@ import { PageTransition } from '@/components/layout/page-transition';
 import { ReservationsProvider } from '@/context/reservations-context';
 import { usePathname, useRouter } from 'next/navigation';
 import React, { useEffect, useMemo, useState } from 'react';
-import { FirebaseClientProvider, useUser } from '@/firebase';
+import { FirebaseClientProvider } from '@/firebase';
 import Loading from './loading';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
@@ -18,13 +18,28 @@ const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 function AppContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { user, isUserLoading } = useUser();
   const [role, setRole] = useState<string | null>(null);
+  const [user, setUser] = useState<any | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [isClient, setIsClient] = useState(false);
   
   const isAuthPage = useMemo(() => ['/login', '/signup'].includes(pathname), [pathname]);
   const isOwnerPage = useMemo(() => pathname.startsWith('/owner'), [pathname]);
   const isCameraPage = useMemo(() => pathname === '/violations/camera', [pathname]);
+
+  useEffect(() => {
+    setIsClient(true);
+    try {
+      const storedUser = localStorage.getItem('user');
+      const storedRole = localStorage.getItem('role');
+      setUser(storedUser ? JSON.parse(storedUser) : null);
+      setRole(storedRole);
+    } catch (e) {
+      // ignore
+    } finally {
+      setIsLoading(false);
+    }
+  }, [pathname]); // Rerun on path change to reflect login/logout
 
   const showHeader = useMemo(() => {
     if (!isClient || isCameraPage) return false;
@@ -34,50 +49,34 @@ function AppContent({ children }: { children: React.ReactNode }) {
   }, [role, isOwnerPage, user, isAuthPage, isClient, isCameraPage]);
 
   useEffect(() => {
-    setIsClient(true);
-    setRole(localStorage.getItem('role'));
-  }, []);
+    if (isLoading || !isClient) return;
 
-  useEffect(() => {
-    if (!isClient) return;
-
-    const currentRole = localStorage.getItem('role');
-    setRole(currentRole);
-
-    if (currentRole === 'owner') {
+    if (role === 'owner') {
       if (!isOwnerPage) {
         router.replace('/owner');
       }
       return;
     }
     
-    if (!isUserLoading) {
-      if (user) { // Logged-in user
-        if (isAuthPage) {
-            router.replace('/home');
-        }
-      } else { // Logged-out user
-        if (!isAuthPage && !isCameraPage) { // Allow camera page for logged-out users for now
-          router.replace('/login');
-        }
+    if (user) { // Logged-in user
+      if (isAuthPage) {
+          router.replace('/home');
+      }
+    } else { // Logged-out user
+      if (!isAuthPage && !isCameraPage) {
+        router.replace('/login');
       }
     }
-  }, [user, isUserLoading, isAuthPage, isOwnerPage, router, isClient, pathname, isCameraPage]);
+  }, [user, isLoading, isAuthPage, isOwnerPage, router, isClient, pathname, isCameraPage, role]);
 
-  if (!isClient) {
+  if (isLoading || !isClient) {
     return <Loading />;
   }
-
-  const currentRole = role; // Use state variable for consistent value in render
-  if (currentRole === 'owner') {
-    if (!isOwnerPage) return <Loading />;
-  } else {
-    if (isUserLoading && !isAuthPage) return <Loading />;
-    if (!isUserLoading) {
-      if (user && isAuthPage) return <Loading />;
-      if (!user && !isAuthPage && !isCameraPage) return <Loading />;
-    }
-  }
+  
+  // Prevent flicker during redirects
+  if (role === 'owner' && !isOwnerPage) return <Loading />;
+  if (user && isAuthPage) return <Loading />;
+  if (!user && !isAuthPage && !isCameraPage && role !== 'owner') return <Loading />;
   
   const content = (
     <>

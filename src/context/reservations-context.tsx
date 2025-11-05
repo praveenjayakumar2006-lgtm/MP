@@ -2,8 +2,7 @@
 'use client';
 
 import React, { createContext, useState, ReactNode, useEffect, useCallback } from 'react';
-import type { Reservation } from '@/lib/types';
-import { useUser } from '@/firebase';
+import type { Reservation, User } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 import { getReservations, saveReservation, deleteReservation } from '@/app/actions/reservations';
 import { addHours, parseISO } from 'date-fns';
@@ -20,7 +19,7 @@ interface ReservationsContextType {
 export const ReservationsContext = createContext<ReservationsContextType | undefined>(undefined);
 
 export const ReservationsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const { user } = useUser();
+  const [user, setUser] = useState<User | null>(null);
   const { toast } = useToast();
   
   const [reservations, setReservations] = useState<Reservation[]>([]);
@@ -29,6 +28,10 @@ export const ReservationsProvider: React.FC<{ children: ReactNode }> = ({ childr
 
   useEffect(() => {
     setIsClient(true);
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+        setUser(JSON.parse(storedUser));
+    }
   }, []);
 
   const fetchReservations = useCallback(async () => {
@@ -64,7 +67,7 @@ export const ReservationsProvider: React.FC<{ children: ReactNode }> = ({ childr
 
 
   const addReservation = async (reservation: Omit<Reservation, 'id' | 'createdAt' | 'updatedAt' | 'userId' | 'status' | 'userName' | 'email'> & { startTime: Date, endTime: Date }) => {
-    if (!user || !user.displayName || !user.email) {
+    if (!user || !user.username || !user.email) {
       toast({
         variant: 'destructive',
         title: 'Authentication Error',
@@ -75,7 +78,7 @@ export const ReservationsProvider: React.FC<{ children: ReactNode }> = ({ childr
     
     // Find if there's an existing reservation for the same slot and time by the same user
     const existingReservation = reservations.find(
-      (r) => r.slotId === reservation.slotId && r.userId === user.uid
+      (r) => r.slotId === reservation.slotId && r.userId === user.id
     );
 
     if (existingReservation) {
@@ -91,8 +94,8 @@ export const ReservationsProvider: React.FC<{ children: ReactNode }> = ({ childr
         ...reservation,
         startTime: reservation.startTime.toISOString(),
         endTime: reservation.endTime.toISOString(),
-        userId: user.uid,
-        userName: user.displayName,
+        userId: user.id,
+        userName: user.username,
         email: user.email,
       });
       await fetchReservations(); // Refetch after adding

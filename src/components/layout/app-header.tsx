@@ -22,9 +22,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useEffect, useState } from 'react';
-import { useFirebase, useUser } from '@/firebase';
 import { Separator } from '@/components/ui/separator';
-import { signOut } from 'firebase/auth';
 import { useToast } from '@/hooks/use-toast';
 
 const navItems = [
@@ -47,7 +45,7 @@ export function AppHeader() {
   const isMobile = useIsMobile();
   const [isClient, setIsClient] = useState(false);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
-  const { user, auth } = useUser();
+  const [user, setUser] = useState<any | null>(null);
   const router = useRouter();
   const { toast } = useToast();
   const [role, setRole] = useState<string | null>(null);
@@ -55,17 +53,15 @@ export function AppHeader() {
   useEffect(() => {
     setIsClient(true);
     setRole(localStorage.getItem('role'));
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+        setUser(JSON.parse(storedUser));
+    }
   }, []);
 
   const handleSignOut = async () => {
     localStorage.removeItem('role');
-    if (auth) {
-        try {
-          await signOut(auth);
-        } catch (error) {
-           console.error("Error signing out: ", error);
-        }
-    }
+    localStorage.removeItem('user');
     router.replace('/login');
     toast({
         title: 'Signed Out',
@@ -219,8 +215,8 @@ export function AppHeader() {
                   <div className="absolute bottom-6 left-6 right-6">
                     {(user || role === 'owner') && (
                       <div className="mb-4">
-                        {user && user.displayName && (
-                            <p className="text-foreground text-xl font-medium mb-4 text-center underline underline-offset-8 decoration-primary decoration-4">{user.displayName}</p>
+                        {user && user.username && (
+                            <p className="text-foreground text-xl font-medium mb-4 text-center underline underline-offset-8 decoration-primary decoration-4">{user.username}</p>
                         )}
                         <Button
                           variant="destructive"
@@ -274,5 +270,3 @@ export function AppHeader() {
     </header>
   );
 }
-
-    

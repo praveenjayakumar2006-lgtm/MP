@@ -24,8 +24,6 @@ import {
 } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
-import { useFirebase } from '@/firebase';
-import { signInWithEmailAndPassword } from 'firebase/auth';
 import { useState } from 'react';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { getUsers } from '@/app/actions/users';
@@ -43,7 +41,6 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 export default function LoginPage() {
   const { toast } = useToast();
   const router = useRouter();
-  const { auth } = useFirebase();
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -55,14 +52,6 @@ export default function LoginPage() {
   });
 
   async function onSubmit(values: LoginFormValues) {
-    if (!auth) {
-      toast({
-        variant: 'destructive',
-        title: 'Authentication service not available.',
-      });
-      return;
-    }
-    
     if (values.role === 'owner') {
       if (values.email === 'owner@gmail.com' && values.password === '123456') {
         localStorage.setItem('role', 'owner');
@@ -84,35 +73,34 @@ export default function LoginPage() {
     }
 
     try {
-      // Check if user exists in the User_Data.json file
       const appUsers = await getUsers();
-      const userExistsInJson = appUsers.some(appUser => appUser.email === values.email);
+      const existingUser = appUsers.find(
+        (appUser) => appUser.email === values.email && appUser.password === values.password
+      );
 
-      if (!userExistsInJson) {
-         toast({
+      if (existingUser) {
+        localStorage.setItem('user', JSON.stringify(existingUser));
+        localStorage.setItem('role', 'user');
+
+        toast({
+          title: 'Login Successful',
+          description: 'Welcome back!',
+          duration: 2000,
+        });
+        router.replace('/home');
+      } else {
+        toast({
           variant: 'destructive',
           title: 'Login Incorrect',
           description: 'Please try to sign up.',
         });
-        return;
       }
 
-      // If user exists in JSON, then try to sign in with Firebase
-      await signInWithEmailAndPassword(auth, values.email, values.password);
-
-      toast({
-        title: 'Login Successful',
-        description: 'Welcome back!',
-        duration: 2000,
-      });
-      localStorage.setItem('role', 'user');
-
     } catch (error: any) {
-      let description = 'Login incorrect. Please try to sign up.';
       toast({
         variant: 'destructive',
         title: 'Login Failed',
-        description: description,
+        description: 'An unexpected error occurred. Please try again.',
       });
     }
   }

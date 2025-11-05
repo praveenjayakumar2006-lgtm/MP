@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
 import { parkingSlots as defaultSlots } from '@/lib/data';
-import type { ParkingSlot, Reservation } from '@/lib/types';
+import type { ParkingSlot, Reservation, User } from '@/lib/types';
 import { Separator } from '@/components/ui/separator';
 import { motion } from 'framer-motion';
 import { addHours, parseISO } from 'date-fns';
@@ -25,7 +25,6 @@ import { ReservationsContext } from '@/context/reservations-context';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 import { Skeleton } from '../ui/skeleton';
-import { useUser } from '@/firebase';
 
 type BookingDetails = {
   vehiclePlate: string;
@@ -36,11 +35,18 @@ type BookingDetails = {
 
 export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails }) {
   const reservationsContext = useContext(ReservationsContext);
-  const { user } = useUser();
+  const [user, setUser] = useState<User | null>(null);
   
   if (!reservationsContext) {
     throw new Error('ParkingMap must be used within a ReservationsProvider');
   }
+
+  useState(() => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+        setUser(JSON.parse(storedUser));
+    }
+  });
   
   const { addReservation, reservations, removeReservation, isClient, isLoading } = reservationsContext;
   const [slots] = useState<ParkingSlot[]>(defaultSlots);
@@ -152,7 +158,7 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
     const conflictingReservation = getConflictingReservation(slotId);
 
     if (conflictingReservation) {
-        return { status: 'reserved', isUser: conflictingReservation.userId === user?.uid, conflictingReservation };
+        return { status: 'reserved', isUser: conflictingReservation.userId === user?.id, conflictingReservation };
     }
     
     return { status: 'available', isUser: false, conflictingReservation: null };

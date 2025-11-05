@@ -23,8 +23,6 @@ import {
 } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
-import { useFirebase } from '@/firebase';
-import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { saveUserToFile, getUsers } from '@/app/actions/users';
 
 const signupSchema = z.object({
@@ -39,7 +37,6 @@ type SignupFormValues = z.infer<typeof signupSchema>;
 export default function SignupPage() {
   const { toast } = useToast();
   const router = useRouter();
-  const { auth } = useFirebase();
 
   const form = useForm<SignupFormValues>({
     resolver: zodResolver(signupSchema),
@@ -52,38 +49,27 @@ export default function SignupPage() {
   });
 
   async function onSubmit(values: SignupFormValues) {
-    if (!auth) {
-       toast({
-        variant: 'destructive',
-        title: 'Firebase not initialized',
-        description: 'Authentication service is not available.',
-      });
-      return;
-    }
     try {
-      // First, check if user already exists in the local JSON file
       const appUsers = await getUsers();
       const emailExists = appUsers.some(user => user.email === values.email);
 
       if (emailExists) {
-        // The toast message is removed as requested.
+        toast({
+            variant: 'destructive',
+            title: 'Account Exists',
+            description: 'An account with this email already exists. Please log in.',
+        });
         return;
       }
       
-      const userCredential = await createUserWithEmailAndPassword(auth, values.email, values.password);
-      const user = userCredential.user;
+      const newUser = {
+        id: `user_${Date.now()}`,
+        ...values
+      };
 
-      await updateProfile(user, {
-        displayName: values.username,
-      });
+      await saveUserToFile(newUser);
 
-      await saveUserToFile({
-        id: user.uid,
-        username: values.username,
-        email: values.email,
-        phone: values.phone,
-      });
-
+      localStorage.setItem('user', JSON.stringify(newUser));
       localStorage.setItem('role', 'user');
 
       toast({
@@ -91,14 +77,11 @@ export default function SignupPage() {
         description: "You've been successfully signed up.",
         duration: 2000,
       });
+
+      router.replace('/home');
       
     } catch (error: any) {
        let description = 'There was a problem with your request.';
-       // This specific Firebase error is now handled by the local check,
-       // but we keep the generic error handler for other potential issues.
-       if (error.code === 'auth/email-already-in-use') {
-        description = 'This email is already registered. Please log in.';
-       }
       toast({
         variant: 'destructive',
         title: 'Uh oh! Something went wrong.',
