@@ -83,6 +83,9 @@ function BookingDetailContent() {
   useEffect(() => {
     fetchBookingDetails();
   }, [fetchBookingDetails]);
+  
+  const isCompleted = reservation?.status === 'Completed';
+  const actionText = isCompleted ? 'Delete' : 'Cancel';
 
   const handleDelete = async () => {
     if (!reservation) return;
@@ -90,15 +93,15 @@ function BookingDetailContent() {
     const result = await deleteReservation(reservation.id);
     if (result.success) {
       toast({
-        title: 'Booking Deleted',
-        description: `The booking for slot ${reservation.slotId} has been deleted.`,
+        title: `Booking ${actionText}ed`,
+        description: `The booking for slot ${reservation.slotId} has been ${actionText.toLowerCase()}ed.`,
       });
       router.replace('/owner?view=bookings');
     } else {
       toast({
         variant: 'destructive',
-        title: 'Deletion Failed',
-        description: 'Could not delete the booking. Please try again.',
+        title: `${actionText} Failed`,
+        description: `Could not ${actionText.toLowerCase()} the booking. Please try again.`,
       });
     }
     setIsDeleteDialogOpen(false);
@@ -197,7 +200,7 @@ function BookingDetailContent() {
              <CardFooter className="p-4 pt-2 border-t">
                 <Button variant="destructive" onClick={() => setIsDeleteDialogOpen(true)} className="w-full sm:w-auto ml-auto">
                     <Trash2 className="mr-2 h-4 w-4" />
-                    Delete Booking
+                    {actionText} Booking
                 </Button>
             </CardFooter>
         </Card>
@@ -205,9 +208,9 @@ function BookingDetailContent() {
          <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
             <AlertDialogContent>
             <AlertDialogHeader>
-                <AlertDialogTitle>Delete this booking?</AlertDialogTitle>
+                <AlertDialogTitle>{actionText} this booking?</AlertDialogTitle>
                 <AlertDialogDescription>
-                    Are you sure you want to permanently delete the booking for slot{' '}
+                    Are you sure you want to permanently {actionText.toLowerCase()} the booking for slot{' '}
                     <span className="font-bold text-foreground">{reservation.slotId}</span> for vehicle{' '}
                     <span className="font-bold text-foreground">{reservation.vehiclePlate}</span>?
                     This action cannot be undone.
@@ -219,7 +222,7 @@ function BookingDetailContent() {
                 onClick={handleDelete}
                 asChild
                 >
-                <Button variant="destructive">Delete Booking</Button>
+                <Button variant="destructive">{actionText} Booking</Button>
                 </AlertDialogAction>
             </AlertDialogFooter>
             </AlertDialogContent>
