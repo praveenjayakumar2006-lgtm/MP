@@ -8,12 +8,24 @@ import { Skeleton } from '../ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useRouter } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
-import { Car, Calendar, Clock, Hash, User as UserIcon, Loader2, CalendarCheck } from 'lucide-react';
+import { Car, Calendar, Clock, Hash, User as UserIcon, Loader2, CalendarCheck, Trash2 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Separator } from '../ui/separator';
 import { ReservationsContext } from '@/context/reservations-context';
 import type { VariantProps } from 'class-variance-authority';
 import { badgeVariants } from '@/components/ui/badge';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { useToast } from '@/hooks/use-toast';
+import { deleteReservation } from "@/app/actions/reservations";
 
 
 type Status = 'Active' | 'Completed' | 'Upcoming';
@@ -43,12 +55,29 @@ const formatSlotId = (slotId: string | null) => {
 export function BookingsTable() {
   const context = useContext(ReservationsContext);
   const [filter, setFilter] = useState<Status | 'all'>('all');
+  const [reservationToDelete, setReservationToDelete] = useState<Reservation | null>(null);
+  const { toast } = useToast();
   const router = useRouter();
 
   if (!context) {
     return <div className="flex flex-1 items-center justify-center p-8">Error: Component must be used within a ReservationsProvider.</div>;
   }
-  const { reservations, isLoading } = context;
+  const { reservations, removeReservation, isLoading } = context;
+
+  const handleDeleteClick = (e: React.MouseEvent, reservation: Reservation) => {
+    e.stopPropagation();
+    setReservationToDelete(reservation);
+  };
+  
+  const confirmDelete = () => {
+    if (!reservationToDelete || !removeReservation) return;
+    removeReservation(reservationToDelete.id);
+    toast({
+        title: 'Reservation Deleted',
+        description: `The booking for slot ${reservationToDelete.slotId} has been successfully deleted.`,
+    });
+    setReservationToDelete(null);
+  };
 
   const filteredReservations = reservations?.filter((res) => {
     if (filter === 'all') return true;
@@ -191,6 +220,10 @@ export function BookingsTable() {
                                 <Button size="sm" variant="outline" onClick={() => router.push(`/owner/bookings/${reservation.id}`)}>
                                     View Details
                                 </Button>
+                                <Button size="sm" variant="destructive" onClick={(e) => handleDeleteClick(e, reservation)}>
+                                    <Trash2 className="mr-2 h-4 w-4" />
+                                    Delete
+                                </Button>
                               </CardFooter>
                           </Card>
                       )
@@ -205,6 +238,26 @@ export function BookingsTable() {
             </TabsContent>
         </Tabs>
       </CardContent>
-      </>
+       <AlertDialog open={!!reservationToDelete} onOpenChange={(open) => !open && setReservationToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Reservation?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to permanently delete this reservation for slot{' '}
+              <span className="font-bold">{reservationToDelete?.slotId}</span>? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDelete}
+              asChild
+            >
+              <Button variant="destructive">Yes, Delete</Button>
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }
