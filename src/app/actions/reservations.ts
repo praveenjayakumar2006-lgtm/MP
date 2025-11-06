@@ -61,21 +61,33 @@ export async function getReservations(): Promise<Reservation[]> {
   
   if (!reservations) return [];
 
+  let hasChanges = false;
   // This is where we will dynamically update the status
   const updatedReservations = reservations.map(res => {
     const startTime = new Date(res.startTime);
     const endTime = new Date(res.endTime);
-    let status: 'Upcoming' | 'Active' | 'Completed';
+    let currentStatus: 'Upcoming' | 'Active' | 'Completed' = res.status;
+    let newStatus: 'Upcoming' | 'Active' | 'Completed';
 
     if (now > endTime) {
-      status = 'Completed';
+      newStatus = 'Completed';
     } else if (now >= startTime && now <= endTime) {
-      status = 'Active';
+      newStatus = 'Active';
     } else {
-      status = 'Upcoming';
+      newStatus = 'Upcoming';
     }
-    return { ...res, status };
+    
+    if (newStatus !== currentStatus) {
+      hasChanges = true;
+    }
+
+    return { ...res, status: newStatus };
   });
+  
+  // If any status has changed, write the whole updated file back
+  if (hasChanges) {
+    await writeReservationsFile(updatedReservations);
+  }
 
   return updatedReservations;
 }
