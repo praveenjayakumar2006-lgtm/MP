@@ -189,7 +189,9 @@ function BookingDetailContent() {
                 <Separator />
                 <div className="mt-4">
                   <h3 className="text-md font-semibold mb-4 text-center">Parking Layout</h3>
-                  <ParkingMap displayOnlyReservationId={reservation.id} />
+                  <div className="mt-4">
+                    <ParkingMap displayOnlyReservation={reservation} />
+                  </div>
                 </div>
             </CardContent>
              <CardFooter className="p-4 pt-2 border-t">

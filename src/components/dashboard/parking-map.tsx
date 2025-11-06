@@ -4,7 +4,7 @@
 import { useState, useContext } from 'react';
 import { Car, Bike, CheckCircle2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
+import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -33,7 +33,7 @@ type BookingDetails = {
   duration: string;
 };
 
-export function ParkingMap({ bookingDetails, displayOnlyReservationId }: { bookingDetails?: BookingDetails, displayOnlyReservationId?: string }) {
+export function ParkingMap({ bookingDetails, displayOnlyReservation }: { bookingDetails?: BookingDetails, displayOnlyReservation?: Reservation }) {
   const reservationsContext = useContext(ReservationsContext);
   const [user, setUser] = useState<User | null>(null);
   
@@ -56,17 +56,19 @@ export function ParkingMap({ bookingDetails, displayOnlyReservationId }: { booki
   const { toast } = useToast();
 
   const getConflictingReservation = (slotId: string) => {
-    // If we're displaying a specific reservation, that's the one we care about.
-    if (displayOnlyReservationId) {
-        return reservations.find(res => res.id === displayOnlyReservationId && res.slotId === slotId) || null;
-    }
-    
-    if (!bookingDetails) return null;
+    let searchStartTime: Date, searchEndTime: Date;
 
-    const [hour, minute] = bookingDetails.startTime.split(':').map(Number);
-    const searchStartTime = parseISO(bookingDetails.date);
-    searchStartTime.setHours(hour, minute);
-    const searchEndTime = addHours(searchStartTime, parseInt(bookingDetails.duration, 10));
+    if (displayOnlyReservation) {
+        searchStartTime = new Date(displayOnlyReservation.startTime);
+        searchEndTime = new Date(displayOnlyReservation.endTime);
+    } else if (bookingDetails) {
+        const [hour, minute] = bookingDetails.startTime.split(':').map(Number);
+        searchStartTime = parseISO(bookingDetails.date);
+        searchStartTime.setHours(hour, minute);
+        searchEndTime = addHours(searchStartTime, parseInt(bookingDetails.duration, 10));
+    } else {
+        return null;
+    }
 
     return reservations.find(res => {
         if (res.slotId !== slotId) return false;
@@ -82,7 +84,7 @@ export function ParkingMap({ bookingDetails, displayOnlyReservationId }: { booki
 
   const handleSlotClick = (slot: ParkingSlot) => {
     // Disable all click interactions if it's for display only
-    if (displayOnlyReservationId) return;
+    if (displayOnlyReservation) return;
     
     const { status, isUser, conflictingReservation } = getSlotStatus(slot.id);
 
@@ -160,7 +162,9 @@ export function ParkingMap({ bookingDetails, displayOnlyReservationId }: { booki
     const conflictingReservation = getConflictingReservation(slotId);
 
     if (conflictingReservation) {
-        const isCurrentUser = displayOnlyReservationId ? conflictingReservation.id === displayOnlyReservationId : conflictingReservation.userId === user?.id;
+        const isCurrentUser = displayOnlyReservation 
+            ? conflictingReservation.id === displayOnlyReservation.id 
+            : conflictingReservation.userId === user?.id;
         return { status: 'reserved', isUser: isCurrentUser, conflictingReservation };
     }
     
@@ -170,7 +174,7 @@ export function ParkingMap({ bookingDetails, displayOnlyReservationId }: { booki
 
   const getSlotClasses = (slot: ParkingSlot) => {
     const { status, isUser } = getSlotStatus(slot.id);
-    const isDisplayOnly = !!displayOnlyReservationId;
+    const isDisplayOnly = !!displayOnlyReservation;
 
     return cn(
       'relative flex flex-col items-center rounded-md border-2 transition-colors pt-1',
@@ -205,7 +209,7 @@ export function ParkingMap({ bookingDetails, displayOnlyReservationId }: { booki
     <>
       <Card>
         <CardContent className="p-4 md:p-6 flex justify-center">
-          <div className="relative inline-flex flex-col items-center border-2 border-gray-400 bg-gray-200 p-4 rounded-lg gap-4">
+          <div className="relative inline-flex flex-col items-center border-2 border-gray-400 bg-gray-200 p-2 rounded-lg gap-2">
             <div className="flex flex-col items-center gap-2">
                 <p className="font-semibold text-muted-foreground text-xs md:text-sm">Car Parking</p>
                 <div className="flex flex-row gap-2.5">
