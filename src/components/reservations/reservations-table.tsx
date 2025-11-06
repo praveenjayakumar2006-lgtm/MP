@@ -143,13 +143,8 @@ export function ReservationsTable() {
       });
       return;
     }
-
-    if (reservation.status === 'Active') {
-       setReservationToCancel(reservation);
-       return;
-    }
     
-    // Only 'Upcoming' reservations can be modified
+    // Allow modification for both 'Upcoming' and 'Active' reservations
     const startTime = new Date(reservation.startTime);
     const endTime = new Date(reservation.endTime);
     const durationInMs = endTime.getTime() - startTime.getTime();
