@@ -205,10 +205,10 @@ export function ParkingMap({ bookingDetails, displayOnlyReservationId }: { booki
     <>
       <Card>
         <CardContent className="p-2 md:p-4 flex justify-center">
-          <div className="relative inline-flex flex-col items-center border-2 border-gray-400 bg-gray-200 p-2 rounded-lg gap-2">
+          <div className="relative inline-flex flex-col items-center border-2 border-gray-400 bg-gray-200 p-4 rounded-lg gap-4">
             <div className="flex flex-col items-center gap-2">
                 <p className="font-semibold text-muted-foreground text-xs md:text-sm">Car Parking</p>
-                <div className="flex flex-row gap-2 md:gap-2.5">
+                <div className="flex flex-row gap-2.5">
                 {carSlots.map((slot) => {
                     const { status, isUser } = getSlotStatus(slot.id);
                     const hasIcon = status === 'occupied' || status === 'reserved';
@@ -242,7 +242,7 @@ export function ParkingMap({ bookingDetails, displayOnlyReservationId }: { booki
             <div className="flex flex-col items-center gap-2">
                 <p className="font-semibold text-muted-foreground text-xs md:text-sm">Bike Parking</p>
                 <div className="flex flex-col gap-2">
-                    <div className="flex flex-row gap-2 md:gap-2.5">
+                    <div className="flex flex-row gap-2.5">
                         {bikeSlots.slice(0, 6).map((slot) => {
                         const { status, isUser } = getSlotStatus(slot.id);
                         const hasIcon = status === 'occupied' || status === 'reserved';
@@ -267,7 +267,7 @@ export function ParkingMap({ bookingDetails, displayOnlyReservationId }: { booki
                         )
                         })}
                     </div>
-                    <div className="flex flex-row gap-2 md:gap-2.5">
+                    <div className="flex flex-row gap-2.5">
                         {bikeSlots.slice(6, 12).map((slot) => {
                         const { status, isUser } = getSlotStatus(slot.id);
                         const hasIcon = status === 'occupied' || status === 'reserved';
