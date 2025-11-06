@@ -188,7 +188,7 @@ function BookingDetailContent() {
                 </div>
                 <Separator />
                 <div className="mt-4">
-                  <h3 className="text-md font-semibold mb-4 text-center">Parking Layout</h3>
+                  <h3 className="text-lg font-semibold mb-4 text-center">Parking Layout</h3>
                   <div className="mt-4">
                     <ParkingMap displayOnlyReservation={reservation} />
                   </div>
