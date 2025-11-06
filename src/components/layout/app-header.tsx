@@ -99,6 +99,7 @@ export function AppHeader() {
   ];
 
   const ownerNavItems = [
+    { href: '/owner', label: 'Home' },
     { href: '/owner?view=bookings', label: 'Bookings' },
     { href: '/owner?view=reports', label: 'Reports' },
     { href: '/owner/feedback', label: 'Feedback' },
