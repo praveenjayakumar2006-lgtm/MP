@@ -58,7 +58,7 @@ export const ReservationsProvider: React.FC<{ children: ReactNode }> = ({ childr
 
       const intervalId = setInterval(() => {
         fetchReservations();
-      }, 60000); // Poll every 1 minute
+      }, 1000); // Poll every 1 second
 
       return () => clearInterval(intervalId); // Cleanup interval on unmount
     }
