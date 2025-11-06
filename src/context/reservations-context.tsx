@@ -109,12 +109,21 @@ export const ReservationsProvider: React.FC<{ children: ReactNode }> = ({ childr
 
   const removeReservation = async (reservationId: string) => {
     const originalReservations = [...reservations];
-    // Optimistic UI update
+    // Optimistic UI update for instant feedback
     setReservations(prev => prev.filter(r => r.id !== reservationId));
+    
     try {
-      await deleteReservation(reservationId);
-      // No need to refetch here, optimistic update is sufficient for immediate UI feedback.
-      // The `revalidatePath` in the server action and the polling will handle long-term consistency.
+      const result = await deleteReservation(reservationId);
+      if (!result.success) {
+        // If server deletion fails, revert the optimistic update
+        setReservations(originalReservations);
+        toast({
+          variant: 'destructive',
+          title: 'Cancellation Error',
+          description: 'Could not cancel your reservation on the server. Please try again.',
+        });
+      }
+      // No refetch needed, revalidation is handled by the server action
     } catch (error) {
       console.error("Error deleting reservation: ", error);
       // Revert optimistic update on failure
@@ -122,7 +131,7 @@ export const ReservationsProvider: React.FC<{ children: ReactNode }> = ({ childr
       toast({
         variant: 'destructive',
         title: 'Cancellation Error',
-        description: 'Could not cancel your reservation. Please try again.',
+        description: 'An unexpected error occurred. Please try again.',
       });
     }
   };
