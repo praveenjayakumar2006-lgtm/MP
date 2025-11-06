@@ -4,7 +4,7 @@
 import { useState, useContext } from 'react';
 import { Car, Bike, CheckCircle2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -181,8 +181,8 @@ export function ParkingMap({ bookingDetails, displayOnlyReservationId }: { booki
         'cursor-not-allowed': isDisplayOnly || status === 'occupied' || (status === 'reserved' && !isUser),
         'bg-yellow-100 border-yellow-400 text-yellow-800': status === 'reserved' && isUser,
         'hover:bg-yellow-200 cursor-pointer': status === 'reserved' && isUser && !isDisplayOnly,
-        'h-14 w-10': slot.type === 'car',
-        'h-12 w-8': slot.type === 'bike',
+        'h-12 w-9': slot.type === 'car',
+        'h-10 w-7': slot.type === 'bike',
       }
     );
   };
@@ -205,10 +205,10 @@ export function ParkingMap({ bookingDetails, displayOnlyReservationId }: { booki
     <>
       <Card>
         <CardContent className="p-2 md:p-4 flex justify-center">
-          <div className="relative inline-flex flex-col items-center border-2 border-gray-400 bg-gray-200 p-2 rounded-lg gap-4">
+          <div className="relative inline-flex flex-col items-center border-2 border-gray-400 bg-gray-200 p-2 rounded-lg gap-2">
             <div className="flex flex-col items-center gap-2">
                 <p className="font-semibold text-muted-foreground text-xs md:text-sm">Car Parking</p>
-                <div className="flex flex-row gap-2 md:gap-3">
+                <div className="flex flex-row gap-2 md:gap-2.5">
                 {carSlots.map((slot) => {
                     const { status, isUser } = getSlotStatus(slot.id);
                     const hasIcon = status === 'occupied' || status === 'reserved';
@@ -224,9 +224,9 @@ export function ParkingMap({ bookingDetails, displayOnlyReservationId }: { booki
                     >
                         {hasIcon && <VehicleIcon type={slot.type} />}
                         {status === 'reserved' && isUser && (
-                            <Badge variant="default" className="absolute -top-2.5 -right-2.5 text-[9px] px-1 py-0">You</Badge>
+                            <Badge variant="default" className="absolute -top-2 -right-2 text-[8px] px-1 py-0">You</Badge>
                         )}
-                        <span className="absolute bottom-0.5 right-0.5 text-[9px] font-bold">
+                        <span className="absolute bottom-0.5 right-0.5 text-[8px] font-bold">
                         {slot.id}
                         </span>
                     </div>
@@ -236,13 +236,13 @@ export function ParkingMap({ bookingDetails, displayOnlyReservationId }: { booki
             </div>
 
 
-            <Separator orientation="horizontal" className="bg-gray-400" />
+            <Separator orientation="horizontal" className="bg-gray-400 my-2" />
             
 
             <div className="flex flex-col items-center gap-2">
                 <p className="font-semibold text-muted-foreground text-xs md:text-sm">Bike Parking</p>
                 <div className="flex flex-col gap-2">
-                    <div className="flex flex-row gap-2 md:gap-3">
+                    <div className="flex flex-row gap-2 md:gap-2.5">
                         {bikeSlots.slice(0, 6).map((slot) => {
                         const { status, isUser } = getSlotStatus(slot.id);
                         const hasIcon = status === 'occupied' || status === 'reserved';
@@ -258,16 +258,16 @@ export function ParkingMap({ bookingDetails, displayOnlyReservationId }: { booki
                             >
                             {hasIcon && <VehicleIcon type={slot.type} />}
                             {status === 'reserved' && isUser && (
-                                <Badge variant="default" className="absolute -top-2.5 -right-2.5 text-[9px] px-1 py-0">You</Badge>
+                                <Badge variant="default" className="absolute -top-2 -right-2 text-[8px] px-1 py-0">You</Badge>
                             )}
-                            <span className="absolute bottom-0.5 right-0.5 text-[9px] font-bold">
+                            <span className="absolute bottom-0.5 right-0.5 text-[8px] font-bold">
                                 {slot.id}
                             </span>
                             </div>
                         )
                         })}
                     </div>
-                    <div className="flex flex-row gap-2 md:gap-3">
+                    <div className="flex flex-row gap-2 md:gap-2.5">
                         {bikeSlots.slice(6, 12).map((slot) => {
                         const { status, isUser } = getSlotStatus(slot.id);
                         const hasIcon = status === 'occupied' || status === 'reserved';
@@ -283,9 +283,9 @@ export function ParkingMap({ bookingDetails, displayOnlyReservationId }: { booki
                             >
                             {hasIcon && <VehicleIcon type={slot.type} />}
                             {status === 'reserved' && isUser && (
-                                <Badge variant="default" className="absolute -top-2.5 -right-2.5 text-[9px] px-1 py-0">You</Badge>
+                                <Badge variant="default" className="absolute -top-2 -right-2 text-[8px] px-1 py-0">You</Badge>
                             )}
-                            <span className="absolute bottom-0.5 right-0.5 text-[9px] font-bold">
+                            <span className="absolute bottom-0.5 right-0.5 text-[8px] font-bold">
                                 {slot.id}
                             </span>
                             </div>
