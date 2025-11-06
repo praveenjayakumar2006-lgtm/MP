@@ -1,9 +1,9 @@
 
 'use client';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { format } from 'date-fns';
 import { useState, useEffect, useCallback, useContext } from 'react';
-import type { Reservation } from '@/lib/types';
+import type { Reservation, User } from '@/lib/types';
 import { Skeleton } from '../ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useRouter } from 'next/navigation';

@@ -12,15 +12,51 @@
     "status": "Active"
   },
   {
-    "slotId": "C3",
+    "slotId": "C5",
     "vehiclePlate": "TN45FK3453",
-    "startTime": "2025-11-06T13:30:00.000Z",
-    "endTime": "2025-11-06T14:30:00.000Z",
+    "startTime": "2025-11-06T12:00:00.000Z",
+    "endTime": "2025-11-06T13:00:00.000Z",
     "userId": "user_1762418343263",
     "userName": "Vaishali",
     "email": "vaishu@gmail.com",
-    "id": "res_1762434910260_mdfdpv8",
-    "createdAt": "2025-11-06T13:15:10.260Z",
+    "id": "res_1762435093715_huyq190",
+    "createdAt": "2025-11-06T13:18:13.715Z",
+    "status": "Completed"
+  },
+  {
+    "slotId": "B10",
+    "vehiclePlate": "TN45FK3453",
+    "startTime": "2025-11-18T23:30:00.000Z",
+    "endTime": "2025-11-19T06:30:00.000Z",
+    "userId": "user_1762418343263",
+    "userName": "Vaishali",
+    "email": "vaishu@gmail.com",
+    "id": "res_1762435301008_6u35grz",
+    "createdAt": "2025-11-06T13:21:41.008Z",
+    "status": "Upcoming"
+  },
+  {
+    "slotId": "C1",
+    "vehiclePlate": "TN45FK3453",
+    "startTime": "2025-11-18T23:30:00.000Z",
+    "endTime": "2025-11-19T06:30:00.000Z",
+    "userId": "user_1762418343263",
+    "userName": "Vaishali",
+    "email": "vaishu@gmail.com",
+    "id": "res_1762435307754_mzrfi9t",
+    "createdAt": "2025-11-06T13:21:47.754Z",
+    "status": "Upcoming"
+  },
+  {
+    "slotId": "C2",
+    "vehiclePlate": "TN45FK3453",
+    "startTime": "2025-11-18T23:30:00.000Z",
+    "endTime": "2025-11-19T06:30:00.000Z",
+    "userId": "user_1762418343263",
+    "userName": "Vaishali",
+    "email": "vaishu@gmail.com",
+    "id": "res_1762435310216_qfmuo6v",
+    "createdAt": "2025-11-06T13:21:50.216Z",
     "status": "Upcoming"
   }
 ]
