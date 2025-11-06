@@ -4,7 +4,7 @@
 import { useState, useContext } from 'react';
 import { Car, Bike, CheckCircle2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Card, CardContent, CardFooter } from '@/components/ui/card';
+import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -204,7 +204,7 @@ export function ParkingMap({ bookingDetails, displayOnlyReservationId }: { booki
   return (
     <>
       <Card>
-        <CardContent className="p-2 md:p-4 flex justify-center">
+        <CardContent className="p-4 md:p-6 flex justify-center">
           <div className="relative inline-flex flex-col items-center border-2 border-gray-400 bg-gray-200 p-4 rounded-lg gap-4">
             <div className="flex flex-col items-center gap-2">
                 <p className="font-semibold text-muted-foreground text-xs md:text-sm">Car Parking</p>
