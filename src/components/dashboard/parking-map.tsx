@@ -204,101 +204,100 @@ export function ParkingMap({ bookingDetails, displayOnlyReservationId }: { booki
   return (
     <>
       <Card>
-        <CardContent className="p-2 md:p-4 overflow-x-auto">
-          <div className="relative inline-block border-2 border-gray-400 bg-gray-200 p-2 rounded-lg">
-            <div className="flex flex-wrap justify-center items-end gap-2 md:gap-4">
-              <div className="flex flex-col items-center gap-2">
-                  <p className="font-semibold text-muted-foreground text-xs md:text-sm">Car Parking</p>
-                  <div className="flex flex-row gap-2 md:gap-3">
-                  {carSlots.map((slot) => {
-                      const { status, isUser } = getSlotStatus(slot.id);
-                      const hasIcon = status === 'occupied' || status === 'reserved';
+        <CardContent className="p-2 md:p-4 flex justify-center">
+          <div className="relative inline-flex flex-col items-center border-2 border-gray-400 bg-gray-200 p-2 rounded-lg gap-4">
+            <div className="flex flex-col items-center gap-2">
+                <p className="font-semibold text-muted-foreground text-xs md:text-sm">Car Parking</p>
+                <div className="flex flex-row gap-2 md:gap-3">
+                {carSlots.map((slot) => {
+                    const { status, isUser } = getSlotStatus(slot.id);
+                    const hasIcon = status === 'occupied' || status === 'reserved';
 
-                      return (
-                      <div
-                          key={slot.id}
-                          className={getSlotClasses(slot)}
-                          onClick={() => handleSlotClick(slot)}
-                          role="button"
-                          tabIndex={0}
-                          aria-label={`Parking slot ${slot.id}, status: ${status}`}
-                      >
-                          {hasIcon && <VehicleIcon type={slot.type} />}
-                          {status === 'reserved' && isUser && (
-                              <Badge variant="default" className="absolute -top-2.5 -right-2.5 text-[9px] px-1 py-0">You</Badge>
-                          )}
-                          <span className="absolute bottom-0.5 right-0.5 text-[9px] font-bold">
-                          {slot.id}
-                          </span>
-                      </div>
-                      )
-                  })}
-                  </div>
-              </div>
+                    return (
+                    <div
+                        key={slot.id}
+                        className={getSlotClasses(slot)}
+                        onClick={() => handleSlotClick(slot)}
+                        role="button"
+                        tabIndex={0}
+                        aria-label={`Parking slot ${slot.id}, status: ${status}`}
+                    >
+                        {hasIcon && <VehicleIcon type={slot.type} />}
+                        {status === 'reserved' && isUser && (
+                            <Badge variant="default" className="absolute -top-2.5 -right-2.5 text-[9px] px-1 py-0">You</Badge>
+                        )}
+                        <span className="absolute bottom-0.5 right-0.5 text-[9px] font-bold">
+                        {slot.id}
+                        </span>
+                    </div>
+                    )
+                })}
+                </div>
+            </div>
 
 
-              <Separator orientation="vertical" className="hidden md:block mx-2 bg-gray-400 self-stretch" />
-              
+            <Separator orientation="horizontal" className="bg-gray-400" />
+            
 
-              <div className="flex flex-col items-center gap-2 mt-4 md:mt-0">
-                  <p className="font-semibold text-muted-foreground text-xs md:text-sm">Bike Parking</p>
-                  <div className="flex flex-col gap-2">
-                      <div className="flex flex-row gap-2 md:gap-3">
-                          {bikeSlots.slice(0, 6).map((slot) => {
-                          const { status, isUser } = getSlotStatus(slot.id);
-                          const hasIcon = status === 'occupied' || status === 'reserved';
+            <div className="flex flex-col items-center gap-2">
+                <p className="font-semibold text-muted-foreground text-xs md:text-sm">Bike Parking</p>
+                <div className="flex flex-col gap-2">
+                    <div className="flex flex-row gap-2 md:gap-3">
+                        {bikeSlots.slice(0, 6).map((slot) => {
+                        const { status, isUser } = getSlotStatus(slot.id);
+                        const hasIcon = status === 'occupied' || status === 'reserved';
 
-                          return (
-                              <div
-                              key={slot.id}
-                              className={getSlotClasses(slot)}
-                              onClick={() => handleSlotClick(slot)}
-                              role="button"
-                              tabIndex={0}
-                              aria-label={`Parking slot ${slot.id}, status: ${status}`}
-                              >
-                              {hasIcon && <VehicleIcon type={slot.type} />}
-                              {status === 'reserved' && isUser && (
-                                  <Badge variant="default" className="absolute -top-2.5 -right-2.5 text-[9px] px-1 py-0">You</Badge>
-                              )}
-                              <span className="absolute bottom-0.5 right-0.5 text-[9px] font-bold">
-                                  {slot.id}
-                              </span>
-                              </div>
-                          )
-                          })}
-                      </div>
-                      <div className="flex flex-row gap-2 md:gap-3">
-                          {bikeSlots.slice(6, 12).map((slot) => {
-                          const { status, isUser } = getSlotStatus(slot.id);
-                          const hasIcon = status === 'occupied' || status === 'reserved';
-                          
-                          return (
-                              <div
-                              key={slot.id}
-                              className={getSlotClasses(slot)}
-                              onClick={() => handleSlotClick(slot)}
-                              role="button"
-                              tabIndex={0}
-                              aria-label={`Parking slot ${slot.id}, status: ${status}`}
-                              >
-                              {hasIcon && <VehicleIcon type={slot.type} />}
-                              {status === 'reserved' && isUser && (
-                                  <Badge variant="default" className="absolute -top-2.5 -right-2.5 text-[9px] px-1 py-0">You</Badge>
-                              )}
-                              <span className="absolute bottom-0.5 right-0.5 text-[9px] font-bold">
-                                  {slot.id}
-                              </span>
-                              </div>
-                          )
-                          })}
-                      </div>
-                  </div>
-              </div>
+                        return (
+                            <div
+                            key={slot.id}
+                            className={getSlotClasses(slot)}
+                            onClick={() => handleSlotClick(slot)}
+                            role="button"
+                            tabIndex={0}
+                            aria-label={`Parking slot ${slot.id}, status: ${status}`}
+                            >
+                            {hasIcon && <VehicleIcon type={slot.type} />}
+                            {status === 'reserved' && isUser && (
+                                <Badge variant="default" className="absolute -top-2.5 -right-2.5 text-[9px] px-1 py-0">You</Badge>
+                            )}
+                            <span className="absolute bottom-0.5 right-0.5 text-[9px] font-bold">
+                                {slot.id}
+                            </span>
+                            </div>
+                        )
+                        })}
+                    </div>
+                    <div className="flex flex-row gap-2 md:gap-3">
+                        {bikeSlots.slice(6, 12).map((slot) => {
+                        const { status, isUser } = getSlotStatus(slot.id);
+                        const hasIcon = status === 'occupied' || status === 'reserved';
+                        
+                        return (
+                            <div
+                            key={slot.id}
+                            className={getSlotClasses(slot)}
+                            onClick={() => handleSlotClick(slot)}
+                            role="button"
+                            tabIndex={0}
+                            aria-label={`Parking slot ${slot.id}, status: ${status}`}
+                            >
+                            {hasIcon && <VehicleIcon type={slot.type} />}
+                            {status === 'reserved' && isUser && (
+                                <Badge variant="default" className="absolute -top-2.5 -right-2.5 text-[9px] px-1 py-0">You</Badge>
+                            )}
+                            <span className="absolute bottom-0.5 right-0.5 text-[9px] font-bold">
+                                {slot.id}
+                            </span>
+                            </div>
+                        )
+                        })}
+                    </div>
+                </div>
             </div>
           </div>
           
-          <div className="mt-4 flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
+        </CardContent>
+          <CardFooter className="mt-2 flex-wrap items-center justify-center gap-x-6 gap-y-2">
             <div className="flex items-center gap-2">
               <div className="h-4 w-4 rounded-sm border-2 border-green-400 bg-green-100" />
               <span className="text-sm text-muted-foreground">Available</span>
@@ -311,8 +310,7 @@ export function ParkingMap({ bookingDetails, displayOnlyReservationId }: { booki
               <div className="h-4 w-4 rounded-sm border-2 border-red-400 bg-red-100" />
               <span className="text-sm text-muted-foreground">Occupied</span>
             </div>
-          </div>
-        </CardContent>
+          </CardFooter>
       </Card>
 
       <AlertDialog
