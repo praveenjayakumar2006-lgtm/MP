@@ -54,20 +54,23 @@ export async function getReservations(): Promise<Reservation[]> {
   
   if (!reservations) return [];
 
-  return reservations.map(res => {
+  // This is where we will dynamically update the status
+  const updatedReservations = reservations.map(res => {
     const startTime = new Date(res.startTime);
     const endTime = new Date(res.endTime);
     let status: 'Upcoming' | 'Active' | 'Completed';
 
     if (now > endTime) {
       status = 'Completed';
-    } else if (now >= startTime && now < endTime) {
+    } else if (now >= startTime && now <= endTime) {
       status = 'Active';
     } else {
       status = 'Upcoming';
     }
     return { ...res, status };
   });
+
+  return updatedReservations;
 }
 
 export async function saveReservation(reservation: Omit<Reservation, 'id' | 'createdAt' | 'status'>): Promise<Reservation> {

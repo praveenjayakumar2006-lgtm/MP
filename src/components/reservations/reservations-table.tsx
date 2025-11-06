@@ -131,15 +131,6 @@ export function ReservationsTable() {
       });
       return;
     }
-     if (reservation.status === 'Active') {
-      toast({
-        variant: 'destructive',
-        title: 'Cannot Cancel',
-        description: 'Active reservations cannot be cancelled.',
-        duration: 3000,
-      });
-      return;
-    }
     setReservationToCancel(reservation);
   };
   
@@ -284,7 +275,7 @@ export function ReservationsTable() {
                       <TableCell>
                         <div className="flex flex-col items-start gap-2">
                            <StatusIcon status={reservation.status} />
-                           {reservation.status === 'Upcoming' && (
+                           {(reservation.status === 'Upcoming' || reservation.status === 'Active') && (
                             <Button
                               variant="destructive"
                               size="sm"
