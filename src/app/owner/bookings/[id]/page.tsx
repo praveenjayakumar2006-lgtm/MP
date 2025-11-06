@@ -2,7 +2,7 @@
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, Suspense } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ArrowLeft, Calendar, Car, Clock, Hash, Mail, User as UserIcon, Info, Badge as BadgeIcon, Trash2 } from 'lucide-react';
@@ -26,6 +26,8 @@ import {
 } from '@/components/ui/alert-dialog';
 import type { VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
+import { ParkingMap } from '@/components/dashboard/parking-map';
+import Loading from '@/app/loading';
 
 
 type User = {
@@ -46,7 +48,7 @@ function DetailItem({ icon: Icon, label, value }: { icon: React.ElementType, lab
     )
 }
 
-export default function BookingDetailPage() {
+function BookingDetailContent() {
   const router = useRouter();
   const params = useParams();
   const { id } = params;
@@ -153,7 +155,7 @@ export default function BookingDetailPage() {
 
 
   return (
-    <div className="w-full max-w-md mx-auto mt-6 px-4">
+    <div className="w-full max-w-4xl mx-auto mt-6 px-4">
         <Button onClick={() => router.back()} variant="outline" size="sm" className="mb-4">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back
@@ -175,7 +177,7 @@ export default function BookingDetailPage() {
                     ) : 'User details not found'}
                 </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4 pt-0">
+            <CardContent className="space-y-6 pt-0">
                 <Separator />
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4 pt-2">
                    <DetailItem icon={Hash} label="Slot ID" value={reservation.slotId} />
@@ -183,6 +185,11 @@ export default function BookingDetailPage() {
                    <DetailItem icon={Calendar} label="Start Time" value={format(startTime, 'PPp')} />
                    <DetailItem icon={Clock} label="End Time" value={format(endTime, 'PPp')} />
                    <DetailItem icon={Info} label="Booked On" value={format(new Date(reservation.createdAt), 'PPp')} />
+                </div>
+                <Separator />
+                <div>
+                  <h3 className="text-md font-semibold mb-4 text-center">Parking Layout</h3>
+                  <ParkingMap displayOnlyReservationId={reservation.id} />
                 </div>
             </CardContent>
              <CardFooter className="p-4 pt-2 border-t">
@@ -217,4 +224,12 @@ export default function BookingDetailPage() {
         </AlertDialog>
     </div>
   );
+}
+
+export default function BookingDetailPage() {
+    return (
+        <Suspense fallback={<Loading />}>
+            <BookingDetailContent />
+        </Suspense>
+    )
 }

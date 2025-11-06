@@ -33,7 +33,7 @@ type BookingDetails = {
   duration: string;
 };
 
-export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails }) {
+export function ParkingMap({ bookingDetails, displayOnlyReservationId }: { bookingDetails?: BookingDetails, displayOnlyReservationId?: string }) {
   const reservationsContext = useContext(ReservationsContext);
   const [user, setUser] = useState<User | null>(null);
   
@@ -56,6 +56,11 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
   const { toast } = useToast();
 
   const getConflictingReservation = (slotId: string) => {
+    // If we're displaying a specific reservation, that's the one we care about.
+    if (displayOnlyReservationId) {
+        return reservations.find(res => res.id === displayOnlyReservationId && res.slotId === slotId) || null;
+    }
+    
     if (!bookingDetails) return null;
 
     const [hour, minute] = bookingDetails.startTime.split(':').map(Number);
@@ -76,6 +81,9 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
   }
 
   const handleSlotClick = (slot: ParkingSlot) => {
+    // Disable all click interactions if it's for display only
+    if (displayOnlyReservationId) return;
+    
     const { status, isUser, conflictingReservation } = getSlotStatus(slot.id);
 
     if (status === 'available') {
@@ -96,12 +104,6 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
                 title: 'Action Not Allowed',
                 description: 'This reservation is completed and cannot be cancelled.',
              });
-        } else if (conflictingReservation.status === 'Active') {
-            toast({
-                variant: 'destructive',
-                title: 'Action Not Allowed',
-                description: 'This reservation is active and cannot be cancelled.',
-            });
         } else {
             setReservationToCancel(conflictingReservation);
         }
@@ -158,7 +160,8 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
     const conflictingReservation = getConflictingReservation(slotId);
 
     if (conflictingReservation) {
-        return { status: 'reserved', isUser: conflictingReservation.userId === user?.id, conflictingReservation };
+        const isCurrentUser = displayOnlyReservationId ? conflictingReservation.id === displayOnlyReservationId : conflictingReservation.userId === user?.id;
+        return { status: 'reserved', isUser: isCurrentUser, conflictingReservation };
     }
     
     return { status: 'available', isUser: false, conflictingReservation: null };
@@ -167,12 +170,17 @@ export function ParkingMap({ bookingDetails }: { bookingDetails?: BookingDetails
 
   const getSlotClasses = (slot: ParkingSlot) => {
     const { status, isUser } = getSlotStatus(slot.id);
+    const isDisplayOnly = !!displayOnlyReservationId;
+
     return cn(
       'relative flex flex-col items-center rounded-md border-2 transition-colors pt-1',
       {
-        'bg-green-100 border-green-400 text-green-800 hover:bg-green-200 cursor-pointer': status === 'available',
-        'bg-red-100 border-red-400 text-red-800 cursor-not-allowed opacity-70': status === 'occupied' || (status === 'reserved' && !isUser),
-        'bg-yellow-100 border-yellow-400 text-yellow-800 hover:bg-yellow-200 cursor-pointer': status === 'reserved' && isUser,
+        'bg-green-100 border-green-400 text-green-800': status === 'available',
+        'hover:bg-green-200 cursor-pointer': status === 'available' && !isDisplayOnly,
+        'bg-red-100 border-red-400 text-red-800 opacity-70': status === 'occupied' || (status === 'reserved' && !isUser),
+        'cursor-not-allowed': isDisplayOnly || status === 'occupied' || (status === 'reserved' && !isUser),
+        'bg-yellow-100 border-yellow-400 text-yellow-800': status === 'reserved' && isUser,
+        'hover:bg-yellow-200 cursor-pointer': status === 'reserved' && isUser && !isDisplayOnly,
         'h-16 w-12': slot.type === 'car',
         'h-14 w-10': slot.type === 'bike',
       }
