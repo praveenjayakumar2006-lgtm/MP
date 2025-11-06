@@ -1,14 +1,26 @@
 [
   {
-    "slotId": "C5",
+    "slotId": "B1",
     "vehiclePlate": "TN45FK3453",
-    "startTime": "2025-11-06T09:00:00.000Z",
-    "endTime": "2025-11-06T10:00:00.000Z",
+    "startTime": "2025-11-06T12:00:00.000Z",
+    "endTime": "2025-11-06T13:00:00.000Z",
     "userId": "user_1762418343263",
     "userName": "Vaishali",
     "email": "vaishu@gmail.com",
-    "id": "res_1762418388631_6sf7kuc",
-    "createdAt": "2025-11-06T08:39:48.631Z",
+    "id": "res_1762433930485_eo9u6q0",
+    "createdAt": "2025-11-06T12:58:50.485Z",
+    "status": "Upcoming"
+  },
+  {
+    "slotId": "B5",
+    "vehiclePlate": "TN45FK3453",
+    "startTime": "2025-11-06T13:00:00.000Z",
+    "endTime": "2025-11-06T14:00:00.000Z",
+    "userId": "user_1762418343263",
+    "userName": "Vaishali",
+    "email": "vaishu@gmail.com",
+    "id": "res_1762433979784_9ydmnsg",
+    "createdAt": "2025-11-06T12:59:39.784Z",
     "status": "Upcoming"
   }
 ]

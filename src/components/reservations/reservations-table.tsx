@@ -84,21 +84,7 @@ export function ReservationsTable() {
   const displayReservations = useMemo(() => {
     if (!reservations) return [];
     
-    return reservations.map(res => {
-        const now = new Date();
-        const startTime = new Date(res.startTime);
-        const endTime = new Date(res.endTime);
-        let status: Status;
-
-        if (now > endTime) {
-          status = 'Completed';
-        } else if (now >= startTime && now < endTime) {
-            status = 'Active';
-        } else {
-          status = 'Upcoming';
-        }
-        return { ...res, status };
-      });
+    return reservations;
   }, [reservations]);
 
 
@@ -122,11 +108,11 @@ export function ReservationsTable() {
 
   const handleCancelReservation = (e: React.MouseEvent, reservation: Reservation) => {
     e.stopPropagation();
-    if (reservation.status === 'Completed') {
+    if (reservation.status !== 'Upcoming') {
       toast({
         variant: 'destructive',
-        title: 'Cannot Cancel',
-        description: 'Completed reservations cannot be cancelled.',
+        title: 'Action Not Allowed',
+        description: `Only upcoming reservations can be cancelled. This reservation is ${reservation.status.toLowerCase()}.`,
         duration: 3000,
       });
       return;
@@ -159,10 +145,10 @@ export function ReservationsTable() {
     }
 
     if (reservation.status === 'Active') {
-      toast({
+       toast({
         variant: 'destructive',
         title: 'Action Not Allowed',
-        description: 'This reservation is already active and cannot be modified.',
+        description: 'Active reservations cannot be modified. Please cancel and re-book if needed.',
         duration: 3000,
       });
       return;
@@ -259,7 +245,7 @@ export function ReservationsTable() {
                       onClick={() => handleRowClick(reservation)}
                       className={cn({
                         'cursor-pointer hover:bg-muted/50': reservation.status === 'Upcoming',
-                        'cursor-not-allowed': reservation.status === 'Active' || reservation.status === 'Completed'
+                        'cursor-not-allowed': reservation.status === 'Completed'
                       })}
                     >
                       <TableCell className="font-medium">
