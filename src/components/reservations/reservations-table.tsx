@@ -108,11 +108,11 @@ export function ReservationsTable() {
 
   const handleCancelReservation = (e: React.MouseEvent, reservation: Reservation) => {
     e.stopPropagation();
-    if (reservation.status !== 'Upcoming') {
+    if (reservation.status === 'Completed') {
       toast({
         variant: 'destructive',
         title: 'Action Not Allowed',
-        description: `Only upcoming reservations can be cancelled. This reservation is ${reservation.status.toLowerCase()}.`,
+        description: `Completed reservations cannot be cancelled.`,
         duration: 3000,
       });
       return;
@@ -145,13 +145,8 @@ export function ReservationsTable() {
     }
 
     if (reservation.status === 'Active') {
-       toast({
-        variant: 'destructive',
-        title: 'Action Not Allowed',
-        description: 'Active reservations cannot be modified. Please cancel and re-book if needed.',
-        duration: 3000,
-      });
-      return;
+       setReservationToCancel(reservation);
+       return;
     }
     
     // Only 'Upcoming' reservations can be modified
@@ -244,8 +239,8 @@ export function ReservationsTable() {
                       key={reservation.id}
                       onClick={() => handleRowClick(reservation)}
                       className={cn({
-                        'cursor-pointer hover:bg-muted/50': reservation.status === 'Upcoming',
-                        'cursor-not-allowed': reservation.status === 'Completed'
+                        'cursor-pointer hover:bg-muted/50': reservation.status === 'Upcoming' || reservation.status === 'Active',
+                        'cursor-not-allowed opacity-60': reservation.status === 'Completed'
                       })}
                     >
                       <TableCell className="font-medium">
