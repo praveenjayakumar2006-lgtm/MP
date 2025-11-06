@@ -34,5 +34,29 @@
     "id": "res_1762436271614_jx11xab",
     "createdAt": "2025-11-06T13:37:51.615Z",
     "status": "Upcoming"
+  },
+  {
+    "slotId": "B9",
+    "vehiclePlate": "TN45FK3453",
+    "startTime": "2025-11-11T18:30:00.000Z",
+    "endTime": "2025-11-12T02:30:00.000Z",
+    "userId": "user_1762418343263",
+    "userName": "Vaishali",
+    "email": "vaishu@gmail.com",
+    "id": "res_1762438233029_bz7bz5k",
+    "createdAt": "2025-11-06T14:10:33.029Z",
+    "status": "Upcoming"
+  },
+  {
+    "slotId": "B7",
+    "vehiclePlate": "TN45FK3453",
+    "startTime": "2025-11-11T18:30:00.000Z",
+    "endTime": "2025-11-12T02:30:00.000Z",
+    "userId": "user_1762418343263",
+    "userName": "Vaishali",
+    "email": "vaishu@gmail.com",
+    "id": "res_1762438236805_e8d58zk",
+    "createdAt": "2025-11-06T14:10:36.805Z",
+    "status": "Upcoming"
   }
 ]

@@ -103,7 +103,7 @@ function SelectSpotContent() {
                 )}
 
                 <div className="w-full flex justify-center">
-                    <ParkingMap bookingDetails={bookingDetails} />
+                    <ParkingMap bookingDetails={bookingDetails} size="large" />
                 </div>
             </div>
         </div>
