@@ -3,6 +3,7 @@
 
 import fs from 'fs/promises';
 import path from 'path';
+import { revalidatePath } from 'next/cache';
 
 type Reservation = {
     id: string;
@@ -31,21 +32,27 @@ async function ensureDirectoryExists() {
 
 async function readReservationsFile(): Promise<Reservation[]> {
   try {
-    await fs.access(reservationsFilePath);
+    // By using fs.readFile without fs.access, we ensure we get the latest file content.
     const fileContent = await fs.readFile(reservationsFilePath, 'utf-8');
     if (!fileContent) { // Handle empty file case
         return [];
     }
     return JSON.parse(fileContent);
-  } catch (error) {
-    // If the file doesn't exist, return an empty array
-    return [];
+  } catch (error: any) {
+    if (error.code === 'ENOENT') {
+        // If the file doesn't exist, return an empty array
+        return [];
+    }
+    console.error("Error reading reservations file:", error);
+    throw error; // Re-throw other errors
   }
 }
 
 async function writeReservationsFile(data: Reservation[]): Promise<void> {
   await ensureDirectoryExists();
   await fs.writeFile(reservationsFilePath, JSON.stringify(data, null, 2));
+  revalidatePath('/owner'); // Revalidate the cache for the owner page
+  revalidatePath('/reservations'); // Revalidate for user reservations
 }
 
 export async function getReservations(): Promise<Reservation[]> {

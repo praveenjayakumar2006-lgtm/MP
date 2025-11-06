@@ -1,86 +1,14 @@
 [
   {
-    "slotId": "B6",
-    "vehiclePlate": "TN72FB1234",
-    "startTime": "2025-11-05T14:30:00.000Z",
-    "endTime": "2025-11-05T15:30:00.000Z",
-    "userId": "user_1762352506910",
-    "userName": "Mithun",
-    "email": "727723euec110@skcet.ac.in",
-    "id": "res_1762352692173_cazxq7z",
-    "createdAt": "2025-11-05T14:24:52.173Z",
-    "status": "Completed"
-  },
-  {
-    "slotId": "C3",
-    "vehiclePlate": "TN72FB1234",
-    "startTime": "2025-11-06T05:00:00.000Z",
-    "endTime": "2025-11-06T07:00:00.000Z",
-    "userId": "user_1762352506910",
-    "userName": "Mithun",
-    "email": "727723euec110@skcet.ac.in",
-    "id": "res_1762404264966_v44empb",
-    "createdAt": "2025-11-06T04:44:24.966Z",
-    "status": "Completed"
-  },
-  {
-    "slotId": "B2",
-    "vehiclePlate": "TN34DG45",
-    "startTime": "2025-11-06T05:30:00.000Z",
-    "endTime": "2025-11-06T13:30:00.000Z",
-    "userId": "user_1762352506910",
-    "userName": "Mithun",
-    "email": "727723euec110@skcet.ac.in",
-    "id": "res_1762407039484_tbe069e",
-    "createdAt": "2025-11-06T05:30:39.484Z",
-    "status": "Active"
-  },
-  {
-    "slotId": "B3",
-    "vehiclePlate": "TN45FK3453",
-    "startTime": "2025-11-06T06:00:00.000Z",
-    "endTime": "2025-11-06T11:00:00.000Z",
-    "userId": "user_1762352506910",
-    "userName": "Mithun",
-    "email": "727723euec110@skcet.ac.in",
-    "id": "res_1762407665506_xgxq3fa",
-    "createdAt": "2025-11-06T05:41:05.506Z",
-    "status": "Active"
-  },
-  {
     "slotId": "C5",
     "vehiclePlate": "TN45FK3453",
-    "startTime": "2025-11-06T05:30:00.000Z",
-    "endTime": "2025-11-06T10:30:00.000Z",
-    "userId": "user_1762352506910",
-    "userName": "Mithun",
-    "email": "727723euec110@skcet.ac.in",
-    "id": "res_1762407687317_lq8eiql",
-    "createdAt": "2025-11-06T05:41:27.317Z",
-    "status": "Active"
-  },
-  {
-    "slotId": "B5",
-    "vehiclePlate": "TN45FK3453",
-    "startTime": "2025-11-06T06:30:00.000Z",
-    "endTime": "2025-11-06T08:30:00.000Z",
-    "userId": "user_1762352506910",
-    "userName": "Mithun",
-    "email": "727723euec110@skcet.ac.in",
-    "id": "res_1762417428755_yb08851",
-    "createdAt": "2025-11-06T08:23:48.755Z",
-    "status": "Completed"
-  },
-  {
-    "slotId": "C1",
-    "vehiclePlate": "TN45FK3453",
-    "startTime": "2025-11-06T08:30:00.000Z",
-    "endTime": "2025-11-06T14:30:00.000Z",
-    "userId": "user_1762352506910",
-    "userName": "Mithun",
-    "email": "727723euec110@skcet.ac.in",
-    "id": "res_1762417647279_dm6mtif",
-    "createdAt": "2025-11-06T08:27:27.279Z",
-    "status": "Active"
+    "startTime": "2025-11-06T09:00:00.000Z",
+    "endTime": "2025-11-06T10:00:00.000Z",
+    "userId": "user_1762418343263",
+    "userName": "Vaishali",
+    "email": "vaishu@gmail.com",
+    "id": "res_1762418388631_6sf7kuc",
+    "createdAt": "2025-11-06T08:39:48.631Z",
+    "status": "Upcoming"
   }
 ]

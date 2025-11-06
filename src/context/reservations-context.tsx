@@ -10,8 +10,8 @@ import { addHours, parseISO } from 'date-fns';
 
 interface ReservationsContextType {
   reservations: Reservation[];
-  addReservation: (reservation: Omit<Reservation, 'id' | 'createdAt' | 'updatedAt' | 'userId' | 'status' | 'userName' | 'email'> & { startTime: Date, endTime: Date }) => void;
-  removeReservation: (reservationId: string) => void;
+  addReservation: (reservation: Omit<Reservation, 'id' | 'createdAt' | 'updatedAt' | 'userId' | 'status' | 'userName' | 'email'> & { startTime: Date, endTime: Date }) => Promise<void>;
+  removeReservation: (reservationId: string) => Promise<void>;
   isLoading: boolean;
   isClient: boolean;
 }
@@ -36,7 +36,6 @@ export const ReservationsProvider: React.FC<{ children: ReactNode }> = ({ childr
 
   const fetchReservations = useCallback(async () => {
     try {
-      // Always fetch all reservations. Filtering will be done in components.
       const fetchedReservations = await getReservations();
       setReservations(fetchedReservations as Reservation[]);
     } catch (error) {
@@ -76,7 +75,6 @@ export const ReservationsProvider: React.FC<{ children: ReactNode }> = ({ childr
       return;
     }
     
-    // Find if there's an existing reservation for the same slot and time by the same user
     const existingReservation = reservations.find(
       (r) => r.slotId === reservation.slotId && r.userId === user.id
     );
@@ -110,11 +108,16 @@ export const ReservationsProvider: React.FC<{ children: ReactNode }> = ({ childr
   };
 
   const removeReservation = async (reservationId: string) => {
+    // Optimistic UI update
+    setReservations(prev => prev.filter(r => r.id !== reservationId));
     try {
       await deleteReservation(reservationId);
-      await fetchReservations(); // Refetch after deleting
+      // The revalidation in the server action handles the refetch, but we can do it here too for good measure
+      await fetchReservations();
     } catch (error) {
        console.error("Error deleting reservation: ", error);
+      // Revert optimistic update on failure
+      await fetchReservations();
       toast({
         variant: 'destructive',
         title: 'Cancellation Error',
