@@ -187,7 +187,7 @@ function BookingDetailContent() {
                    <DetailItem icon={Info} label="Booked On" value={format(new Date(reservation.createdAt), 'PPp')} />
                 </div>
                 <Separator />
-                <div>
+                <div className="mt-4">
                   <h3 className="text-md font-semibold mb-4 text-center">Parking Layout</h3>
                   <ParkingMap displayOnlyReservationId={reservation.id} />
                 </div>
