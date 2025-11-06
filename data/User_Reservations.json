@@ -36,18 +36,6 @@
     "status": "Upcoming"
   },
   {
-    "slotId": "B9",
-    "vehiclePlate": "TN45FK3453",
-    "startTime": "2025-11-11T18:30:00.000Z",
-    "endTime": "2025-11-12T02:30:00.000Z",
-    "userId": "user_1762418343263",
-    "userName": "Vaishali",
-    "email": "vaishu@gmail.com",
-    "id": "res_1762438233029_bz7bz5k",
-    "createdAt": "2025-11-06T14:10:33.029Z",
-    "status": "Upcoming"
-  },
-  {
     "slotId": "B7",
     "vehiclePlate": "TN45FK3453",
     "startTime": "2025-11-11T18:30:00.000Z",
@@ -69,42 +57,6 @@
     "email": "vaishu@gmail.com",
     "id": "res_1762438356803_iaoglr4",
     "createdAt": "2025-11-06T14:12:36.804Z",
-    "status": "Upcoming"
-  },
-  {
-    "slotId": "B4",
-    "vehiclePlate": "TN45FK3453",
-    "startTime": "2025-11-11T18:30:00.000Z",
-    "endTime": "2025-11-12T06:30:00.000Z",
-    "userId": "user_1762438388512",
-    "userName": "Harsha",
-    "email": "harsha@gmail.com",
-    "id": "res_1762438503066_br2m3is",
-    "createdAt": "2025-11-06T14:15:03.066Z",
-    "status": "Upcoming"
-  },
-  {
-    "slotId": "B5",
-    "vehiclePlate": "TN45FK3453",
-    "startTime": "2025-11-11T18:30:00.000Z",
-    "endTime": "2025-11-12T06:30:00.000Z",
-    "userId": "user_1762438388512",
-    "userName": "Harsha",
-    "email": "harsha@gmail.com",
-    "id": "res_1762438506345_vxviccn",
-    "createdAt": "2025-11-06T14:15:06.345Z",
-    "status": "Upcoming"
-  },
-  {
-    "slotId": "B6",
-    "vehiclePlate": "TN45FK3453",
-    "startTime": "2025-11-11T18:30:00.000Z",
-    "endTime": "2025-11-12T06:30:00.000Z",
-    "userId": "user_1762438388512",
-    "userName": "Harsha",
-    "email": "harsha@gmail.com",
-    "id": "res_1762438507171_t9w9saf",
-    "createdAt": "2025-11-06T14:15:07.171Z",
     "status": "Upcoming"
   }
 ]
