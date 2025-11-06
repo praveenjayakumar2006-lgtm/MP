@@ -71,10 +71,16 @@ export function BookingsTable() {
   
   const confirmDelete = () => {
     if (!reservationToDelete || !removeReservation) return;
+    
+    const isCompleted = reservationToDelete.status === 'Completed';
+    const actionText = isCompleted ? 'Deleted' : 'Cancelled';
+    const actionTitle = `Reservation ${actionText}`;
+    const actionDescription = `The booking for slot ${reservationToDelete.slotId} has been successfully ${actionText.toLowerCase()}.`;
+
     removeReservation(reservationToDelete.id);
     toast({
-        title: 'Reservation Deleted',
-        description: `The booking for slot ${reservationToDelete.slotId} has been successfully deleted.`,
+        title: actionTitle,
+        description: actionDescription,
     });
     setReservationToDelete(null);
   };
@@ -186,6 +192,8 @@ export function BookingsTable() {
               {!isLoading && (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {filteredReservations && filteredReservations.map((reservation) => {
+                      const isCompleted = reservation.status === 'Completed';
+                      const actionText = isCompleted ? 'Delete' : 'Cancel';
                       return (
                           <Card key={reservation.id} className="flex flex-col text-sm p-3">
                             <CardHeader className="p-1 flex-row justify-between items-center space-y-0">
@@ -222,7 +230,7 @@ export function BookingsTable() {
                                 </Button>
                                 <Button size="sm" variant="destructive" onClick={(e) => handleDeleteClick(e, reservation)}>
                                     <Trash2 className="mr-2 h-4 w-4" />
-                                    Delete
+                                    {actionText}
                                 </Button>
                               </CardFooter>
                           </Card>
@@ -241,19 +249,19 @@ export function BookingsTable() {
        <AlertDialog open={!!reservationToDelete} onOpenChange={(open) => !open && setReservationToDelete(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Reservation?</AlertDialogTitle>
+            <AlertDialogTitle>{reservationToDelete?.status === 'Completed' ? 'Delete' : 'Cancel'} Reservation?</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to permanently delete this reservation for slot{' '}
+              Are you sure you want to permanently {reservationToDelete?.status === 'Completed' ? 'delete' : 'cancel'} this reservation for slot{' '}
               <span className="font-bold">{reservationToDelete?.slotId}</span>? This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>Back</AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmDelete}
               asChild
             >
-              <Button variant="destructive">Yes, Delete</Button>
+              <Button variant="destructive">Yes, {reservationToDelete?.status === 'Completed' ? 'Delete' : 'Cancel'}</Button>
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
