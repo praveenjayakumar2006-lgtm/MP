@@ -57,7 +57,7 @@ function OwnerDashboard() {
                         <CardHeader className="pb-4">
                            <div className="flex items-center gap-4">
                              <CalendarCheck className="h-8 w-8 text-green-500" />
-                             <CardTitle className="text-xl">User Bookings</CardTitle>
+                             <CardTitle className="text-xl">Bookings</CardTitle>
                            </div>
                         </CardHeader>
                         <CardContent>
@@ -73,7 +73,7 @@ function OwnerDashboard() {
                         <CardHeader className="pb-4">
                            <div className="flex items-center gap-4">
                              <FileText className="h-8 w-8 text-destructive" />
-                             <CardTitle className="text-xl">Violation Reports</CardTitle>
+                             <CardTitle className="text-xl">Reports</CardTitle>
                            </div>
                         </CardHeader>
                         <CardContent>
@@ -89,7 +89,7 @@ function OwnerDashboard() {
                         <CardHeader className="pb-4">
                             <div className="flex items-center gap-4">
                                 <MessageSquare className="h-8 w-8 text-blue-500" />
-                                <CardTitle className="text-xl">User Feedback</CardTitle>
+                                <CardTitle className="text-xl">Feedback</CardTitle>
                             </div>
                         </CardHeader>
                         <CardContent>
