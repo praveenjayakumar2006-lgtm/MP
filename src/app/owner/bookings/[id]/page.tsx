@@ -121,7 +121,7 @@ function BookingDetailContent() {
 
   if (isLoading || !reservation) {
     return (
-        <div className="w-full max-w-md mx-auto mt-6 px-4">
+        <div className="w-full max-w-4xl mx-auto mt-6 px-4 pb-6">
             <Button onClick={() => router.back()} variant="outline" size="sm" className="mb-4">
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 Back
@@ -155,7 +155,7 @@ function BookingDetailContent() {
 
 
   return (
-    <div className="w-full max-w-4xl mx-auto mt-6 px-4">
+    <div className="w-full max-w-4xl mx-auto mt-6 px-4 pb-6">
         <Button onClick={() => router.back()} variant="outline" size="sm" className="mb-4">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back
