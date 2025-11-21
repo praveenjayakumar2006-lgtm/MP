@@ -2,7 +2,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Car, Menu, ChevronDown, Mail, Phone, LogOut, Users } from 'lucide-react';
+import { Car, Menu, ChevronDown, Mail, Phone, LogOut, Users, FileText as FinesIcon } from 'lucide-react';
 import {
   Sheet,
   SheetContent,
@@ -30,12 +30,14 @@ const navItems = [
   { href: '/booking', label: 'Booking' },
   { href: '/violations', label: 'Report a Violation' },
   { href: '/reservations', label: 'My Bookings' },
+  { href: '/fines', label: 'Fines' },
   { href: '/feedback', label: 'Feedback' },
   { href: '/help', label: 'Help' },
 ];
 
 const otherItems = [
     { href: '/reservations', label: 'My Bookings' },
+    { href: '/fines', label: 'Fines' },
     { href: '/feedback', label: 'Feedback' },
     { href: '/help', label: 'Help' },
 ];
