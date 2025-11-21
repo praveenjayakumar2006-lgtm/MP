@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
@@ -11,7 +10,6 @@ import { getReservations } from '@/app/actions/reservations';
 import type { Reservation, User } from '@/lib/types';
 import { format } from 'date-fns';
 import Image from 'next/image';
-import { Separator } from '@/components/ui/separator';
 
 type Violation = {
   id: string;
@@ -123,7 +121,6 @@ export default function FinesPage() {
                     Review any parking violations associated with your vehicles.
                 </p>
             </CardHeader>
-            <Separator />
             <CardContent className="p-4 md:p-6">
             {isLoading && renderSkeletons()}
             {!isLoading && sortedFines.length > 0 && (
