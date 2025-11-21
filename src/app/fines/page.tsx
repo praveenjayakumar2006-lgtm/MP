@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
@@ -120,9 +121,9 @@ export default function FinesPage() {
                 <div className="inline-flex items-center gap-2 justify-center">
                     <CardTitle className="text-3xl">My Fines</CardTitle>
                 </div>
-                <CardDescription>
+                <p className="text-muted-foreground">
                     Review any parking violations associated with your vehicles.
-                </CardDescription>
+                </p>
             </CardHeader>
             <Separator />
             <CardContent className="p-4 md:p-6">
