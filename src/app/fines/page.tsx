@@ -116,11 +116,9 @@ export default function FinesPage() {
 
   return (
     <div className="w-full flex-1 flex flex-col items-center">
-        <Card className="w-full max-w-7xl">
+        <Card className="w-full max-w-7xl border-0 bg-transparent shadow-none">
             <CardHeader className="text-center">
-                <div className="inline-flex items-center gap-2 justify-center">
-                    <CardTitle className="text-3xl">My Fines</CardTitle>
-                </div>
+                <CardTitle className="text-3xl">My Fines</CardTitle>
                 <p className="text-muted-foreground">
                     Review any parking violations associated with your vehicles.
                 </p>
@@ -168,9 +166,13 @@ export default function FinesPage() {
                 </div>
             )}
             {!isLoading && sortedFines.length === 0 && (
-                <div className="text-center p-8 text-muted-foreground bg-card rounded-lg">
-                    You have no outstanding fines. Great job!
-                </div>
+                <Card>
+                    <CardContent className="pt-6">
+                        <div className="text-center p-8 text-muted-foreground">
+                            You have no outstanding fines. Great job!
+                        </div>
+                    </CardContent>
+                </Card>
             )}
             </CardContent>
         </Card>
