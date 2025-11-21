@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
@@ -11,7 +10,6 @@ import { getReservations } from '@/app/actions/reservations';
 import type { Reservation, User } from '@/lib/types';
 import { format } from 'date-fns';
 import Image from 'next/image';
-import { FileWarning } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 
 type Violation = {
@@ -120,7 +118,6 @@ export default function FinesPage() {
         <Card className="w-full max-w-7xl">
             <CardHeader className="text-center">
                 <div className="inline-flex items-center gap-2 justify-center">
-                    <FileWarning className="h-8 w-8 text-primary" />
                     <CardTitle className="text-3xl">My Fines</CardTitle>
                 </div>
                 <CardDescription>
