@@ -5,8 +5,6 @@ import React, { createContext, useState, ReactNode, useEffect, useCallback } fro
 import type { Reservation, User } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 import { getReservations, saveReservation, deleteReservation } from '@/app/actions/reservations';
-import { addHours, parseISO } from 'date-fns';
-
 
 interface ReservationsContextType {
   reservations: Reservation[];
@@ -73,18 +71,6 @@ export const ReservationsProvider: React.FC<{ children: ReactNode }> = ({ childr
         description: 'You must be logged in to make a reservation.',
       });
       return;
-    }
-    
-    const existingReservation = reservations.find(
-      (r) => r.slotId === reservation.slotId && r.userId === user.id
-    );
-
-    if (existingReservation) {
-       try {
-        await deleteReservation(existingReservation.id);
-      } catch (error) {
-         console.error("Error deleting existing reservation: ", error);
-      }
     }
     
     try {
