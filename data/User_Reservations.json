@@ -34,5 +34,41 @@
     "id": "res_1764160894791_g29sf55",
     "createdAt": "2025-11-26T12:41:34.791Z",
     "status": "Upcoming"
+  },
+  {
+    "slotId": "B1",
+    "vehiclePlate": "TN72FB1234",
+    "startTime": "2025-11-26T18:00:00.000Z",
+    "endTime": "2025-11-26T22:00:00.000Z",
+    "userId": "user_1763746958285",
+    "userName": "Mithun",
+    "email": "mithun@gmail.com",
+    "id": "res_1764180406036_xxinlo7",
+    "createdAt": "2025-11-26T18:06:46.036Z",
+    "status": "Active"
+  },
+  {
+    "slotId": "B2",
+    "vehiclePlate": "TN72FB1234",
+    "startTime": "2025-11-26T18:00:00.000Z",
+    "endTime": "2025-11-26T22:00:00.000Z",
+    "userId": "user_1763746958285",
+    "userName": "Mithun",
+    "email": "mithun@gmail.com",
+    "id": "res_1764180408895_g7urd0i",
+    "createdAt": "2025-11-26T18:06:48.895Z",
+    "status": "Active"
+  },
+  {
+    "slotId": "B3",
+    "vehiclePlate": "TN72FB1234",
+    "startTime": "2025-11-26T18:00:00.000Z",
+    "endTime": "2025-11-26T22:00:00.000Z",
+    "userId": "user_1763746958285",
+    "userName": "Mithun",
+    "email": "mithun@gmail.com",
+    "id": "res_1764180412373_g9aax1w",
+    "createdAt": "2025-11-26T18:06:52.374Z",
+    "status": "Active"
   }
 ]
