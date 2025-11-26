@@ -1,3 +1,4 @@
+\
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
@@ -144,7 +145,7 @@ export default function FinesPage() {
                                 <Badge variant={fine.violationType === 'overstaying' ? 'destructive' : 'secondary'}>
                                     {fine.violationType.replace('_', ' ')}
                                 </Badge>
-                                <p className="font-semibold text-lg text-destructive">${fine.fineAmount.toFixed(2)}</p>
+                                <p className="font-semibold text-lg text-destructive">₹ {fine.fineAmount.toFixed(0)}</p>
                             </div>
                             <CardTitle className="text-xl">{formatLicensePlate(fine.licensePlate)}</CardTitle>
                             <p className="text-muted-foreground">
@@ -156,7 +157,7 @@ export default function FinesPage() {
                         <p className="text-xs text-muted-foreground">
                             Issued on {format(new Date(fine.createdAt), 'PPP')}
                         </p>
-                        <Button size="sm" disabled>Pay Fine</Button>
+                        <Button size="sm">Pay Fine</Button>
                     </CardFooter>
                     </Card>
                 ))}
