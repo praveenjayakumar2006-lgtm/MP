@@ -18,41 +18,34 @@ type Reservation = {
     createdAt: string;
 };
 
-// Use a permanent location within the project
 const dataDir = path.join(process.cwd(), 'data');
 const reservationsFilePath = path.join(dataDir, 'User_Reservations.json');
 
-async function ensureDirectoryExists() {
-  try {
-    await fs.mkdir(dataDir, { recursive: true });
-  } catch (error) {
-    console.error("Error creating data directory:", error);
-  }
-}
-
 async function readReservationsFile(): Promise<Reservation[]> {
   try {
-    // By using fs.readFile without fs.access, we ensure we get the latest file content.
+    await fs.access(reservationsFilePath);
     const fileContent = await fs.readFile(reservationsFilePath, 'utf-8');
-    if (!fileContent) { // Handle empty file case
-        return [];
-    }
-    return JSON.parse(fileContent);
-  } catch (error: any) {
-    if (error.code === 'ENOENT') {
-        // If the file doesn't exist, return an empty array
-        return [];
-    }
-    console.error("Error reading reservations file:", error);
-    throw error; // Re-throw other errors
+    // If file is empty, parsing will fail, so we return an empty array.
+    return fileContent ? JSON.parse(fileContent) : [];
+  } catch (error) {
+    // If file doesn't exist or another error occurs, return an empty array.
+    return [];
   }
 }
 
 async function writeReservationsFile(data: Reservation[]): Promise<void> {
-  await ensureDirectoryExists();
-  await fs.writeFile(reservationsFilePath, JSON.stringify(data, null, 2));
-  revalidatePath('/owner'); // Revalidate the cache for the owner page
-  revalidatePath('/reservations'); // Revalidate for user reservations
+    // Critical safety check: Ensure the file path is correct before writing.
+    if (!reservationsFilePath.endsWith('User_Reservations.json')) {
+        console.error(`CRITICAL: Aborting write operation due to incorrect file path: ${reservationsFilePath}`);
+        return;
+    }
+    await fs.writeFile(reservationsFilePath, JSON.stringify(data, null, 2));
+    
+    // Revalidate paths to ensure UI updates across the app
+    revalidatePath('/owner');
+    revalidatePath('/reservations');
+    revalidatePath('/select-spot');
+    revalidatePath('/');
 }
 
 export async function getReservations(): Promise<Reservation[]> {
@@ -62,11 +55,10 @@ export async function getReservations(): Promise<Reservation[]> {
   if (!reservations) return [];
 
   let hasChanges = false;
-  // This is where we will dynamically update the status
   const updatedReservations = reservations.map(res => {
     const startTime = new Date(res.startTime);
     const endTime = new Date(res.endTime);
-    let currentStatus: 'Upcoming' | 'Active' | 'Completed' = res.status;
+    const currentStatus = res.status;
     let newStatus: 'Upcoming' | 'Active' | 'Completed';
 
     if (now > endTime) {
@@ -84,7 +76,6 @@ export async function getReservations(): Promise<Reservation[]> {
     return { ...res, status: newStatus };
   });
   
-  // If any status has changed, write the whole updated file back
   if (hasChanges) {
     await writeReservationsFile(updatedReservations);
   }
