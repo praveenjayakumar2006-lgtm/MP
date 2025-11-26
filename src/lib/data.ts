@@ -1,5 +1,6 @@
 
 import type { ParkingSlot } from './types';
+import parkedSlots from '../../data/parked.json';
 
 export const parkingSlots: ParkingSlot[] = [
   // Car slots
@@ -23,4 +24,4 @@ export const parkingSlots: ParkingSlot[] = [
   { id: 'B12', type: 'bike', status: 'occupied' },
 ];
 
-    
+export const parked: string[] = parkedSlots;

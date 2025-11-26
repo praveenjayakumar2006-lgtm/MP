@@ -16,7 +16,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
-import { parkingSlots as defaultSlots } from '@/lib/data';
+import { parkingSlots as defaultSlots, parked } from '@/lib/data';
 import type { ParkingSlot, Reservation, User } from '@/lib/types';
 import { Separator } from '@/components/ui/separator';
 import { motion } from 'framer-motion';
@@ -67,7 +67,9 @@ export function ParkingMap({ bookingDetails, displayOnlyReservation, size = 'def
         searchStartTime.setHours(hour, minute);
         searchEndTime = addHours(searchStartTime, parseInt(bookingDetails.duration, 10));
     } else {
-        return null;
+        // For the dashboard view, check for reservations active right now.
+        searchStartTime = new Date();
+        searchEndTime = new Date();
     }
 
     return reservations.find(res => {
@@ -159,6 +161,25 @@ export function ParkingMap({ bookingDetails, displayOnlyReservation, size = 'def
   };
   
   const getSlotStatus = (slotId: string): { status: 'available' | 'occupied' | 'reserved', isUser: boolean, conflictingReservation: Reservation | null } => {
+    let dateToCheck: Date;
+
+    if (bookingDetails) {
+      dateToCheck = parseISO(bookingDetails.date);
+    } else if (displayOnlyReservation) {
+      dateToCheck = new Date(displayOnlyReservation.startTime);
+    } else {
+      dateToCheck = new Date();
+    }
+
+    const isTargetDay =
+      dateToCheck.getFullYear() === 2025 &&
+      dateToCheck.getMonth() === 10 && // Month is 0-indexed (10 is November)
+      dateToCheck.getDate() === 26;
+
+    if (isTargetDay && parked.includes(slotId)) {
+      return { status: 'occupied', isUser: false, conflictingReservation: null };
+    }
+
     const conflictingReservation = getConflictingReservation(slotId);
 
     if (conflictingReservation) {
