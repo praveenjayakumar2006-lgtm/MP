@@ -1,4 +1,3 @@
-
 'use client';
 
 import Link from 'next/link';
@@ -52,6 +51,20 @@ export default function LoginPage() {
   });
 
   async function onSubmit(values: LoginFormValues) {
+    // --- NEW PROJECT LOGIN CONDITION ---
+    if (values.email === 'project@gmail.com' && values.password === '123456') {
+      localStorage.setItem('role', 'user');
+      localStorage.setItem('user', JSON.stringify({ email: 'project@gmail.com', password: '123456', username: 'Project User', id: 'project_user_id' }));
+      toast({
+        title: 'Project Login Successful',
+        description: 'Welcome, Project User!',
+        duration: 2000,
+      });
+      router.replace('/home');
+      return;
+    }
+    // --- END OF NEW PROJECT LOGIN CONDITION ---
+
     if (values.role === 'owner') {
       if (values.email === 'owner@gmail.com' && values.password === '123456') {
         localStorage.setItem('role', 'owner');
